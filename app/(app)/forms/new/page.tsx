@@ -2,7 +2,6 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -58,6 +57,34 @@ export default function NewFormPage() {
       }
     } catch (error) {
       console.error("Error:", error);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleManualCreate = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch("/api/forms/create-manual", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Redirect to the edit page
+        router.push(`/forms/${result.formId}/edit`);
+      } else {
+        console.error("Error creating form:", result.error);
+        alert("Error creating form. Please try again.");
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error("Error creating form:", error);
+      alert("Error creating form. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -129,16 +156,22 @@ export default function NewFormPage() {
             )}
           </Button>
           
-          {/* Manual Form Builder Link */}
+          {/* Manual Form Builder Button */}
           <div className="text-center mt-4">
             <Button
               variant="ghost"
-              asChild
+              onClick={handleManualCreate}
+              disabled={isSubmitting}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              <Link href="/forms/builder">
-                or create form manually
-              </Link>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "or create form manually"
+              )}
             </Button>
           </div>
         </form>
