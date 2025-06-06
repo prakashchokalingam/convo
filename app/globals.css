@@ -1,0 +1,387 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 270 4.8% 95.9%;
+    --secondary-foreground: 270 5.9% 10%;
+    --muted: 270 4.8% 95.9%;
+    --muted-foreground: 270 3.8% 46.1%;
+    --accent: 270 4.8% 95.9%;
+    --accent-foreground: 270 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 270 5.9% 90%;
+    --input: 270 5.9% 90%;
+    --ring: 262.1 83.3% 57.8%;
+    --radius: 0.75rem;
+    
+    /* Additional semantic colors for better dark mode support */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+    --info: 221 83% 53%;
+    --info-foreground: 0 0% 98%;
+    
+    /* Surface colors for layered UI */
+    --surface: 0 0% 98%;
+    --surface-foreground: 240 10% 3.9%;
+    --surface-elevated: 0 0% 100%;
+    --surface-hover: 270 4.8% 95.9%;
+    
+    /* Interactive states */
+    --hover: 270 4.8% 93%;
+    --active: 270 4.8% 90%;
+    --focus: 262.1 83.3% 57.8%;
+    
+    /* Sidebar and navigation */
+    --sidebar: 0 0% 98%;
+    --sidebar-foreground: 240 10% 3.9%;
+    --sidebar-border: 270 5.9% 90%;
+    
+    /* Form specific colors */
+    --form-background: 0 0% 100%;
+    --form-field-background: 0 0% 100%;
+    --form-field-border: 270 5.9% 90%;
+    --form-field-hover: 270 4.8% 95.9%;
+    
+    /* Status colors */
+    --status-active: 142 76% 36%;
+    --status-inactive: 270 3.8% 46.1%;
+    --status-pending: 38 92% 50%;
+    --status-error: 0 84.2% 60.2%;
+  }
+
+  .dark {
+    --background: 249 22% 3.9%;
+    --foreground: 0 0% 95%;
+    --card: 258 18% 8%;
+    --card-foreground: 0 0% 95%;
+    --popover: 249 22% 3.9%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 270 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 262 5% 14%;
+    --muted-foreground: 270 5% 64.9%;
+    --accent: 261 6.5% 15.1%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+    --border: 270 3.7% 15.9%;
+    --input: 270 3.7% 15.9%;
+    --ring: 263.4 70% 50.4%;
+    
+    /* Additional semantic colors for dark mode */
+    --success: 142 69% 58%;
+    --success-foreground: 142 84% 5%;
+    --warning: 38 95% 70%;
+    --warning-foreground: 38 84% 5%;
+    --info: 221 91% 91%;
+    --info-foreground: 221 84% 5%;
+    
+    /* Surface colors for layered UI */
+    --surface: 258 18% 6%;
+    --surface-foreground: 0 0% 95%;
+    --surface-elevated: 258 18% 8%;
+    --surface-hover: 270 3.7% 12%;
+    
+    /* Interactive states */
+    --hover: 270 3.7% 18%;
+    --active: 270 3.7% 22%;
+    --focus: 263.4 70% 50.4%;
+    
+    /* Sidebar and navigation */
+    --sidebar: 258 18% 6%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-border: 270 3.7% 15.9%;
+    
+    /* Form specific colors */
+    --form-background: 258 18% 6%;
+    --form-field-background: 270 3.7% 15.9%;
+    --form-field-border: 270 3.7% 20%;
+    --form-field-hover: 270 3.7% 18%;
+    
+    /* Status colors */
+    --status-active: 142 69% 58%;
+    --status-inactive: 270 5% 64.9%;
+    --status-pending: 38 95% 70%;
+    --status-error: 0 62.8% 30.6%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .form-field {
+    @apply space-y-1.5;
+  }
+  
+  .glass-card {
+    @apply bg-surface/80 backdrop-blur-sm border border-border/30 shadow-lg;
+  }
+  
+  .gradient-bg {
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(var(--surface)) 50%,
+      hsl(var(--background)) 100%);
+  }
+  
+  /* Interactive elements */
+  .interactive-hover {
+    @apply hover:bg-hover transition-colors duration-200;
+  }
+  
+  .interactive-active {
+    @apply active:bg-active;
+  }
+  
+  /* Form components */
+  .form-container {
+    @apply bg-form-background border border-form-field-border rounded-lg;
+  }
+  
+  .form-field-container {
+    @apply bg-form-field-background border border-form-field-border hover:border-form-field-hover transition-colors;
+  }
+  
+  /* Status indicators */
+  .status-active {
+    @apply bg-status-active text-white;
+  }
+  
+  .status-inactive {
+    @apply bg-status-inactive text-white;
+  }
+  
+  .status-pending {
+    @apply bg-status-pending text-black;
+  }
+  
+  .status-error {
+    @apply bg-status-error text-white;
+  }
+  
+  /* Navigation components */
+  .nav-item {
+    @apply text-muted-foreground hover:text-foreground hover:bg-hover rounded-md transition-colors;
+  }
+  
+  .nav-item-active {
+    @apply bg-primary text-primary-foreground;
+  }
+  
+  /* Field library styling */
+  .field-item {
+    @apply border border-border bg-card hover:border-primary/30 hover:bg-surface-hover transition-all duration-200 rounded-lg;
+  }
+  
+  .field-item-disabled {
+    @apply cursor-not-allowed opacity-50 bg-muted;
+  }
+  
+  .field-item-icon {
+    @apply bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors;
+  }
+  
+  /* Empty state styling */
+  .empty-state-icon {
+    @apply bg-gradient-to-br from-primary/10 to-primary/20 text-primary;
+  }
+  
+  .empty-state-step {
+    @apply bg-primary/10 text-primary;
+  }
+  
+  .empty-state-cta {
+    @apply bg-primary/10 text-primary border border-primary/20;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Grid pattern for hero section */
+  .bg-grid-pattern {
+    background-image: radial-gradient(circle at 1px 1px, hsl(var(--border)) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+  
+  /* Animated gradient backgrounds */
+  .animate-gradient {
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+  }
+  
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
+  /* Smooth fade-in animations */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  
+  .animate-fade-in-delay-1 {
+    animation: fadeIn 0.6s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+  
+  .animate-fade-in-delay-2 {
+    animation: fadeIn 0.6s ease-out 0.4s forwards;
+    opacity: 0;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    transition: transform 0.2s ease-out;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Glass morphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .dark .glass {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Text gradient utilities */
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary)) 60%, hsl(var(--foreground)));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* Enhanced shadows */
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.3);
+  }
+  
+  .shadow-soft {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Button enhancements */
+  .btn-glow {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.4);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .btn-glow:hover {
+    box-shadow: 0 0 30px rgba(var(--primary), 0.6);
+  }
+  
+  /* Loading states */
+  .skeleton {
+    background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted-foreground)) 50%, hsl(var(--muted)) 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+  
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+  
+  /* Responsive utilities */
+  .container-narrow {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .container-wide {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground));
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary));
+  }
+}
