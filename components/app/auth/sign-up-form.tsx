@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useSignUp } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { useWorkspaceSetup } from '@/hooks/use-workspace-setup';
-import { buildContextUrl } from '@/lib/subdomain';
+import { getWorkspaceUrl, getMarketingUrl } from '@/lib/context';
 import { Button } from '@/components/shared/ui/button';
 import { Input } from '@/components/shared/ui/input';
 import { Label } from '@/components/shared/ui/label';
@@ -63,13 +63,12 @@ export function SignUpForm() {
         });
 
         if (workspaceResult) {
-          // Step 4: Redirect to workspace with new subdomain URL structure
-          const workspaceUrl = buildContextUrl('app', `/${workspaceResult.workspaceSlug}?welcome=true`);
+          // Step 4: Redirect to workspace with welcome flag
+          const workspaceUrl = getWorkspaceUrl(workspaceResult.workspaceSlug) + '?welcome=true';
           router.push(workspaceUrl);
         } else {
-          // Fallback: redirect to home (workspace should be created but might have failed)
-          const homeUrl = buildContextUrl('marketing', '/');
-          router.push(homeUrl);
+          // Fallback: redirect to marketing home
+          router.push(getMarketingUrl('/'));
         }
       } else {
         // Handle cases where verification is required

@@ -36,7 +36,7 @@ import {
 
 interface WorkspaceSwitcherProps {
   currentWorkspace: WorkspaceWithRole;
-  availableWorkspaces: WorkspaceWithRole[];
+  availableWorkspaces?: WorkspaceWithRole[]; // Make optional
   onCreateWorkspace?: () => void;
   usage?: {
     workspaces: {
@@ -64,7 +64,7 @@ const roleColors = {
 
 export function WorkspaceSwitcher({ 
   currentWorkspace, 
-  availableWorkspaces,
+  availableWorkspaces = [], // Add default empty array
   onCreateWorkspace,
   usage
 }: WorkspaceSwitcherProps) {

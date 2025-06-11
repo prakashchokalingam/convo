@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { forms, responses, workspaceMembers, workspaces } from "@/lib/db/schema";
+import { createId } from "@paralleldrive/cuid2";
+import { db } from "@/drizzle/db";
+import { forms, responses, workspaceMembers, workspaces } from "@/drizzle/schema";
 import { eq, count, desc, and } from "drizzle-orm";
 
 /**
@@ -251,10 +252,14 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Generate unique ID for the form
+    const formId = createId();
+
     // Create the form
     const [newForm] = await db
       .insert(forms)
       .values({
+        id: formId,
         workspaceId,
         createdBy: userId,
         title,

@@ -1,15 +1,14 @@
-import { getSubdomainContext } from '@/lib/subdomain';
-import { LandingPage } from '@/components/marketing/landing-page';
+import { redirect } from 'next/navigation';
 
+/**
+ * Root page - redirects to marketing
+ * 
+ * This ensures that visiting the root of the app (/) 
+ * redirects users to the marketing site (/marketing).
+ * 
+ * In production, convo.ai will rewrite to /marketing automatically,
+ * but this redirect ensures consistency across environments.
+ */
 export default function RootPage() {
-  // For now, just render the original landing page
-  // The route group system will handle context routing
-  return <LandingPage />;
-}
-
-export function generateMetadata() {
-  return {
-    title: 'Convo - Build AI-Powered Conversational Forms',
-    description: 'Create engaging conversational forms that increase completion rates by 40-60%. Transform boring surveys into engaging conversations.',
-  };
+  redirect('/marketing');
 }

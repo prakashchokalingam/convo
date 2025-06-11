@@ -14,13 +14,27 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ workspace }: AppHeaderProps) {
-  const [availableWorkspaces, setAvailableWorkspaces] = useState<WorkspaceWithRole[]>([workspace]);
+  const [availableWorkspaces, setAvailableWorkspaces] = useState<WorkspaceWithRole[]>([]);
   const [usage, setUsage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Ensure workspace is valid
+  if (!workspace) {
+    return (
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-center">
+          <div>Loading...</div>
+        </div>
+      </header>
+    );
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Always start with current workspace to prevent loading states
+        setAvailableWorkspaces([workspace]);
+        
         // Fetch all workspaces and usage data
         const [workspacesRes, usageRes] = await Promise.all([
           fetch('/api/workspaces'),
@@ -32,8 +46,11 @@ export function AppHeader({ workspace }: AppHeaderProps) {
           usageRes.json()
         ]);
 
-        if (workspacesData.success) {
+        if (workspacesData.success && Array.isArray(workspacesData.workspaces)) {
           setAvailableWorkspaces(workspacesData.workspaces);
+        } else {
+          // Fallback to current workspace only
+          setAvailableWorkspaces([workspace]);
         }
 
         if (usageData.success) {
@@ -48,7 +65,9 @@ export function AppHeader({ workspace }: AppHeaderProps) {
       }
     };
 
-    fetchData();
+    if (workspace) {
+      fetchData();
+    }
   }, [workspace]);
 
   const handleWorkspaceCreated = () => {

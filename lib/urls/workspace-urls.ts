@@ -1,56 +1,66 @@
 // URL helper functions for workspace navigation
 // Safe to import in client components (no database dependencies)
 
-import { buildContextUrl } from '@/lib/subdomain';
+import { 
+  getWorkspaceUrl as getBaseWorkspaceUrl,
+  getWorkspaceSettingsUrl as getBaseWorkspaceSettingsUrl,
+  getMembersUrl as getBaseMembersUrl,
+  getFormsListUrl,
+  getFormEditorUrl as getBaseFormEditorUrl,
+  getPublicFormUrl as getBasePublicFormUrl,
+  getMarketingUrl as getBaseMarketingUrl
+} from '@/lib/context';
 
 // Workspace URLs (app context)
 export function getWorkspaceUrl(workspaceSlug: string, path: string = ''): string {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return buildContextUrl('app', `/${workspaceSlug}${cleanPath}`);
+  if (path) {
+    return `/app/${workspaceSlug}${path.startsWith('/') ? path : '/' + path}`;
+  }
+  return getBaseWorkspaceUrl(workspaceSlug);
 }
 
 export function getWorkspaceDashboardUrl(workspaceSlug: string): string {
-  return buildContextUrl('app', `/${workspaceSlug}`);
+  return getBaseWorkspaceUrl(workspaceSlug);
 }
 
 export function getFormsUrl(workspaceSlug: string): string {
-  return buildContextUrl('app', `/${workspaceSlug}/forms`);
+  return getFormsListUrl(workspaceSlug);
 }
 
 export function getFormEditorUrl(workspaceSlug: string, formId: string): string {
-  return buildContextUrl('app', `/${workspaceSlug}/forms/${formId}`);
+  return getBaseFormEditorUrl(workspaceSlug, formId);
 }
 
 export function getWorkspaceSettingsUrl(workspaceSlug: string): string {
-  return buildContextUrl('app', `/${workspaceSlug}/settings`);
+  return getBaseWorkspaceSettingsUrl(workspaceSlug);
 }
 
 export function getMembersUrl(workspaceSlug: string): string {
-  return buildContextUrl('app', `/${workspaceSlug}/members`);
+  return getBaseMembersUrl(workspaceSlug);
 }
 
 export function getTemplatesUrl(workspaceSlug: string): string {
-  return buildContextUrl('app', `/${workspaceSlug}/templates`);
+  return `/app/${workspaceSlug}/templates`;
 }
 
 export function getResponsesUrl(workspaceSlug: string, formId?: string): string {
   if (formId) {
-    return buildContextUrl('app', `/${workspaceSlug}/forms/${formId}/responses`);
+    return `/app/${workspaceSlug}/forms/${formId}/responses`;
   }
-  return buildContextUrl('app', `/${workspaceSlug}/responses`);
+  return `/app/${workspaceSlug}/responses`;
 }
 
 // Form URLs (forms context)
 export function getPublicFormUrl(workspaceSlug: string, formId: string): string {
-  return buildContextUrl('forms', `/${workspaceSlug}/${formId}`);
+  return getBasePublicFormUrl(workspaceSlug, formId);
 }
 
 // Marketing URLs
 export function getMarketingUrl(path: string = ''): string {
-  return buildContextUrl('marketing', path);
+  return getBaseMarketingUrl(path);
 }
 
 // Switch workspace helper (client-safe)
 export function buildWorkspaceSwitchUrl(workspaceSlug: string): string {
-  return buildContextUrl('app', `/${workspaceSlug}`);
+  return getBaseWorkspaceUrl(workspaceSlug);
 }

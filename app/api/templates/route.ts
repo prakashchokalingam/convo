@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { templates, workspaceMembers, workspaces } from "@/lib/db/schema";
+import { createId } from "@paralleldrive/cuid2";
+import { db } from "@/drizzle/db";
+import { templates, workspaceMembers, workspaces } from "@/drizzle/schema";
 import { eq, and, or, count, desc, ilike } from "drizzle-orm";
 
 /**
@@ -317,10 +318,14 @@ export async function POST(request: NextRequest) {
       }, { status: 403 });
     }
 
+    // Generate unique ID for the template
+    const templateId = createId();
+
     // Create the template
     const [newTemplate] = await db
       .insert(templates)
       .values({
+        id: templateId,
         name,
         description,
         formSchema,

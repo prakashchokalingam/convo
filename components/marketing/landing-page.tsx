@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/shared/ui/button';
 import { ArrowRight, CheckCircle, MessageSquare, BarChart } from 'lucide-react';
-import { getLoginUrl, getSignupUrl } from '@/lib/subdomain';
+import { getLoginUrl, getSignupUrl } from '@/lib/context';
 
 export function LandingPage() {
   return (

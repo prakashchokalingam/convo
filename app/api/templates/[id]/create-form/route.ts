@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { templates, forms, formTemplates, workspaceMembers } from "@/lib/db/schema";
+import { createId } from "@paralleldrive/cuid2";
+import { db } from "@/drizzle/db";
+import { templates, forms, formTemplates, workspaceMembers } from "@/drizzle/schema";
 import { eq, and } from "drizzle-orm";
 
 /**
@@ -178,10 +179,14 @@ export async function POST(
     // Convert template formSchema to form config format
     const formConfig = JSON.stringify(templateData.formSchema);
 
+    // Generate unique ID for the form
+    const formId = createId();
+
     // Create the form
     const [newForm] = await db
       .insert(forms)
       .values({
+        id: formId,
         workspaceId: workspaceId,
         createdBy: userId,
         title: name,
@@ -197,6 +202,7 @@ export async function POST(
     await db
       .insert(formTemplates)
       .values({
+        id: createId(),
         formId: newForm.id,
         templateId: templateData.id,
       });

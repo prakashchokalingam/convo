@@ -8,12 +8,8 @@ import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { createId } from '@paralleldrive/cuid2';
-import { buildContextUrl } from '@/lib/subdomain';
 import type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
-import { 
-  getWorkspaceDashboardUrl,
-  buildWorkspaceSwitchUrl 
-} from '@/lib/urls/workspace-urls';
+import { getWorkspaceUrl } from '@/lib/context';
 
 // Re-export types for server components
 export type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
@@ -132,7 +128,7 @@ export async function getCurrentWorkspace(workspaceSlug?: string): Promise<Works
     if (!workspaceSlug) {
       const defaultWorkspace = await getUserDefaultWorkspace();
       if (!defaultWorkspace) {
-        redirect('/login?subdomain=app');
+        redirect('/app/login');
       }
       return defaultWorkspace;
     }
@@ -141,20 +137,20 @@ export async function getCurrentWorkspace(workspaceSlug?: string): Promise<Works
     const workspace = await getWorkspaceBySlug(workspaceSlug);
     if (!workspace) {
       // User doesn't have access to this workspace or it doesn't exist
-      redirect('/onboarding?subdomain=app');
+      redirect('/app/onboarding');
     }
 
     return workspace;
   } catch (error) {
     console.error('Error getting current workspace:', error);
     // If there's an auth error, redirect to login
-    redirect('/login?subdomain=app');
+    redirect('/app/login');
   }
 }
 
 // Switch workspace helper
 export function switchToWorkspace(workspaceSlug: string) {
-  const url = buildWorkspaceSwitchUrl(workspaceSlug);
+  const url = getWorkspaceUrl(workspaceSlug);
   redirect(url);
 }
 
@@ -166,7 +162,7 @@ export async function validateWorkspaceAccess(
   const workspace = await getWorkspaceBySlug(workspaceSlug);
   
   if (!workspace) {
-    redirect('/');
+    redirect('/app/onboarding');
   }
 
   // Check role requirement if specified
@@ -176,7 +172,7 @@ export async function validateWorkspaceAccess(
     const requiredRoleLevel = roleHierarchy[requiredRole];
     
     if (userRoleLevel < requiredRoleLevel) {
-      redirect(getWorkspaceDashboardUrl(workspaceSlug));
+      redirect(getWorkspaceUrl(workspaceSlug));
     }
   }
 

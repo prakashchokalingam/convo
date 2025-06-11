@@ -1,7 +1,9 @@
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { forms } from "@/lib/db/schema";
+import { createId } from "@paralleldrive/cuid2";
+import { db } from "@/drizzle/db";
+import { forms, workspaceMembers } from "@/drizzle/schema";
+import { eq, and } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,27 +14,57 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, config } = body;
+    const { workspaceId, name, description, config } = body;
 
-    if (!name || !config) {
-      return NextResponse.json({ error: "Name and config are required" }, { status: 400 });
+    if (!workspaceId || !name || !config) {
+      return NextResponse.json({ error: "Workspace ID, name and config are required" }, { status: 400 });
     }
+
+    // Verify user has access to the workspace
+    const workspaceMember = await db
+      .select({
+        role: workspaceMembers.role
+      })
+      .from(workspaceMembers)
+      .where(and(
+        eq(workspaceMembers.workspaceId, workspaceId),
+        eq(workspaceMembers.userId, userId)
+      ))
+      .limit(1);
+
+    if (workspaceMember.length === 0) {
+      return NextResponse.json({ error: "Access denied to workspace" }, { status: 403 });
+    }
+
+    // Check if user has create_form permission (owner, admin, or member)
+    const userRole = workspaceMember[0].role;
+    if (!['owner', 'admin', 'member'].includes(userRole)) {
+      return NextResponse.json({ 
+        error: "Insufficient permissions. Requires create_form permission." 
+      }, { status: 403 });
+    }
+
+    // Generate unique ID for the form
+    const formId = createId();
 
     // Save form to database
     const [newForm] = await db.insert(forms).values({
-      userId,
-      name,
+      id: formId,
+      workspaceId,
+      createdBy: userId,
+      title: name,
       description: description || '',
       prompt: 'Created with manual form builder',
       config: JSON.stringify(config),
       isConversational: false,
       isPublished: false,
+      version: 1,
     }).returning();
 
     return NextResponse.json({ 
       success: true, 
       formId: newForm.id,
-      redirectUrl: `/forms/${newForm.id}/edit`
+      redirectUrl: `/app/${workspaceId}/forms/${newForm.id}/edit`
     });
   } catch (error) {
     console.error("Error saving form:", error);

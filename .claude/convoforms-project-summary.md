@@ -65,32 +65,30 @@ npm run e2e:debug        # Debug individual tests
 - **Deployment**: Designed for Vercel + Supabase
 - **e2e**: Playwright
 
-### URL Architecture (Subdomain-Based)
-ConvoForms uses a sophisticated subdomain architecture with Next.js route groups:
+### URL Architecture (Path-Based)
+ConvoForms uses a clean path-based routing system that's consistent across environments:
 
-**Production URLs:**
-- Marketing: `convo.ai` (landing page, pricing)
-- V2 Marketing: `convo.ai/v2-sparrow-jot` (new modern landing page)
-- App: `app.convo.ai/workspace` (authenticated dashboard)
-- Forms: `forms.convo.ai/contact/abc123` (public form submissions)
+**Development & Production URLs:**
+- Marketing: `localhost:3002/marketing` | `convo.ai` (rewrites to `/marketing`)
+- App: `localhost:3002/app` | `app.convo.ai` (rewrites to `/app`)
+- Forms: `localhost:3002/forms` | `forms.convo.ai` (rewrites to `/forms`)
 
-**Development URLs:**
-- Marketing: `localhost:3002/?subdomain=marketing` (route group)
-- V2 Marketing: `localhost:3002/v2-sparrow-jot?subdomain=marketing`
-- App: `localhost:3002/workspace?subdomain=app`
-- Forms: `localhost:3002/contact/abc123?subdomain=forms`
+**URL Examples:**
+- Marketing: `/marketing`, `/marketing/pricing`, `/marketing/v2-sparrow-jot`
+- App: `/app/login`, `/app/signup`, `/app/{workspaceSlug}`
+- Forms: `/forms/{workspaceSlug}/{formId}`
 
-### Route Groups Structure
+### Route Structure
 ```
 app/
-├── page.tsx                    # Fallback page (renders original landing)
-├── (marketing)/                # Marketing subdomain (public website)
-│   ├── layout.tsx              # Marketing context + verification
-│   ├── page.tsx                # Original landing page
-│   └── v2-sparrow-jot/         # New modern landing page
-│       └── page.tsx            # Convo rebrand inspired by SurveySparrow/JotForm
-├── (app)/                      # SaaS App (auth required)
-│   ├── layout.tsx              # App context + auth check
+├── page.tsx                    # Root redirect to /marketing
+├── marketing/                  # Marketing site (public)
+│   ├── layout.tsx              # Marketing layout
+│   ├── page.tsx                # Landing page
+│   ├── pricing/page.tsx        # Pricing page
+│   └── v2-sparrow-jot/page.tsx # New modern landing
+├── app/                        # SaaS Application (auth required)
+│   ├── layout.tsx              # App layout + auth check
 │   ├── login/page.tsx          # Login page
 │   ├── signup/page.tsx         # Signup page
 │   ├── onboarding/page.tsx     # Workspace creation
@@ -99,19 +97,19 @@ app/
 │       ├── forms/              # Form management
 │       ├── settings/           # Workspace settings
 │       └── members/            # Team management
-├── (forms)/                    # Public Forms (no auth)
-│   ├── layout.tsx              # Forms context check
+├── forms/                      # Public Forms (no auth)
+│   ├── layout.tsx              # Forms layout
 │   └── [workspaceSlug]/[formId]/page.tsx # Public form submission
 └── api/                        # Backend APIs
 ```
 
 ## 🔧 Key Components & Utilities
 
-### Context Detection (`lib/subdomain.ts`)
-The core utility that determines which "context" a request is in:
-- `getSubdomainContext()`: Detects 'marketing', 'app', or 'forms'
-- `buildContextUrl()`: Builds proper URLs for each context
-- URL helpers: `getWorkspaceUrl()`, `getPublicFormUrl()`, etc.
+### Context Detection (`lib/context.ts`)
+Simplified context detection based on URL paths:
+- `getContext()`: Returns 'marketing', 'app', or 'forms' based on pathname
+- Simple URL helpers: `getWorkspaceUrl()`, `getPublicFormUrl()`, etc.
+- No complex environment checks or subdomain parsing needed
 
 ### Database Schema (`drizzle/schema.ts`)
 **Core Tables:**
@@ -188,21 +186,21 @@ npm run db:push
 ```
 
 ### Context Testing
-Use query parameters to test different contexts:
-- Marketing: `localhost:3002/`
-- App: `localhost:3002/login?subdomain=app`
-- Forms: `localhost:3002/contact/123?subdomain=forms`
+Direct path access for testing different contexts:
+- Marketing: `localhost:3002/marketing`
+- App: `localhost:3002/app/login`
+- Forms: `localhost:3002/forms/workspace/formId`
 
 ## 📁 File Organization
 
-### Component Structure (Reorganized by Subdomain)
+### Component Structure (Organized by Context)
 ```
 components/
-├── shared/              # Shared across all subdomains
+├── shared/              # Shared across all contexts
 │   ├── ui/             # shadcn/ui base components
 │   ├── theme/          # Theme provider and configuration
 │   └── error-boundary.tsx # Global error handling
-├── marketing/           # Marketing subdomain components
+├── marketing/           # Marketing context components
 │   ├── landing-page.tsx # Original landing page
 │   ├── features-showcase.tsx
 │   ├── hero-demo.tsx
@@ -223,7 +221,7 @@ components/
 │           ├── pricing-preview-section.tsx
 │           ├── trust-indicators-section.tsx
 │           └── cta-section.tsx
-├── app/                 # App subdomain components (authenticated)
+├── app/                 # App context components (authenticated)
 │   ├── dashboard/       # Main dashboard interface
 │   │   ├── app-header.tsx
 │   │   ├── app-sidebar.tsx
@@ -239,14 +237,15 @@ components/
 │   ├── settings/        # Workspace settings
 │   ├── auth/           # Authentication components
 │   └── plan-usage-dashboard.tsx # Usage tracking
-└── forms/              # Forms subdomain components (public)
+└── forms/              # Forms context components (public)
     └── form-components.tsx # Public form rendering
 ```
 
 ### Utility Structure
 ```
 lib/
-├── subdomain.ts     # Context detection & URL building
+├── context.ts       # Simple path-based context detection
+├── urls.ts          # Clean URL helper functions
 ├── workspace.ts     # Workspace management utilities
 ├── db.ts           # Database connection
 └── utils.ts        # General utilities
@@ -389,11 +388,11 @@ NEXT_PUBLIC_APP_URL=https://convo.ai
 ## 📋 Development Guidelines
 
 ### When Adding Features
-1. **Check context**: Determine if feature belongs in marketing, app, or forms subdomain
+1. **Check context**: Determine if feature belongs in marketing, app, or forms context
 2. **Verify cases**: Craft all the essential cases with ref to existing docs/cases/* get verified and start coding
 3. **Follow patterns**: Use existing component and utility patterns
 4. **Place components correctly**:
-   - `components/shared/` for components used across subdomains
+   - `components/shared/` for components used across contexts
    - `components/app/` for authenticated app features
    - `components/marketing/` for marketing site
    - `components/forms/` for public form rendering
