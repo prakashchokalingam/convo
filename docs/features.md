@@ -1,204 +1,281 @@
-# Feature Specifications
+# ✨ ConvoForms Features
 
-## 1. AI Form Generation
+This document explains what ConvoForms does and how it works for users.
 
-### Input
-User provides a natural language prompt describing their form needs.
+## 🎯 Core Value Proposition
 
-**Example prompts:**
-- "Create a job application form with name, email, resume upload, and years of experience"
-- "I need a feedback form for my restaurant with rating, favorite dish, and suggestions"
-- "Build a contact form for my real estate business"
+**Transform boring static forms into engaging conversations with AI.**
 
-### Output
-JSON schema that defines the form structure:
+Traditional forms have 81% abandonment rates. ConvoForms reduces this to 40-60% by making forms feel like natural conversations.
 
-```json
-{
-  "fields": [
-    {
-      "id": "field_1",
-      "type": "text",
-      "label": "Full Name",
-      "placeholder": "John Doe",
-      "required": true,
-      "validation": {
-        "minLength": 2,
-        "maxLength": 50
-      }
-    },
-    {
-      "id": "field_2",
-      "type": "email",
-      "label": "Email Address",
-      "placeholder": "john@example.com",
-      "required": true
-    },
-    {
-      "id": "field_3",
-      "type": "file",
-      "label": "Resume",
-      "accept": ".pdf,.doc,.docx",
-      "required": true
-    },
-    {
-      "id": "field_4",
-      "type": "number",
-      "label": "Years of Experience",
-      "min": 0,
-      "max": 50,
-      "required": true
-    }
-  ],
-  "settings": {
-    "title": "Job Application Form",
-    "description": "Please fill out all required fields",
-    "submitText": "Submit Application",
-    "successMessage": "Thank you! We'll review your application."
-  }
-}
+## 🤖 AI Form Generation
+
+### How It Works
+Users describe their form in natural language, and AI generates the complete form structure.
+
+**Example Prompts:**
+- "Create a job application form"
+- "I need a customer feedback survey for my restaurant"
+- "Build a contact form for my website"
+- "Make an event registration form with meal preferences"
+
+**AI Output:**
+- Form fields with proper types (text, email, select, etc.)
+- Validation rules (required fields, email format, etc.)
+- Smart labels and placeholder text
+- Logical field ordering
+- Appropriate form settings
+
+### Supported Field Types
+- **Text Input** - Single line text with validation
+- **Email** - Email validation built-in
+- **Textarea** - Multi-line text for longer responses
+- **Select Dropdown** - Choose from predefined options
+- **Radio Buttons** - Single choice from multiple options
+- **Checkboxes** - Multiple selections
+- **Number** - Numeric input with min/max validation
+- **Phone** - Phone number with country code
+- **File Upload** - Document/image uploads
+
+## 💬 Conversational Mode
+
+### The Magic Feature
+Any form can be toggled into "conversational mode" - transforming it into a chat-like experience.
+
+### How It Works
 ```
+Traditional Form:
+[Name: ______]
+[Email: ______]
+[Message: ______]
+[Submit Button]
 
-## 2. Conversational Mode
-
-### How it works
-1. User toggles "Conversational Mode" for any form
-2. Form transforms into a chat-like interface
-3. Questions are asked one at a time
-4. Natural transitions between questions
-5. Progress indicator shows completion status
-
-### Conversation Flow Example
-```
-Bot: "Hi! Let's get your job application started. What's your full name?"
-User: "John Doe"
-Bot: "Nice to meet you, John! What's the best email to reach you at?"
+Conversational Mode:
+Bot: "Hi! What's your name?"
+User: "John Smith"
+Bot: "Nice to meet you, John! What's your email?"
 User: "john@example.com"
-Bot: "Great! Now, could you upload your resume? (PDF, DOC, or DOCX format)"
-User: [Uploads file]
-Bot: "Perfect! Last question - how many years of experience do you have?"
-User: "5"
-Bot: "Thank you for completing the application! We'll review it and get back to you soon."
+Bot: "Perfect! What would you like to tell us?"
+User: "I'm interested in your services..."
+Bot: "Thanks for reaching out! We'll be in touch soon."
 ```
 
-## 3. Form Builder Features
+### Benefits
+- **Higher completion rates** (40-60% improvement)
+- **Better user experience** (feels more personal)
+- **Mobile-friendly** (easier on small screens)
+- **Progressive disclosure** (one question at a time)
+- **Natural flow** (smart transitions between questions)
 
-### Drag & Drop
+## 🏗️ Visual Form Builder
+
+### Drag & Drop Interface
+- Add fields from sidebar library
 - Reorder fields by dragging
-- Add new fields from sidebar
 - Delete fields with confirmation
+- Real-time preview as you build
 
-### Field Types (MVP)
-1. **Text Input**
-   - Single line text
-   - Validation: min/max length, regex pattern
-   
-2. **Email Input**
-   - Email validation built-in
-   - Placeholder support
-   
-3. **Select Dropdown**
-   - Multiple options
-   - Optional placeholder
-   - Single selection
-   
-4. **Radio Buttons**
-   - Multiple options
-   - Single selection
-   - Vertical or horizontal layout
-   
-5. **Checkbox**
-   - Single checkbox for yes/no
-   - Multiple checkboxes for multi-select
+### Field Customization
+For each field, you can customize:
+- **Label** - The question text
+- **Placeholder** - Hint text in the input
+- **Help Text** - Additional instructions
+- **Required/Optional** - Whether field is mandatory
+- **Validation Rules** - Min/max length, patterns, etc.
+- **Default Values** - Pre-filled answers
 
-### Field Properties
-- Label (required)
-- Placeholder text
-- Help text
-- Required/Optional
-- Validation rules
-- Default values
+### Smart Suggestions
+- AI suggests improvements to form flow
+- Recommends field types based on labels
+- Warns about potential usability issues
+- Suggests better wording for questions
 
-## 4. Analytics Dashboard
+## 📊 Response Management
 
-### Basic Metrics
-- Total views
-- Total starts (someone began filling)
-- Total completions
-- Completion rate (%)
-- Average time to complete
-- Drop-off points
+### Response Collection
+- **Real-time notifications** when someone submits
+- **Data validation** before saving
+- **Spam protection** built-in
+- **File upload handling** for documents/images
 
-### AI Insights (Pro/Enterprise)
-- "Most users drop off at the email field"
-- "Completion rate increases 40% in conversational mode"
-- "Peak submission times: Weekdays 2-4 PM"
-- "Suggested improvements based on user behavior"
+### Response Viewing
+- **Table view** of all responses
+- **Individual response details**
+- **Search and filter** responses
+- **Export to CSV** for analysis
+- **Mark as read/unread**
+- **Add internal notes**
 
-## 5. Embeddable Forms
+### Analytics Dashboard
+Track form performance:
+- **View count** - How many people saw your form
+- **Start rate** - How many began filling it out
+- **Completion rate** - How many finished
+- **Drop-off points** - Where people abandon
+- **Average completion time**
+- **Device breakdown** (mobile vs desktop)
 
-### Embed Options
+## 🔗 Form Sharing & Embedding
+
+### Multiple Sharing Options
+
 1. **Direct Link**
-   - `https://convoforms.com/f/[form-id]`
-   - Branded or white-label options
+   ```
+   https://forms.convo.ai/contact/abc123
+   ```
 
-2. **iFrame Embed**
+2. **Embed Code**
    ```html
-   <iframe src="https://convoforms.com/embed/[form-id]" 
-           width="100%" 
-           height="600">
+   <iframe src="https://forms.convo.ai/embed/abc123" 
+           width="100%" height="600">
    </iframe>
    ```
 
 3. **JavaScript Widget**
    ```html
-   <div id="convoform-[form-id]"></div>
-   <script src="https://convoforms.com/widget.js"></script>
+   <div id="convoform-abc123"></div>
+   <script src="https://forms.convo.ai/widget.js"></script>
    ```
 
-4. **Popup Trigger**
-   - Button that opens form in modal
-   - Exit intent trigger
-   - Time-based trigger
+### Customization Options
+- **Custom branding** (Pro plan)
+- **Remove "Powered by ConvoForms"** (Pro plan)
+- **Custom thank you pages**
+- **Redirect after submission**
+- **Custom CSS styling** (Enterprise)
 
-## 6. Response Management
+## 🎨 Form Templates
 
-### Features
-- View all responses in table format
-- Export to CSV
-- Search and filter responses
-- Mark as read/unread
-- Add internal notes
-- Email notifications for new responses
+### Ready-to-Use Templates
+- **Contact Form** - Name, email, message
+- **Job Application** - Resume upload, experience, skills
+- **Customer Feedback** - Ratings, comments, contact info
+- **Event Registration** - Attendee details, meal preferences
+- **Lead Generation** - Company info, budget, timeline
+- **Newsletter Signup** - Email with preferences
+- **Support Ticket** - Issue description, priority level
 
-## 7. Integrations (Post-MVP)
+### Template Features
+- **Instant setup** - One-click to create
+- **Fully customizable** - Modify any field
+- **Industry-specific** - Tailored for different use cases
+- **Conversion-optimized** - Based on best practices
 
-### Priority Integrations
-1. **Zapier** - Connect to 5000+ apps
-2. **Webhooks** - Send data anywhere
-3. **Google Sheets** - Auto-populate spreadsheets
-4. **Slack** - Notifications for new responses
-5. **Email** - Auto-responders
+## 👥 Team Collaboration
 
-## 8. Templates Library
+### Workspace Management
+- **Personal workspaces** - For individual users
+- **Team workspaces** - For organizations
+- **Role-based access** - Owner, Admin, Member, Viewer
+- **Member management** - Invite/remove team members
 
-### Launch Templates
-1. **Contact Form**
-   - Name, Email, Message
-   - Perfect for websites
+### Permissions System
+- **Owner** - Full access, billing, delete workspace
+- **Admin** - Manage forms, members, settings
+- **Member** - Create and edit forms
+- **Viewer** - View forms and responses only
 
-2. **Job Application**
-   - Personal info, Experience, Resume
-   - For recruiting
+## 🔧 Integrations (Coming Soon)
 
-3. **Feedback Survey**
-   - Rating, Comments, Contact info
-   - For customer feedback
+### Planned Integrations
+- **Zapier** - Connect to 5000+ apps
+- **Webhooks** - Send data to any endpoint
+- **Google Sheets** - Auto-populate spreadsheets
+- **Slack** - Notifications for new responses
+- **Email Services** - Auto-responders via Resend
+- **CRM Systems** - HubSpot, Salesforce integration
+- **Payment Processing** - Stripe for paid forms
 
-4. **Event Registration**
-   - Name, Email, Attendance options
-   - For events/webinars
+## 💳 Pricing Plans
 
-5. **Lead Generation**
-   - Name, Company, Interest level
-   - For sales teams
+### Free Plan
+- **3 forms** maximum
+- **100 responses** per month
+- **Basic analytics**
+- **ConvoForms branding**
+- **Community support**
+
+### Starter Plan ($19/month)
+- **10 forms** maximum
+- **1,000 responses** per month
+- **Advanced analytics**
+- **Remove branding**
+- **Email support**
+- **Custom thank you pages**
+
+### Professional Plan ($49/month)
+- **Unlimited forms**
+- **10,000 responses** per month
+- **Team collaboration** (up to 5 members)
+- **Priority support**
+- **Integrations**
+- **Custom domains**
+
+### Enterprise Plan (Custom)
+- **Unlimited everything**
+- **White-label solution**
+- **Custom integrations**
+- **Dedicated support**
+- **SLA guarantees**
+- **On-premise deployment**
+
+## 🎯 Target Use Cases
+
+### Small Businesses
+- Contact forms for websites
+- Customer feedback collection
+- Lead generation forms
+- Event registration
+
+### HR & Recruiting
+- Job application forms
+- Employee feedback surveys
+- Interview scheduling
+- Onboarding questionnaires
+
+### Marketing Teams
+- Lead capture forms
+- Newsletter signups
+- Event registrations
+- Customer surveys
+
+### Customer Support
+- Support ticket forms
+- Bug report submissions
+- Feature request collection
+- Satisfaction surveys
+
+### Education
+- Student registration
+- Course feedback
+- Application forms
+- Survey research
+
+## 🚀 What Makes ConvoForms Special
+
+### 1. AI-First Approach
+- Generate forms from natural language
+- Smart field suggestions
+- Automated form optimization
+
+### 2. Conversational Experience
+- Chat-like interface option
+- Higher completion rates
+- Better user engagement
+
+### 3. Developer-Friendly
+- Clean embed codes
+- Webhook support
+- API access (coming soon)
+
+### 4. Mobile-Optimized
+- Responsive design
+- Touch-friendly interface
+- Fast loading on mobile
+
+### 5. Privacy-Focused
+- GDPR compliant
+- Data encryption
+- User consent management
+
+This feature set positions ConvoForms as the next generation of form builders - where AI meets conversation to create better user experiences.

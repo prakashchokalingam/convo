@@ -6,10 +6,7 @@
 .pnp.js
 .yarn/install-state.gz
 
-# testing
-/coverage
-/__tests__/coverage
-*.test.d.ts
+
 
 # next.js
 /.next/
@@ -29,6 +26,10 @@ yarn-error.log*
 
 # local env files
 .env*.local
+
+# Old SQLite database (migrated to PostgreSQL)
+local.db
+local.db-*
 .env
 
 # vercel
@@ -39,11 +40,18 @@ yarn-error.log*
 next-env.d.ts
 *.log
 
-# vitest
+# testing (vitest + playwright)
+/coverage
+/__tests__/coverage
+*.test.d.ts
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/.auth/
+*.png
+*.webm
+*.mp4
 
 # database
 *.db

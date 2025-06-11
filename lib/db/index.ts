@@ -1,17 +1,19 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import * as schema from './schema';
 
-const sqlite = new Database('local.db');
-export const db = drizzle(sqlite, { schema });
+// Database connection
+const connectionString = process.env.DATABASE_URL!;
 
-// For production with Turso:
-// import { drizzle } from 'drizzle-orm/libsql';
-// import { createClient } from '@libsql/client';
-// 
-// const client = createClient({
-//   url: process.env.DATABASE_URL!,
-//   authToken: process.env.DATABASE_AUTH_TOKEN,
-// });
-// 
-// export const db = drizzle(client, { schema });
+// Create postgres client
+const client = postgres(connectionString, {
+  max: 10,
+  idle_timeout: 20,
+  connect_timeout: 10,
+});
+
+// Create Drizzle instance
+export const db = drizzle(client, { schema });
+
+// Export the client for potential direct usage
+export { client };

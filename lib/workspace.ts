@@ -1,0 +1,368 @@
+// Server-side workspace operations (database dependencies)
+// DO NOT import this file in client components
+
+import { db } from '@/drizzle/db';
+import { workspaces, workspaceMembers, users } from '@/drizzle/schema';
+import { eq, and, desc } from 'drizzle-orm';
+import { auth } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
+import { cache } from 'react';
+import { createId } from '@paralleldrive/cuid2';
+import { buildContextUrl } from '@/lib/subdomain';
+import type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
+import { 
+  getWorkspaceDashboardUrl,
+  buildWorkspaceSwitchUrl 
+} from '@/lib/urls/workspace-urls';
+
+// Re-export types for server components
+export type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
+
+// Get all workspaces accessible by current user
+export const getCurrentUserWorkspaces = cache(async (): Promise<WorkspaceWithRole[]> => {
+  try {
+    const { userId } = auth();
+    if (!userId) return [];
+
+    const userWorkspaces = await db
+      .select({
+        id: workspaces.id,
+        name: workspaces.name,
+        slug: workspaces.slug,
+        type: workspaces.type,
+        ownerId: workspaces.ownerId,
+        description: workspaces.description,
+        avatarUrl: workspaces.avatarUrl,
+        settings: workspaces.settings,
+        role: workspaceMembers.role,
+        createdAt: workspaces.createdAt,
+        updatedAt: workspaces.updatedAt,
+      })
+      .from(workspaces)
+      .innerJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
+      .where(eq(workspaceMembers.userId, userId))
+      .orderBy(desc(workspaces.createdAt));
+
+    return userWorkspaces as WorkspaceWithRole[];
+  } catch (error) {
+    console.error('Error getting user workspaces:', error);
+    return [];
+  }
+});
+
+// Get user's default workspace
+export const getUserDefaultWorkspace = cache(async (): Promise<WorkspaceWithRole | null> => {
+  try {
+    const { userId } = auth();
+    if (!userId) return null;
+
+    const defaultWorkspace = await db
+      .select({
+        id: workspaces.id,
+        name: workspaces.name,
+        slug: workspaces.slug,
+        type: workspaces.type,
+        ownerId: workspaces.ownerId,
+        description: workspaces.description,
+        avatarUrl: workspaces.avatarUrl,
+        settings: workspaces.settings,
+        role: workspaceMembers.role,
+        createdAt: workspaces.createdAt,
+        updatedAt: workspaces.updatedAt,
+      })
+      .from(workspaces)
+      .innerJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
+      .where(
+        and(
+          eq(workspaceMembers.userId, userId),
+          eq(workspaces.type, 'default'),
+          eq(workspaces.ownerId, userId)
+        )
+      )
+      .limit(1);
+
+    return defaultWorkspace[0] as WorkspaceWithRole || null;
+  } catch (error) {
+    console.error('Error getting default workspace:', error);
+    return null;
+  }
+});
+
+// Get workspace by slug with user access check
+export const getWorkspaceBySlug = cache(async (slug: string): Promise<WorkspaceWithRole | null> => {
+  try {
+    const { userId } = auth();
+    if (!userId) return null;
+
+    const workspace = await db
+      .select({
+        id: workspaces.id,
+        name: workspaces.name,
+        slug: workspaces.slug,
+        type: workspaces.type,
+        ownerId: workspaces.ownerId,
+        description: workspaces.description,
+        avatarUrl: workspaces.avatarUrl,
+        settings: workspaces.settings,
+        role: workspaceMembers.role,
+        createdAt: workspaces.createdAt,
+        updatedAt: workspaces.updatedAt,
+      })
+      .from(workspaces)
+      .innerJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
+      .where(
+        and(
+          eq(workspaces.slug, slug),
+          eq(workspaceMembers.userId, userId)
+        )
+      )
+      .limit(1);
+
+    return workspace[0] as WorkspaceWithRole || null;
+  } catch (error) {
+    console.error('Error getting workspace by slug:', error);
+    return null;
+  }
+});
+
+// Get current workspace from URL context
+export async function getCurrentWorkspace(workspaceSlug?: string): Promise<WorkspaceWithRole> {
+  try {
+    // If no workspace slug provided, get user's default workspace
+    if (!workspaceSlug) {
+      const defaultWorkspace = await getUserDefaultWorkspace();
+      if (!defaultWorkspace) {
+        redirect('/login?subdomain=app');
+      }
+      return defaultWorkspace;
+    }
+
+    // Get workspace by slug
+    const workspace = await getWorkspaceBySlug(workspaceSlug);
+    if (!workspace) {
+      // User doesn't have access to this workspace or it doesn't exist
+      redirect('/onboarding?subdomain=app');
+    }
+
+    return workspace;
+  } catch (error) {
+    console.error('Error getting current workspace:', error);
+    // If there's an auth error, redirect to login
+    redirect('/login?subdomain=app');
+  }
+}
+
+// Switch workspace helper
+export function switchToWorkspace(workspaceSlug: string) {
+  const url = buildWorkspaceSwitchUrl(workspaceSlug);
+  redirect(url);
+}
+
+// Validate workspace access middleware
+export async function validateWorkspaceAccess(
+  workspaceSlug: string,
+  requiredRole?: WorkspaceRole
+): Promise<WorkspaceWithRole> {
+  const workspace = await getWorkspaceBySlug(workspaceSlug);
+  
+  if (!workspace) {
+    redirect('/');
+  }
+
+  // Check role requirement if specified
+  if (requiredRole) {
+    const roleHierarchy = { viewer: 1, member: 2, admin: 3, owner: 4 };
+    const userRoleLevel = roleHierarchy[workspace.role];
+    const requiredRoleLevel = roleHierarchy[requiredRole];
+    
+    if (userRoleLevel < requiredRoleLevel) {
+      redirect(getWorkspaceDashboardUrl(workspaceSlug));
+    }
+  }
+
+  return workspace;
+}
+
+// Workspace creation helper
+export async function createWorkspace(data: {
+  name: string;
+  slug: string;
+  description?: string;
+  type?: 'default' | 'team';
+}) {
+  const { userId } = auth();
+  if (!userId) throw new Error('Not authenticated');
+
+  const workspace = await db.insert(workspaces).values({
+    id: createId(),
+    name: data.name,
+    slug: data.slug,
+    type: data.type || 'team',
+    ownerId: userId,
+    description: data.description || null,
+    settings: JSON.stringify({
+      theme: 'light',
+      timezone: 'UTC',
+      notifications: {
+        email: true,
+        browser: true,
+      }
+    }),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }).returning();
+
+  // Add creator as owner
+  await db.insert(workspaceMembers).values({
+    workspaceId: workspace[0].id,
+    userId,
+    role: 'owner',
+    joinedAt: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  return workspace[0];
+}
+
+// Email-to-slug generation utilities for automatic onboarding
+export async function generateWorkspaceSlugFromEmail(email: string): Promise<string> {
+  const [username, domain] = email.split('@');
+  let baseSlug = cleanSlugFromUsername(username);
+  
+  // Add domain for generic terms to make slug more unique
+  if (isGenericTerm(baseSlug)) {
+    const domainPart = cleanSlugFromUsername(domain.split('.')[0]);
+    baseSlug = `${baseSlug}-${domainPart}`;
+  }
+  
+  // Try base slug first
+  if (await isSlugAvailable(baseSlug)) {
+    return baseSlug;
+  }
+  
+  // Try numbered versions (reasonable attempts)
+  for (let i = 2; i <= 10; i++) {
+    const numberedSlug = `${baseSlug}-${i}`;
+    if (await isSlugAvailable(numberedSlug)) {
+      return numberedSlug;
+    }
+  }
+  
+  // Bulletproof fallback: guaranteed unique with random ID
+  const randomId = generateRandomId(6);
+  return `${baseSlug}-${randomId}`;
+}
+
+// Clean username/domain part for slug generation
+function cleanSlugFromUsername(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')  // Replace non-alphanumeric with hyphens
+    .replace(/-+/g, '-')        // Replace multiple hyphens with single
+    .replace(/^-|-$/g, '')      // Remove leading/trailing hyphens
+    .substring(0, 20);          // Limit length
+}
+
+// Check if term is too generic and needs domain suffix
+function isGenericTerm(slug: string): boolean {
+  const genericTerms = [
+    'user', 'admin', 'test', 'demo', 'info', 'contact',
+    'hello', 'hi', 'me', 'my', 'app', 'web', 'site'
+  ];
+  return genericTerms.includes(slug) || slug.length < 3;
+}
+
+// Check if workspace slug is available
+export async function isSlugAvailable(slug: string): Promise<boolean> {
+  const existing = await db.query.workspaces.findFirst({
+    where: eq(workspaces.slug, slug),
+  });
+  return !existing;
+}
+
+// Generate random ID for bulletproof uniqueness
+function generateRandomId(length: number): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// Workspace count validation functions
+export async function getWorkspaceCount(userId: string): Promise<{ default: number; team: number }> {
+  const userWorkspaces = await db
+    .select({
+      type: workspaces.type,
+    })
+    .from(workspaces)
+    .innerJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
+    .where(
+      and(
+        eq(workspaceMembers.userId, userId),
+        eq(workspaces.ownerId, userId) // Only count owned workspaces
+      )
+    );
+
+  const count = { default: 0, team: 0 };
+  userWorkspaces.forEach(ws => {
+    if (ws.type === 'default') count.default++;
+    if (ws.type === 'team') count.team++;
+  });
+
+  return count;
+}
+
+export async function canCreateDefaultWorkspace(userId: string): Promise<boolean> {
+  const count = await getWorkspaceCount(userId);
+  return count.default === 0;
+}
+
+export async function canCreateTeamWorkspace(userId: string): Promise<boolean> {
+  const count = await getWorkspaceCount(userId);
+  return count.team < 3;
+}
+
+export async function getWorkspaceLimitsInfo(userId: string): Promise<{
+  canCreateDefault: boolean;
+  canCreateTeam: boolean;
+  currentCount: { default: number; team: number };
+  limits: { default: number; team: number };
+}> {
+  const currentCount = await getWorkspaceCount(userId);
+  
+  return {
+    canCreateDefault: currentCount.default === 0,
+    canCreateTeam: currentCount.team < 3,
+    currentCount,
+    limits: { default: 1, team: 3 }
+  };
+}
+
+// Create workspace from email automatically (for onboarding)
+export async function createWorkspaceFromEmail(
+  email: string,
+  firstName?: string,
+  lastName?: string
+): Promise<{ slug: string; name: string }> {
+  const slug = await generateWorkspaceSlugFromEmail(email);
+  
+  // Generate workspace name from user info
+  const name = firstName 
+    ? `${firstName}'s Workspace`
+    : `${email.split('@')[0]} Workspace`;
+  
+  const workspace = await createWorkspace({
+    name,
+    slug,
+    type: 'default',
+    description: 'Your default workspace for creating conversational forms'
+  });
+  
+  return {
+    slug: workspace.slug,
+    name: workspace.name
+  };
+}

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithDnd, createMockFormConfig, createMockField, createMockSection } from '../utils/test-helpers'
-import { FormBuilder } from '@/components/form-builder/core/FormBuilder'
+import { FormBuilder } from '@/components/app/form-builder/core/FormBuilder'
 
 // Mock the child components but keep FormCanvas real to test section functionality
 vi.mock('@/components/form-builder/core/FieldLibrary', () => ({

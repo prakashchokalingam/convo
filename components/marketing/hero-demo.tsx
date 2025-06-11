@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shared/ui/button";
 import { Play, Pause, Volume2, Maximize } from "lucide-react";
 
 export function HeroDemo() {
