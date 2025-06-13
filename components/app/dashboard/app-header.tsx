@@ -1,118 +1,74 @@
 'use client';
 
 import { UserButton } from '@clerk/nextjs';
-import { Button } from '@/components/shared/ui/button';
-import { Bell, Search } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Bell, Search, Command } from 'lucide-react';
 
 // Import client-safe types
 import type { WorkspaceWithRole } from '@/lib/types/workspace';
-import { WorkspaceSwitcher } from '@/components/app/workspace/workspace-switcher';
-
 interface AppHeaderProps {
   workspace: WorkspaceWithRole;
 }
 
 export function AppHeader({ workspace }: AppHeaderProps) {
-  const [availableWorkspaces, setAvailableWorkspaces] = useState<WorkspaceWithRole[]>([]);
-  const [usage, setUsage] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
   // Ensure workspace is valid
   if (!workspace) {
     return (
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-center">
-          <div>Loading...</div>
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-center px-4 sm:px-6">
+          <div className="text-sm text-muted-foreground">Loading...</div>
         </div>
       </header>
     );
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Always start with current workspace to prevent loading states
-        setAvailableWorkspaces([workspace]);
-        
-        // Fetch all workspaces and usage data
-        const [workspacesRes, usageRes] = await Promise.all([
-          fetch('/api/workspaces'),
-          fetch('/api/usage/workspaces')
-        ]);
-
-        const [workspacesData, usageData] = await Promise.all([
-          workspacesRes.json(),
-          usageRes.json()
-        ]);
-
-        if (workspacesData.success && Array.isArray(workspacesData.workspaces)) {
-          setAvailableWorkspaces(workspacesData.workspaces);
-        } else {
-          // Fallback to current workspace only
-          setAvailableWorkspaces([workspace]);
-        }
-
-        if (usageData.success) {
-          setUsage(usageData.data);
-        }
-      } catch (error) {
-        console.error('Error fetching header data:', error);
-        // Fallback to current workspace only
-        setAvailableWorkspaces([workspace]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (workspace) {
-      fetchData();
-    }
-  }, [workspace]);
-
-  const handleWorkspaceCreated = () => {
-    // Refresh workspaces and usage data
-    window.location.reload();
-  };
-
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
-        {/* Left: Workspace Switcher */}
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center px-4 sm:px-6">
+        {/* Left: Logo/Brand */}
         <div className="flex items-center gap-4">
-          <WorkspaceSwitcher 
-            currentWorkspace={workspace}
-            availableWorkspaces={availableWorkspaces}
-            usage={usage}
-            onCreateWorkspace={handleWorkspaceCreated}
-          />
+          <h1 className="text-xl font-semibold text-foreground">ConvoForms</h1>
         </div>
 
-        {/* Center: Search (future) */}
-        <div className="flex-1 max-w-md mx-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search forms..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        {/* Center: Enhanced Search */}
+        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
+          <div className="w-full flex-1 md:w-auto md:flex-none">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search forms..."
+                className="h-9 w-full bg-background pl-10 pr-4 md:w-[300px] lg:w-[400px]"
+              />
+              <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                <Command className="h-3 w-3" />
+                <span className="text-xs">K</span>
+              </kbd>
+            </div>
+          </div>
+          
+          {/* Right: Notifications + User */}
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="relative">
+              <Bell className="h-4 w-4" />
+              <Badge 
+                variant="destructive" 
+                className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs"
+              >
+                3
+              </Badge>
+            </Button>
+            
+            <UserButton 
+              appearance={{
+                elements: {
+                  avatarBox: "h-8 w-8"
+                }
+              }}
             />
           </div>
-        </div>
-
-        {/* Right: Notifications + User */}
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm">
-            <Bell className="h-4 w-4" />
-          </Button>
-          
-          <UserButton 
-            appearance={{
-              elements: {
-                avatarBox: "h-8 w-8"
-              }
-            }}
-          />
         </div>
       </div>
     </header>

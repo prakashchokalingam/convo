@@ -26,7 +26,7 @@ export default async function WorkspaceLayout({
   const workspace = await getCurrentWorkspace(params.workspaceSlug);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* App Header */}
       <AppHeader workspace={workspace} />
       
@@ -35,7 +35,7 @@ export default async function WorkspaceLayout({
         <AppSidebar workspace={workspace} />
         
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 bg-background">
           {children}
         </main>
       </div>

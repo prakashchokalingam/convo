@@ -10,7 +10,10 @@ import { FormConfig, FieldConfig, DragItem } from '@/lib/form-builder/types'
 import { SortableFieldItem } from './SortableFieldItem'
 import { EmptyCanvas } from './EmptyCanvas'
 import { Plus, Eye, GripVertical, Trash2, Copy, Settings, ChevronDown, ChevronRight } from 'lucide-react'
-import { Button } from '@/components/shared/ui/button'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
 // Insertion Indicator Component
 interface InsertionIndicatorProps {
@@ -176,14 +179,14 @@ function SectionContainer({
   }, [setSortableRef, setSectionDropRef])
 
   return (
-    <div 
+    <Card 
       ref={combinedRef}
       style={style}
       className={`
-        relative border rounded-lg transition-all duration-200 bg-white
-        ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2 shadow-lg' : 'border-gray-200 hover:border-blue-300 hover:shadow-md'}
+        relative transition-all duration-200
+        ${isSelected ? 'ring-2 ring-primary ring-offset-2 shadow-lg' : 'hover:shadow-md'}
         ${isDragging ? 'opacity-50 rotate-1 scale-105' : ''}
-        ${isSectionOver && !isCollapsed ? 'border-blue-500 shadow-xl bg-blue-50/30 scale-[1.02]' : ''}
+        ${isSectionOver && !isCollapsed ? 'border-primary shadow-xl bg-primary/5 scale-[1.02]' : ''}
       `}
     >
 
@@ -205,8 +208,8 @@ function SectionContainer({
       )}
 
       {/* Section Header */}
-      <div 
-        className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100 cursor-pointer rounded-t-lg"
+      <CardHeader 
+        className="flex flex-row items-center justify-between p-4 bg-gradient-to-r from-primary/5 to-primary/10 cursor-pointer space-y-0"
         onClick={handleSectionClick}
       >
         <div className="flex items-center space-x-3 flex-1">
@@ -220,8 +223,8 @@ function SectionContainer({
           </button>
 
           {/* Section Icon */}
-          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-            <div className="w-4 h-4 border-2 border-blue-500 border-dashed rounded"></div>
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <div className="w-4 h-4 border-2 border-primary border-dashed rounded"></div>
           </div>
 
           {/* Section Content */}
@@ -292,11 +295,11 @@ function SectionContainer({
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-      </div>
+      </CardHeader>
 
       {/* Section Content Area */}
       {!isCollapsed && (
-        <div className="p-4">
+        <CardContent className="p-4">
           {children.length === 0 ? (
             // Empty section state
             <div className={`
@@ -382,7 +385,7 @@ function SectionContainer({
               </Button>
             </div>
           )}
-        </div>
+        </CardContent>
       )}
 
       {/* Selection Indicator */}
@@ -393,7 +396,7 @@ function SectionContainer({
           initial={false}
         />
       )}
-    </div>
+    </Card>
   )
 }
 
@@ -507,52 +510,54 @@ export function FormCanvas({
   }, [selectedFieldId, getFieldsBySection, onSelectField, onUpdateField, onRemoveField, onDuplicateField, handleFieldClick])
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-muted/30">
       {/* Canvas Header */}
-      <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-lg font-semibold text-gray-900">Form Canvas</h2>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <span>{config.fields.length} fields</span>
+      <Card className="rounded-none border-0 border-b">
+        <CardHeader className="flex flex-row items-center justify-between p-4 space-y-0">
+          <div className="flex items-center space-x-4">
+            <CardTitle className="text-lg">Form Canvas</CardTitle>
+            <Badge variant="secondary" className="text-xs">
+              {config.fields.length} fields
+            </Badge>
           </div>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" className="flex items-center space-x-2">
-            <Eye className="h-4 w-4" />
-            <span>Preview Mode</span>
-          </Button>
-        </div>
-      </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm" className="flex items-center space-x-2">
+              <Eye className="h-4 w-4" />
+              <span>Preview Mode</span>
+            </Button>
+          </div>
+        </CardHeader>
+      </Card>
 
       {/* Canvas Content */}
       <div className="flex-1 overflow-auto">
         <div className="max-w-4xl mx-auto p-6">
-          <div 
+          <Card 
             ref={setCanvasDropRef}
             onClick={handleCanvasClick}
             className={`
-              min-h-[600px] bg-white rounded-lg border border-gray-200 shadow-sm
-              transition-all duration-200 relative
-              ${isCanvasOver ? 'border-blue-500 bg-blue-50/50 shadow-lg' : ''}
-              ${rootFields.length === 0 ? 'flex items-center justify-center' : 'p-6'}
+              min-h-[600px] transition-all duration-200 relative
+              ${isCanvasOver ? 'border-primary bg-primary/5 shadow-lg' : ''}
+              ${rootFields.length === 0 ? 'flex items-center justify-center' : ''}
             `}
           >
             {rootFields.length === 0 ? (
               <EmptyCanvas />
             ) : (
-              <div className="space-y-6">
-                {/* Form Header */}
-                <div className="pb-6 border-b border-gray-100">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                    {config.settings.title}
-                  </h1>
-                  {config.description && (
-                    <p className="text-gray-600">
-                      {config.description}
-                    </p>
-                  )}
-                </div>
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  {/* Form Header */}
+                  <div className="pb-6 border-b border-border">
+                    <h1 className="text-2xl font-bold mb-2">
+                      {config.settings.title}
+                    </h1>
+                    {config.description && (
+                      <p className="text-muted-foreground">
+                        {config.description}
+                      </p>
+                    )}
+                  </div>
 
                 {/* Form Fields */}
                 <SortableContext
@@ -577,13 +582,14 @@ export function FormCanvas({
                   </div>
                 </SortableContext>
 
-                {/* Submit Button Preview */}
-                <div className="pt-6 border-t border-gray-100">
-                  <Button className="w-full md:w-auto">
-                    {config.settings.submitButtonText}
-                  </Button>
+                  {/* Submit Button Preview */}
+                  <div className="pt-6 border-t border-border">
+                    <Button className="w-full md:w-auto">
+                      {config.settings.submitButtonText}
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              </CardContent>
             )}
 
             {/* Canvas Drop indicator overlay */}
@@ -592,17 +598,17 @@ export function FormCanvas({
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="absolute inset-0 bg-blue-500/15 border-2 border-dashed border-blue-500 rounded-lg flex items-center justify-center pointer-events-none backdrop-blur-sm"
+                className="absolute inset-0 bg-primary/15 border-2 border-dashed border-primary rounded-lg flex items-center justify-center pointer-events-none backdrop-blur-sm"
               >
-                <div className="text-center bg-white px-6 py-3 rounded-full border-2 border-blue-500 shadow-lg">
+                <Card className="bg-background px-6 py-3 border-2 border-primary shadow-lg">
                   <div className="flex items-center space-x-3">
-                    <Plus className="h-6 w-6 text-blue-600" />
-                    <span className="text-blue-700 font-semibold">Add field to form</span>
+                    <Plus className="h-6 w-6 text-primary" />
+                    <span className="text-primary font-semibold">Add field to form</span>
                   </div>
-                </div>
+                </Card>
               </motion.div>
             )}
-          </div>
+          </Card>
         </div>
       </div>
     </div>

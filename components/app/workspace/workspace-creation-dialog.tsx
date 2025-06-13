@@ -2,18 +2,22 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/shared/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/shared/ui/dialog';
-import { Input } from '@/components/shared/ui/input';
-import { Label } from '@/components/shared/ui/label';
-import { Plus } from 'lucide-react';
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Plus, AlertCircle, Loader2, Sparkles } from 'lucide-react';
 
 interface CreateWorkspaceDialogProps {
   trigger?: React.ReactNode;
@@ -36,6 +40,7 @@ export function CreateWorkspaceDialog({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
 
   const canCreateWorkspace = usage?.workspaces.unlimited || 
@@ -46,6 +51,8 @@ export function CreateWorkspaceDialog({
     if (!name.trim() || !canCreateWorkspace) return;
 
     setLoading(true);
+    setError('');
+    
     try {
       // TODO: Implement workspace creation API call
       const newWorkspace = {
@@ -57,58 +64,137 @@ export function CreateWorkspaceDialog({
       
       setOpen(false);
       setName('');
+      setError('');
       onSuccess?.(newWorkspace);
     } catch (error) {
       console.error('Failed to create workspace:', error);
+      setError('Failed to create workspace. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!loading) {
+      setOpen(isOpen);
+      if (!isOpen) {
+        setName('');
+        setError('');
+      }
+    }
+  };
+
   const defaultTrigger = (
-    <Button variant="outline" size="sm" disabled={!canCreateWorkspace}>
+    <Button 
+      variant="outline" 
+      size="sm" 
+      disabled={!canCreateWorkspace}
+      className="hover:bg-primary/5 transition-colors"
+    >
       <Plus className="h-4 w-4 mr-2" />
       Create Workspace
     </Button>
   );
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Create New Workspace</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogHeader className="text-left">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Sparkles className="h-5 w-5 text-primary" />
+            </div>
+            <DialogTitle className="text-xl">Create New Workspace</DialogTitle>
+          </div>
+          <DialogDescription className="text-base leading-relaxed">
             Create a new workspace to organize your forms and collaborate with your team.
+            You'll be able to invite members and manage permissions.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Usage Information */}
+        {usage && !usage.workspaces.unlimited && (
+          <Card className="bg-muted/50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Workspace Usage</p>
+                  <p className="text-xs text-muted-foreground">
+                    {usage.workspaces.used} of {usage.workspaces.limit} workspaces used
+                  </p>
+                </div>
+                <Badge 
+                  variant={canCreateWorkspace ? "default" : "destructive"}
+                  className="text-xs"
+                >
+                  {canCreateWorkspace ? 'Available' : 'Limit Reached'}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Workspace Name</Label>
+            <Label htmlFor="name" className="text-sm font-medium">
+              Workspace Name
+            </Label>
             <Input
               id="name"
-              placeholder="My Workspace"
+              placeholder="e.g., Marketing Team, HR Department"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              disabled={loading}
+              disabled={loading || !canCreateWorkspace}
               required
+              className="text-base"
+              autoFocus
             />
+            <p className="text-xs text-muted-foreground">
+              This will be used to identify your workspace and can be changed later.
+            </p>
           </div>
-          <div className="flex justify-end space-x-2">
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {!canCreateWorkspace && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                You've reached your plan's workspace limit. 
+                <Button variant="link" className="h-auto p-0 ml-1" asChild>
+                  <a href="/billing">Upgrade your plan</a>
+                </Button>
+                {' '}to create more workspaces.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <DialogFooter className="gap-3">
             <Button
               type="button"
               variant="outline"
-              onClick={() => setOpen(false)}
+              onClick={() => handleOpenChange(false)}
               disabled={loading}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !name.trim() || !canCreateWorkspace}>
+            <Button 
+              type="submit" 
+              disabled={loading || !name.trim() || !canCreateWorkspace}
+              className="min-w-[120px]"
+            >
+              {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {loading ? 'Creating...' : 'Create Workspace'}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

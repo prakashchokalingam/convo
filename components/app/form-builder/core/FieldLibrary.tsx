@@ -6,8 +6,10 @@ import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { FieldType, FieldDefinition, DragItem, FormConfig } from '@/lib/form-builder/types'
 import { getFieldsByCategory, searchFieldDefinitions } from '@/lib/form-builder/field-registry'
-import { Input } from '@/components/shared/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 interface DraggableFieldItemProps {
   definition: FieldDefinition
@@ -59,47 +61,56 @@ function DraggableFieldItem({ definition, onAddField, selectedFieldId, config }:
   }
 
   return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      {...(isDisabled ? {} : listeners)}
-      {...(isDisabled ? {} : attributes)}
-      onClick={!isDisabled ? handleClick : undefined}
-      className={`
-        group relative p-3 transition-all duration-200
-        ${isDisabled 
-          ? 'field-item-disabled' 
-          : 'field-item cursor-grab active:cursor-grabbing'
-        }
-        ${isDragging ? 'opacity-50 scale-95' : ''}
-      `}
-      whileHover={!isDisabled ? { scale: 1.02 } : {}}
-      whileTap={!isDisabled ? { scale: 0.98 } : {}}
-    >
-      <div className="flex items-start space-x-3">
-        <div className="flex-shrink-0 w-8 h-8 field-item-icon rounded-md flex items-center justify-center transition-colors">
-          <IconComponent className="h-4 w-4" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-medium text-foreground">
-            {definition.label}
-          </h4>
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-            {definition.description}
-          </p>
-          {isSection && (
-            <p className="text-xs text-primary mt-1 font-medium">
-              → Add to section
-            </p>
-          )}
-          {isDisabled && (
-            <p className="text-xs text-destructive mt-1 font-medium">
-              Cannot nest sections
-            </p>
-          )}
-        </div>
-      </div>
-    </motion.div>
+    <Card className={`
+      group relative transition-all duration-200 hover:shadow-md
+      ${isDisabled 
+        ? 'opacity-50 cursor-not-allowed bg-muted' 
+        : 'cursor-grab active:cursor-grabbing hover:border-primary/50'
+      }
+      ${isDragging ? 'opacity-50 scale-95 rotate-1' : ''}
+    `}>
+      <CardContent className="p-3">
+        <motion.div
+          ref={setNodeRef}
+          style={style}
+          {...(isDisabled ? {} : listeners)}
+          {...(isDisabled ? {} : attributes)}
+          onClick={!isDisabled ? handleClick : undefined}
+          whileHover={!isDisabled ? { scale: 1.02 } : {}}
+          whileTap={!isDisabled ? { scale: 0.98 } : {}}
+        >
+          <div className="flex items-start space-x-3">
+            <div className={`
+              flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center transition-colors
+              ${isDisabled 
+                ? 'bg-muted-foreground/20 text-muted-foreground' 
+                : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground'
+              }
+            `}>
+              <IconComponent className="h-4 w-4" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-sm font-medium text-foreground">
+                {definition.label}
+              </h4>
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                {definition.description}
+              </p>
+              {isSection && (
+                <Badge variant="secondary" className="mt-2 text-xs">
+                  → Add to section
+                </Badge>
+              )}
+              {isDisabled && (
+                <Badge variant="destructive" className="mt-2 text-xs">
+                  Cannot nest sections
+                </Badge>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -126,9 +137,12 @@ function FieldCategory({ category, title, searchQuery, onAddField, selectedField
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-1">
-        {title}
-      </h3>
+      <div className="flex items-center space-x-2">
+        <Badge variant="outline" className="text-xs font-semibold">
+          {title}
+        </Badge>
+        <div className="flex-1 h-px bg-border"></div>
+      </div>
       <div className="grid gap-2">
         {fields.map((definition) => (
           <DraggableFieldItem
@@ -160,9 +174,9 @@ export function FieldLibrary({ onAddField, selectedFieldId, config }: FieldLibra
   }, [searchQuery])
 
   return (
-    <div className="flex flex-col h-full">
+    <Card className="flex flex-col h-full rounded-none border-0 border-r">
       {/* Header */}
-      <div className="p-4 border-b border-border">
+      <CardContent className="p-4 border-b border-border">
         <h2 className="text-lg font-semibold text-foreground mb-3">
           Field Library
         </h2>
@@ -178,7 +192,7 @@ export function FieldLibrary({ onAddField, selectedFieldId, config }: FieldLibra
             className="pl-10 pr-4 py-2 w-full"
           />
         </div>
-      </div>
+      </CardContent>
 
       {/* Tabs */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -271,22 +285,24 @@ export function FieldLibrary({ onAddField, selectedFieldId, config }: FieldLibra
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-border bg-muted/30">
+      <CardContent className="p-4 border-t border-border bg-muted/30">
         {selectedFieldId && config.fields.find(f => f.id === selectedFieldId)?.type === 'section' ? (
-          <div className="text-center">
-            <div className="text-xs text-primary font-medium mb-1">
-              Section Selected
+          <Card className="p-3 bg-primary/5 border-primary/20">
+            <div className="text-center">
+              <Badge variant="default" className="mb-2">
+                Section Selected
+              </Badge>
+              <p className="text-xs text-muted-foreground">
+                Click fields to add to "{config.fields.find(f => f.id === selectedFieldId)?.label}"
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Click fields to add to "{config.fields.find(f => f.id === selectedFieldId)?.label}"
-            </p>
-          </div>
+          </Card>
         ) : (
           <p className="text-xs text-muted-foreground text-center">
             Drag fields to the canvas or click to add them
           </p>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
