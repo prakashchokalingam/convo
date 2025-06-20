@@ -69,7 +69,7 @@ export default function TemplatesPage() {
           </TabsTrigger>
           <TabsTrigger value="workspace" className="flex items-center gap-2">
             <Building className="w-4 h-4" />
-            My Templates
+            Workspace Templates
           </TabsTrigger>
         </TabsList>
 
