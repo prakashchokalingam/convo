@@ -1,14 +1,14 @@
 # Templates Feature - Test Cases
 
 ## Feature Overview
-Template system allowing admins to create forms from pre-defined global templates or user-created templates, with role-based permissions and usage tracking.
+Template system allowing users to create forms from pre-defined global templates or user-created workspace templates. Access and operations are controlled by granular, resource-based permissions (e.g., `create_template`, `edit_template`, `delete_template`) rather than broad roles, with usage tracking.
 
 ---
 
 ## 🔐 Permission-Based Test Cases
 
 ### [Case 1] User with `create_template` permission can access template creation
-**When enabled verify:**
+**Verify that a user possessing the `create_template` permission for a workspace can:**
 - [ ] "Create Template" button is visible on Templates page
 - [ ] User can click "Create Template" and open creation dialog
 - [ ] User can successfully create a new template
@@ -16,25 +16,25 @@ Template system allowing admins to create forms from pre-defined global template
 - [ ] Template is associated with user's workspace
 
 ### [Case 2] User without `create_template` permission cannot create templates
-**When disabled verify:**
+**Verify that a user lacking the `create_template` permission for a workspace:**
 - [ ] "Create Template" button is hidden on Templates page
 - [ ] API endpoint `/api/templates` POST returns 403 for unauthorized users
 - [ ] User cannot access template creation dialog
 - [ ] Error message is displayed if user tries to access creation via URL manipulation
 
 ### [Case 3] User with `edit_template` permission can modify templates
-**When enabled verify:**
-- [ ] "Edit" button is visible on user-created template cards
-- [ ] User can access template edit dialog
-- [ ] User can successfully update template name, description, and form schema
+**Verify that a user possessing the `edit_template` permission for a workspace can:**
+  - [ ] "Edit" button is visible on template cards within that workspace
+  - [ ] User can access template edit dialog for workspace templates
+  - [ ] User can successfully update template name, description, and form schema for workspace templates
 - [ ] Changes are saved and reflected immediately
 - [ ] Updated timestamp is refreshed
 
 ### [Case 4] User without `edit_template` permission cannot modify templates
-**When disabled verify:**
-- [ ] "Edit" button is hidden on template cards
-- [ ] API endpoint `/api/templates/[id]` PUT returns 403 for unauthorized users
-- [ ] User cannot access edit functionality even with direct URL access
+**Verify that a user lacking the `edit_template` permission for a workspace:**
+  - [ ] "Edit" button is hidden on template cards within that workspace
+  - [ ] API endpoint `/api/templates/[id]` PUT returns 403 if the user lacks `edit_template` permission for the template's workspace
+  - [ ] User cannot access edit functionality for workspace templates even with direct URL access
 - [ ] Read-only view is maintained
 
 ### [Case 5] User with `create_form` permission can create forms from templates
@@ -64,20 +64,22 @@ Template system allowing admins to create forms from pre-defined global template
 - [ ] Usage statistics are displayed correctly
 - [ ] Templates cannot be edited by regular users
 
-### [Case 8] Global templates can be cloned by users with permissions
-**When enabled verify:**
-- [ ] "Clone" button is visible for users with `create_template` permission
-- [ ] Cloning creates a copy in user's workspace
-- [ ] Cloned template appears in "Templates" tab
-- [ ] Original global template clone count is incremented
-- [ ] Cloned template can be edited by the user
+### [Case 8] Global templates can be cloned by users with `create_template` permission in the target workspace
+**Verify that:**
+- [ ] "Clone" button is visible on global template cards for users.
+- [ ] User can initiate cloning and specify a target workspace.
+- [ ] If the user has `create_template` permission in the *target workspace*, cloning succeeds.
+- [ ] If the user lacks `create_template` permission in the *target workspace*, cloning is denied with a 403 error.
+- [ ] Cloning creates a new, editable, workspace-specific template in the target workspace (it's not another global template).
+- [ ] The new template appears in the "My Templates" (or equivalent) tab for the target workspace.
+- [ ] Original global template's clone count is incremented.
 
 ### [Case 9] Global templates cannot be deleted or edited by users
-**When enabled verify:**
-- [ ] "Edit" and "Delete" buttons are not visible on global template cards
-- [ ] API endpoints for editing/deleting global templates return 403
-- [ ] Global templates maintain their original form and cannot be modified
-- [ ] Only Convo administrators can modify global templates
+**Verify that:**
+  - [ ] "Edit" and "Delete" buttons are not visible on global template cards for any workspace user.
+  - [ ] API endpoints for editing or deleting templates return 403 if a user attempts this on a global template ID.
+  - [ ] Global templates maintain their original form and content.
+  - [ ] (Assumption) Only system administrators (e.g., "Convo administrators") can manage global templates through a separate interface/process.
 
 ---
 
@@ -107,11 +109,12 @@ Template system allowing admins to create forms from pre-defined global template
 - [ ] Original template clone count is incremented
 - [ ] Both templates exist independently
 
-### [Case 13] User can delete their own templates
-**When enabled verify:**
-- [ ] "Delete" button appears on user-created templates
-- [ ] Confirmation dialog appears before deletion
-- [ ] Template is permanently removed from user's workspace
+### [Case 13] User with `delete_template` permission can delete their workspace templates
+**Verify that a user possessing the `delete_template` permission for a workspace can:**
+- [ ] "Delete" button appears on workspace templates within that workspace.
+- [ ] User can initiate deletion and a confirmation dialog appears.
+- [ ] Template is permanently removed from the user's workspace upon confirmation.
+- [ ] API endpoint `/api/templates/[id]` DELETE returns 403 if the user lacks `delete_template` permission for the template's workspace.
 - [ ] Forms created from template are not affected
 - [ ] Template no longer appears in lists
 

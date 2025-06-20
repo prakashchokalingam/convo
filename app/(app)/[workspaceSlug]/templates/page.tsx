@@ -30,8 +30,8 @@ export default function TemplatesPage() {
     );
   }
 
-  // Check if user can create templates (owner or admin)
-  const canCreateTemplates = hasPermission('admin'); // Assuming admin includes template creation
+  // Check if user can create templates using granular permission
+  const canCreateTemplates = hasPermission('templates', 'create');
 
   return (
     <div className="flex-1 space-y-6 p-6">

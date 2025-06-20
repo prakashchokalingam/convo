@@ -1,18 +1,20 @@
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
+import { createId } from "@paralleldrive/cuid2";
 import { db } from "@/lib/db";
-import { templates, workspaceMembers } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { templates } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { checkWorkspacePermission, getUserWorkspaceRole } from "@/lib/rbac";
 
 /**
  * @swagger
  * /api/templates/{id}/clone:
  *   post:
- *     summary: Clone a template to workspace
+ *     summary: Clone a template to a workspace
  *     description: |
- *       Creates a copy of an existing template in the specified workspace.
- *       Can clone both global templates and workspace templates (if user has access).
- *       Requires create_template permission in the target workspace.
+ *       Creates a copy of an existing template (either global or workspace-specific)
+ *       into the specified target workspace.
+ *       Permissions are checked based on the source template type and target workspace.
  *     tags: [Templates]
  *     security:
  *       - ClerkAuth: []
@@ -22,8 +24,7 @@ import { eq, and } from "drizzle-orm";
  *         required: true
  *         schema:
  *           type: string
- *           format: uuid
- *         description: Source template ID to clone
+ *         description: ID of the source template to clone.
  *     requestBody:
  *       required: true
  *       content:
@@ -35,24 +36,13 @@ import { eq, and } from "drizzle-orm";
  *             properties:
  *               workspaceId:
  *                 type: string
- *                 format: uuid
- *                 description: Target workspace ID for the cloned template
- *               name:
+ *                 description: ID of the target workspace where the template will be cloned.
+ *               name: # Optional custom name
  *                 type: string
- *                 description: Custom name for the cloned template (optional)
- *               description:
- *                 type: string
- *                 description: Custom description for the cloned template (optional)
- *           examples:
- *             cloneTemplate:
- *               summary: Clone template to workspace
- *               value:
- *                 workspaceId: "550e8400-e29b-41d4-a716-446655440000"
- *                 name: "My Custom Job Application Form"
- *                 description: "Customized version of the global job application template"
+ *                 description: Optional custom name for the cloned template. If not provided, appends "(Copy)".
  *     responses:
  *       201:
- *         description: Template cloned successfully
+ *         description: Template cloned successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -62,136 +52,127 @@ import { eq, and } from "drizzle-orm";
  *                   type: boolean
  *                   example: true
  *                 template:
- *                   $ref: '#/components/schemas/Template'
+ *                   $ref: '#/components/schemas/Template' # Assuming you have a Template schema defined
  *                 message:
  *                   type: string
  *                   example: "Template cloned successfully"
  *       400:
- *         $ref: '#/components/responses/ValidationError'
+ *         description: Bad request (e.g., missing targetWorkspaceId).
  *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
+ *         description: Unauthorized.
  *       403:
- *         $ref: '#/components/responses/ForbiddenError'
+ *         description: Forbidden (insufficient permissions or access denied).
  *       404:
- *         $ref: '#/components/responses/NotFoundError'
+ *         description: Source template not found.
  *       500:
- *         $ref: '#/components/responses/InternalServerError'
+ *         description: Internal server error.
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } } // id is the source template ID
 ) {
   try {
     const { userId } = auth();
-    
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { workspaceId, name: customName, description: customDescription } = body;
+    const targetWorkspaceId = body.workspaceId;
+    const customName = body.name; // Optional custom name from request body
 
-    if (!workspaceId) {
-      return NextResponse.json({ 
-        error: "Missing required field: workspaceId" 
-      }, { status: 400 });
+    if (!targetWorkspaceId) {
+      return NextResponse.json({ error: "Target workspaceId is required in the request body" }, { status: 400 });
     }
 
-    // Get source template
-    const sourceTemplate = await db
+    const sourceTemplateId = params.id;
+
+    // 1. Fetch the source template
+    const sourceTemplateResults = await db
       .select()
       .from(templates)
-      .where(eq(templates.id, params.id))
+      .where(eq(templates.id, sourceTemplateId))
       .limit(1);
 
-    if (sourceTemplate.length === 0) {
+    if (sourceTemplateResults.length === 0) {
       return NextResponse.json({ error: "Source template not found" }, { status: 404 });
     }
+    const sourceTemplateData = sourceTemplateResults[0];
 
-    const templateData = sourceTemplate[0];
+    // 2. Permission Checks
+    // 2a. Check if user is part of the target workspace (required for all clone operations)
+    const targetUserRole = await getUserWorkspaceRole(userId, targetWorkspaceId);
+    if (!targetUserRole) {
+      return NextResponse.json({ error: "Access denied to target workspace. User is not a member." }, { status: 403 });
+    }
 
-    // Check access to source template
-    if (!templateData.isGlobal) {
-      // For workspace templates, verify user has access to the source workspace
-      if (!templateData.workspaceId) {
-        return NextResponse.json({ error: "Source template access error" }, { status: 403 });
+    // 2b. Check 'create_template' permission in the target workspace (required for all clone operations)
+    const canCreateInTarget = await checkWorkspacePermission(userId, targetWorkspaceId, 'templates', 'create');
+    if (!canCreateInTarget) {
+      return NextResponse.json({ error: "Insufficient permissions to create template in target workspace." }, { status: 403 });
+    }
+
+    // 2c. Additional checks if the source template is workspace-specific (not global)
+    if (!sourceTemplateData.isGlobal) {
+      if (!sourceTemplateData.workspaceId) {
+        console.error(`Source template ${sourceTemplateData.id} is not global but has no workspaceId.`);
+        return NextResponse.json({ error: "Source template data integrity issue." }, { status: 500 });
       }
-
-      const sourceWorkspaceMember = await db
-        .select()
-        .from(workspaceMembers)
-        .where(and(
-          eq(workspaceMembers.workspaceId, templateData.workspaceId),
-          eq(workspaceMembers.userId, userId)
-        ))
-        .limit(1);
-
-      if (sourceWorkspaceMember.length === 0) {
-        return NextResponse.json({ error: "Access denied to source template" }, { status: 403 });
+      // If source and target workspaces are different, verify membership in source workspace.
+      if (sourceTemplateData.workspaceId !== targetWorkspaceId) {
+        const sourceUserRole = await getUserWorkspaceRole(userId, sourceTemplateData.workspaceId);
+        if (!sourceUserRole) {
+          // User must be a member of the source template's workspace to clone it to a different workspace.
+          return NextResponse.json({ error: "Access denied to source template's workspace. User is not a member." }, { status: 403 });
+        }
       }
     }
+    // If source is global, being a member of target and having create_template in target is sufficient.
 
-    // Verify user has create_template permission in target workspace
-    const targetWorkspaceMember = await db
-      .select({
-        role: workspaceMembers.role
-      })
-      .from(workspaceMembers)
-      .where(and(
-        eq(workspaceMembers.workspaceId, workspaceId),
-        eq(workspaceMembers.userId, userId)
-      ))
-      .limit(1);
+    // 3. Create the new (cloned) template
+    const newTemplateId = createId(); // Generate a new unique ID
+    const clonedTemplateName = customName || `${sourceTemplateData.name} (Copy)`;
 
-    if (targetWorkspaceMember.length === 0) {
-      return NextResponse.json({ error: "Access denied to target workspace" }, { status: 403 });
-    }
-
-    // Check if user has create_template permission (owner or admin)
-    const userRole = targetWorkspaceMember[0].role;
-    if (!['owner', 'admin'].includes(userRole)) {
-      return NextResponse.json({ 
-        error: "Insufficient permissions. Requires create_template permission." 
-      }, { status: 403 });
-    }
-
-    // Increment clone count on source template
-    await db
-      .update(templates)
-      .set({
-        cloneCount: templateData.cloneCount + 1,
-        updatedAt: new Date()
-      })
-      .where(eq(templates.id, params.id));
-
-    // Create the cloned template
-    const clonedName = customName || `${templateData.name} (Copy)`;
-    const clonedDescription = customDescription || templateData.description;
-
-    const [clonedTemplate] = await db
+    const [newClonedTemplate] = await db
       .insert(templates)
       .values({
-        name: clonedName,
-        description: clonedDescription,
-        formSchema: templateData.formSchema,
-        category: templateData.category,
-        workspaceId: workspaceId,
+        id: newTemplateId,
+        name: clonedTemplateName,
+        description: sourceTemplateData.description,
+        formSchema: sourceTemplateData.formSchema,
+        category: sourceTemplateData.category,
+        isGlobal: false,
+        workspaceId: targetWorkspaceId,
         createdBy: userId,
-        thumbnailUrl: templateData.thumbnailUrl,
-        isGlobal: false, // Cloned templates are always workspace-specific
+        originalTemplateId: sourceTemplateData.id,
         usageCount: 0,
         cloneCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        thumbnailUrl: sourceTemplateData.thumbnailUrl, // Ensure this is copied
       })
       .returning();
 
+    // 4. Increment cloneCount of the source template
+    await db
+      .update(templates)
+      .set({
+        cloneCount: (sourceTemplateData.cloneCount || 0) + 1,
+        updatedAt: new Date() // Also update updatedAt for the source template
+      })
+      .where(eq(templates.id, sourceTemplateData.id));
+
     return NextResponse.json({
       success: true,
-      template: clonedTemplate,
+      template: newClonedTemplate,
       message: "Template cloned successfully"
     }, { status: 201 });
 
   } catch (error) {
     console.error("Error cloning template:", error);
+    if (error instanceof SyntaxError) {
+        return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    }
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

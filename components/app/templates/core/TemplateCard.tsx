@@ -128,10 +128,13 @@ export function TemplateCard({
   }
 
   return (
-    <Card className={cn(
-      "group hover:shadow-lg transition-all duration-200 border-muted/40", 
-      variant === 'compact' ? 'h-auto' : 'h-full'
-    )}>
+    <Card
+      role="article"
+      className={cn(
+        "group hover:shadow-lg transition-all duration-200 border-muted/40",
+        variant === 'compact' ? 'h-auto' : 'h-full'
+      )}
+    >
       <CardHeader className={variant === 'compact' ? 'pb-3' : 'pb-4'}>
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">

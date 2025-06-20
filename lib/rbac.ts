@@ -19,6 +19,9 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     { resource: 'members', action: '*' },
     { resource: 'billing', action: '*' },
     { resource: 'activities', action: 'read' },
+    { resource: 'templates', action: 'create' },
+    { resource: 'templates', action: 'edit' },
+    { resource: 'templates', action: 'delete' },
   ],
   admin: [
     { resource: 'workspace', action: 'read' },
@@ -29,6 +32,9 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     { resource: 'members', action: 'invite' },
     { resource: 'members', action: 'update' },
     { resource: 'activities', action: 'read' },
+    { resource: 'templates', action: 'create' },
+    { resource: 'templates', action: 'edit' },
+    { resource: 'templates', action: 'delete' },
   ],
   member: [
     { resource: 'workspace', action: 'read' },

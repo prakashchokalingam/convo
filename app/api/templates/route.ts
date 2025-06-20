@@ -1,9 +1,10 @@
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { createId } from "@paralleldrive/cuid2";
-import { db } from "@/drizzle/db";
-import { templates, workspaceMembers, workspaces } from "@/drizzle/schema";
+import { db } from "@/lib/db";
+import { templates, workspaceMembers, workspaces } from "@/lib/db/schema"; // Assuming workspaceMembers is still needed for other checks or can be removed if not.
 import { eq, and, or, count, desc, ilike } from "drizzle-orm";
+import { checkWorkspacePermission, getUserWorkspaceRole } from "@/lib/rbac"; // Added checkWorkspacePermission and getUserWorkspaceRole
 
 /**
  * @swagger
@@ -295,26 +296,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user has create_template permission in the workspace
-    const workspaceMember = await db
-      .select({
-        role: workspaceMembers.role
-      })
-      .from(workspaceMembers)
-      .where(and(
-        eq(workspaceMembers.workspaceId, workspaceId),
-        eq(workspaceMembers.userId, userId)
-      ))
-      .limit(1);
-
-    if (workspaceMember.length === 0) {
-      return NextResponse.json({ error: "Access denied to workspace" }, { status: 403 });
+    // First, ensure the user is part of the workspace.
+    const userRole = await getUserWorkspaceRole(userId, workspaceId);
+    if (!userRole) {
+      return NextResponse.json({ error: "Access denied to workspace. User is not a member." }, { status: 403 });
     }
 
-    // Check if user has create_template permission (owner or admin)
-    const userRole = workspaceMember[0].role;
-    if (!['owner', 'admin'].includes(userRole)) {
+    // Now, check for specific 'create_template' permission
+    const canCreateTemplate = await checkWorkspacePermission(userId, workspaceId, 'templates', 'create');
+    if (!canCreateTemplate) {
       return NextResponse.json({ 
-        error: "Insufficient permissions. Requires create_template permission." 
+        error: "Insufficient permissions. Requires 'create_template' permission."
       }, { status: 403 });
     }
 

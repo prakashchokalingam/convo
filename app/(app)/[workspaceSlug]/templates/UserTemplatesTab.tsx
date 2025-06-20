@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useWorkspace } from '@/hooks/use-workspace'; // Added useWorkspace import
 import { TemplateGrid, TemplateAction, TemplatePermissions } from '@/components/app/templates/core';
 import { TemplatePreview } from '@/components/app/templates/core';
 import { Template } from '@/lib/db/schema';
@@ -40,12 +41,14 @@ export function UserTemplatesTab({
     template: Template | null;
   }>({ isOpen: false, template: null });
 
+  const { hasPermission } = useWorkspace(); // Get hasPermission from hook
+
   // Define permissions for workspace templates
   const permissions: TemplatePermissions = {
-    canClone: canCreateTemplates, // Can clone if user can create templates
+    canClone: canCreateTemplates, // This comes from parent, already based on ('templates', 'create')
     canCreateForm: true, // All users can create forms from templates
-    canEdit: canCreateTemplates, // Can edit if user can create templates (owner/admin)
-    canDelete: canCreateTemplates, // Can delete if user can create templates (owner/admin)
+    canEdit: hasPermission('templates', 'edit'),
+    canDelete: hasPermission('templates', 'delete'),
   };
 
   const fetchWorkspaceTemplates = useCallback(async () => {

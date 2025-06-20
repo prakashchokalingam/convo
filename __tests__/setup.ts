@@ -1,6 +1,32 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeAll, vi } from 'vitest'
+import React from 'react'; // Import React for JSX in mock
+
+// Mock lucide-react icons
+vi.mock('lucide-react', () => {
+  const createIcon = (name: string) => (props: any) => {
+    // Consistent data-testid, e.g., remove "Icon" suffix, lowercase
+    const testIdName = name.replace(/Icon$/, '').toLowerCase();
+    return React.createElement('div', { 'data-testid': `lucide-${testIdName}`, ...props });
+  };
+
+  return new Proxy({}, {
+    get: (target, propKey, receiver) => {
+      if (typeof propKey === 'string') {
+        if (propKey === 'default') {
+          // lucide-react primarily uses named exports for icons.
+          // If there's a legitimate default export needed, handle it here.
+          // For now, returning a generic icon for default.
+          return createIcon('default-lucide-icon');
+        }
+        // For any other property access, assume it's an icon name
+        return createIcon(propKey);
+      }
+      return Reflect.get(target, propKey, receiver);
+    },
+  });
+});
 
 // Global test setup
 beforeAll(() => {
