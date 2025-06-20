@@ -29,7 +29,7 @@ export default async function FormsPage({ params }: FormsPageProps) {
 
       {/* Forms List */}
       <Suspense fallback={<div>Loading forms...</div>}>
-        <FormsList workspaceId={workspace.id} />
+        <FormsList workspaceId={workspace.id} workspaceSlug={params.workspaceSlug} />
       </Suspense>
     </div>
   );
