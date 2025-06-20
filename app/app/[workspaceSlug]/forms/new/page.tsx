@@ -45,6 +45,7 @@ export default function NewFormPage() {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [aiPrompt, setAiPrompt] = useState('');
   
   // Form details for scratch creation
   const [formDetails, setFormDetails] = useState({
@@ -139,61 +140,100 @@ export default function NewFormPage() {
   };
 
   const handleCreateFromScratch = async () => {
-    if (!formDetails.title.trim()) {
-      setError('Form title is required');
-      return;
-    }
-
     setIsCreating(true);
     setError(null);
 
-    try {
-      // Create a basic form structure
-      const basicFormSchema = {
-        fields: [
-          {
-            id: 'sample_field',
-            type: 'text',
-            label: 'Sample Field',
-            placeholder: 'Start building your form by editing this field',
-            required: false,
-          }
-        ],
-        settings: {
-          submitButtonText: 'Submit',
-          successMessage: 'Thank you for your submission!',
-        },
-      };
-
-      const response = await fetch('/api/forms', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          workspaceId: workspace.id,
-          title: formDetails.title,
-          description: formDetails.description,
-          config: JSON.stringify(basicFormSchema),
-          isConversational: formDetails.isConversational,
-          isPublished: false,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create form');
+    if (selectedMethod === 'ai') {
+      if (!aiPrompt.trim() || !formDetails.title.trim()) {
+        setError('AI Prompt and Form Title are required for AI generation.');
+        setIsCreating(false);
+        return;
       }
+      try {
+        const response = await fetch('/api/forms/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            workspaceId: workspace.id,
+            prompt: aiPrompt,
+            formTitle: formDetails.title,
+            // description: formDetails.description, // Description might not be needed for AI
+            isConversational: formDetails.isConversational,
+          }),
+        });
 
-      const data = await response.json();
-      
-      // Navigate to the form editor
-      router.push(`/${workspace.slug}/forms/${data.form.id}`);
-      
-    } catch (error) {
-      console.error('Error creating form:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create form');
-    } finally {
-      setIsCreating(false);
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: 'Failed to generate form using AI' }));
+          throw new Error(errorData.message || 'Failed to generate form using AI');
+        }
+
+        const data = await response.json();
+
+        // Navigate to the form editor
+        router.push(`/${workspace.slug}/forms/${data.form.id}`);
+
+      } catch (error) {
+        console.error('Error generating form with AI:', error);
+        setError(error instanceof Error ? error.message : 'An unexpected error occurred during AI form generation');
+      } finally {
+        setIsCreating(false);
+      }
+    } else { // Handles 'scratch' method
+      if (!formDetails.title.trim()) {
+        setError('Form title is required');
+        setIsCreating(false);
+        return;
+      }
+      try {
+        // Create a basic form structure
+        const basicFormSchema = {
+          fields: [
+            {
+              id: 'sample_field',
+              type: 'text',
+              label: 'Sample Field',
+              placeholder: 'Start building your form by editing this field',
+              required: false,
+            }
+          ],
+          settings: {
+            submitButtonText: 'Submit',
+            successMessage: 'Thank you for your submission!',
+          },
+        };
+
+        const response = await fetch('/api/forms', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            workspaceId: workspace.id,
+            title: formDetails.title,
+            description: formDetails.description,
+            config: JSON.stringify(basicFormSchema),
+            isConversational: formDetails.isConversational,
+            isPublished: false,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create form from scratch');
+        }
+
+        const data = await response.json();
+
+        // Navigate to the form editor
+        router.push(`/${workspace.slug}/forms/${data.form.id}`);
+
+      } catch (error) {
+        console.error('Error creating form from scratch:', error);
+        setError(error instanceof Error ? error.message : 'Failed to create form');
+      } finally {
+        setIsCreating(false);
+      }
     }
   };
 
@@ -277,22 +317,27 @@ export default function NewFormPage() {
       </div>
 
       {/* Future AI Option - Coming Soon */}
-      <Card className="mt-6 border-dashed border-2 border-gray-200 bg-gray-50 opacity-75">
+      <Card
+        className="mt-6 border-2 border-transparent hover:border-purple-200 cursor-pointer"
+        onClick={() => {
+          setSelectedMethod('ai');
+          setCreationStep('details');
+        }}
+      >
         <CardHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg">
               <Sparkles className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <CardTitle className="text-xl text-gray-500">AI-Generated Form</CardTitle>
-              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                Coming Soon
-              </Badge>
+              <CardTitle className="text-xl text-gray-900">AI-Generated Form</CardTitle>
             </div>
           </div>
-          <CardDescription>
-            Describe your form in plain English and let AI build it for you automatically.
-          </CardDescription>
+          <Textarea
+            placeholder="Describe your form in plain English and let AI build it for you automatically."
+            className="mt-1"
+            rows={3}
+          />
         </CardHeader>
       </Card>
     </div>
@@ -316,12 +361,14 @@ export default function NewFormPage() {
         <p className="text-gray-600">
           {selectedMethod === 'template' 
             ? `Creating form from "${selectedTemplate?.name}" template`
+            : selectedMethod === 'ai'
+            ? 'Describe the form you want to create using AI'
             : 'Provide basic information for your new form'
           }
         </p>
       </div>
 
-      {selectedTemplate && (
+      {selectedTemplate && selectedMethod === 'template' && (
         <Card className="mb-6 bg-blue-50 border-blue-200">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -346,6 +393,19 @@ export default function NewFormPage() {
 
       <Card>
         <CardContent className="pt-6 space-y-4">
+          {selectedMethod === 'ai' && (
+            <div>
+              <Label htmlFor="ai-prompt">Describe your form (AI Prompt) *</Label>
+              <Textarea
+                id="ai-prompt"
+                placeholder="e.g., A simple contact form with name, email, and message fields."
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                className="mt-1"
+                rows={5}
+              />
+            </div>
+          )}
           <div>
             <Label htmlFor="form-title">Form Title *</Label>
             <Input
@@ -357,17 +417,19 @@ export default function NewFormPage() {
             />
           </div>
 
-          <div>
-            <Label htmlFor="form-description">Description</Label>
-            <Textarea
-              id="form-description"
-              placeholder="Describe what this form is for..."
-              value={formDetails.description}
-              onChange={(e) => setFormDetails(prev => ({ ...prev, description: e.target.value }))}
-              className="mt-1"
-              rows={3}
-            />
-          </div>
+          {selectedMethod !== 'ai' && ( // Description may not be needed if AI is generating based on prompt
+            <div>
+              <Label htmlFor="form-description">Description</Label>
+              <Textarea
+                id="form-description"
+                placeholder="Describe what this form is for..."
+                value={formDetails.description}
+                onChange={(e) => setFormDetails(prev => ({ ...prev, description: e.target.value }))}
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+          )}
 
           <Separator />
 
@@ -377,8 +439,11 @@ export default function NewFormPage() {
             </Button>
             
             <Button
-              onClick={selectedMethod === 'template' ? handleCreateFromTemplate : handleCreateFromScratch}
-              disabled={!formDetails.title.trim() || isCreating}
+              onClick={selectedMethod === 'template' ? handleCreateFromTemplate : handleCreateFromScratch} // TODO: Add AI handler
+              disabled={
+                (selectedMethod === 'ai' ? !aiPrompt.trim() : !formDetails.title.trim()) ||
+                isCreating
+              }
             >
               {isCreating ? (
                 <>
