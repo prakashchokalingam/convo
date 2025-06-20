@@ -1,4 +1,4 @@
-import { getCurrentWorkspace, validateWorkspaceAccess } from '@/lib/workspace';
+import { getCurrentWorkspace, validateWorkspaceAccess } from '@/lib/workspace-server';
 import { MembersList, InviteMemberButton, MembersHeader } from '@/components/app/members/members-components';
 
 interface MembersPageProps {

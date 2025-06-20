@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getCurrentWorkspace } from '@/lib/workspace';
+import { getCurrentWorkspace } from '@/lib/workspace-server';
 import { WelcomeBanner } from '@/components/app/dashboard/welcome-banner';
 import { DashboardStats, RecentForms, QuickActions } from '@/components/app/dashboard/dashboard-components';
 

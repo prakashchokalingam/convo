@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs';
-import { getCurrentUserWorkspaces } from '@/lib/workspace';
+import { getCurrentUserWorkspaces } from '@/lib/workspace-server';
 import { AnimatedWorkspaceCreation } from '@/components/app/onboarding/animated-workspace-creation';
 
 export default async function OnboardingPage() {

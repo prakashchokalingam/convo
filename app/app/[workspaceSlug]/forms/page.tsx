@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { getCurrentWorkspace } from '@/lib/workspace';
+import { getCurrentWorkspace } from '@/lib/workspace-server';
 import { FormsList, CreateFormButton, FormsHeader } from '@/components/forms/form-components';
 
 interface FormsPageProps {

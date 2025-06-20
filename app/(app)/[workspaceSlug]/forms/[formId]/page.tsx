@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getCurrentWorkspace } from '@/lib/workspace';
+import { getCurrentWorkspace } from '@/lib/workspace-server';
 import { EnhancedFormEditor, FormHeader } from '@/components/forms/enhanced-form-components';
 import { db } from '@/lib/db';
 import { forms } from '@/lib/db/schema';

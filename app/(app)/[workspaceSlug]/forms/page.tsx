@@ -1,7 +1,6 @@
 "use client"; // Required for using useState
 
 import { useState, useEffect } from 'react';
-import { getCurrentWorkspace } from '@/lib/workspace'; // Still needed for initial workspace data
 import { FormsList, CreateFormButton, FormsHeader } from '@/components/forms/form-components';
 
 interface FormsPageProps {
@@ -31,29 +30,41 @@ export default function FormsPage({ params }: FormsPageProps) {
 
   useEffect(() => {
     async function loadWorkspace() {
+      setLoadingWorkspace(true);
       try {
-        setLoadingWorkspace(true);
-        const ws = await getCurrentWorkspace(params.workspaceSlug);
+        const response = await fetch(`/api/workspaces/${params.workspaceSlug}/current`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch workspace: ${response.status}`);
+        }
+        const ws = await response.json();
         setWorkspace(ws);
       } catch (error) {
         console.error("Failed to load workspace", error);
         // Handle error appropriately, e.g., show error message or redirect
+        // For now, we'll just log it and the component will show loading/error state
+        setWorkspace(null); // Clear workspace on error
       } finally {
         setLoadingWorkspace(false);
       }
     }
-    loadWorkspace();
+    if (params.workspaceSlug) {
+      loadWorkspace();
+    }
   }, [params.workspaceSlug]);
 
-  if (loadingWorkspace || !workspace) {
+  if (loadingWorkspace) {
     return <div>Loading workspace information...</div>; // Or a more sophisticated loading state
+  }
+
+  if (!workspace) {
+    return <div>Error loading workspace or workspace not found.</div>; // Handle case where workspace is null after loading
   }
 
   return (
     <div className="space-y-6">
       {/* Forms Header with Search and Filters */}
       <FormsHeader
-        workspace={workspace} // Keep workspace prop for now, can be removed if FormsHeader no longer needs it directly
+        workspace={workspace}
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
         statusFilter={statusFilter}

@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Settings, Users, CreditCard, Plug, AlertCircle } from 'lucide-react'
-import { getWorkspaceSettingsUrl } from '@/lib/workspace'
+import { getWorkspaceSettingsUrl } from '@/lib/urls/workspace-urls'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 

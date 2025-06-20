@@ -1,4 +1,4 @@
-import { getCurrentWorkspace } from '@/lib/workspace';
+import { getCurrentWorkspace } from '@/lib/workspace-server';
 import { WorkspaceSettings, SettingsNavigation } from '@/components/app/settings/settings-components';
 
 interface SettingsPageProps {

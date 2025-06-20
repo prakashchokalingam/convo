@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { WorkspaceWithRole } from '@/lib/workspace';
+import type { WorkspaceWithRole } from '@/lib/types/workspace';
 import { Button } from '@/components/shared/ui/button';
 import { X, Sparkles } from 'lucide-react';
 
