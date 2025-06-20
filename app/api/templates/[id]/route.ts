@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { templates, workspaceMembers } from "@/lib/db/schema";
+import { templates, workspaceMembers } from "@/lib/db/schema"; // workspaceMembers might be removable if getUserWorkspaceRole makes it redundant here
 import { eq, and, or } from "drizzle-orm";
+import { checkWorkspacePermission, getUserWorkspaceRole } from "@/lib/rbac"; // Added imports
 
 /**
  * @swagger
@@ -229,29 +230,21 @@ export async function PUT(
 
     // Verify user has edit_template permission in the workspace
     if (!templateData.workspaceId) {
-      return NextResponse.json({ error: "Template workspace error" }, { status: 403 });
+      // This case should ideally not be reached if non-global templates always have a workspaceId
+      return NextResponse.json({ error: "Template workspace ID is missing for a non-global template" }, { status: 500 });
     }
 
-    const workspaceMember = await db
-      .select({
-        role: workspaceMembers.role
-      })
-      .from(workspaceMembers)
-      .where(and(
-        eq(workspaceMembers.workspaceId, templateData.workspaceId),
-        eq(workspaceMembers.userId, userId)
-      ))
-      .limit(1);
-
-    if (workspaceMember.length === 0) {
-      return NextResponse.json({ error: "Access denied to workspace" }, { status: 403 });
+    // First, ensure the user is part of the workspace.
+    const userRole = await getUserWorkspaceRole(userId, templateData.workspaceId);
+    if (!userRole) {
+      return NextResponse.json({ error: "Access denied to workspace. User is not a member." }, { status: 403 });
     }
 
-    // Check if user has edit_template permission (owner or admin)
-    const userRole = workspaceMember[0].role;
-    if (!['owner', 'admin'].includes(userRole)) {
+    // Now, check for specific 'edit_template' permission
+    const canEditTemplate = await checkWorkspacePermission(userId, templateData.workspaceId, 'templates', 'edit');
+    if (!canEditTemplate) {
       return NextResponse.json({ 
-        error: "Insufficient permissions. Requires edit_template permission." 
+        error: "Insufficient permissions. Requires 'edit_template' permission."
       }, { status: 403 });
     }
 
@@ -359,31 +352,23 @@ export async function DELETE(
       }, { status: 403 });
     }
 
-    // Verify user has edit_template permission in the workspace
+    // Verify user has delete_template permission in the workspace
     if (!templateData.workspaceId) {
-      return NextResponse.json({ error: "Template workspace error" }, { status: 403 });
+      // This case should ideally not be reached if non-global templates always have a workspaceId
+      return NextResponse.json({ error: "Template workspace ID is missing for a non-global template" }, { status: 500 });
     }
 
-    const workspaceMember = await db
-      .select({
-        role: workspaceMembers.role
-      })
-      .from(workspaceMembers)
-      .where(and(
-        eq(workspaceMembers.workspaceId, templateData.workspaceId),
-        eq(workspaceMembers.userId, userId)
-      ))
-      .limit(1);
-
-    if (workspaceMember.length === 0) {
-      return NextResponse.json({ error: "Access denied to workspace" }, { status: 403 });
+    // First, ensure the user is part of the workspace.
+    const userRole = await getUserWorkspaceRole(userId, templateData.workspaceId);
+    if (!userRole) {
+      return NextResponse.json({ error: "Access denied to workspace. User is not a member." }, { status: 403 });
     }
 
-    // Check if user has edit_template permission (owner or admin)
-    const userRole = workspaceMember[0].role;
-    if (!['owner', 'admin'].includes(userRole)) {
+    // Now, check for specific 'delete_template' permission
+    const canDeleteTemplate = await checkWorkspacePermission(userId, templateData.workspaceId, 'templates', 'delete');
+    if (!canDeleteTemplate) {
       return NextResponse.json({ 
-        error: "Insufficient permissions. Requires edit_template permission." 
+        error: "Insufficient permissions. Requires 'delete_template' permission."
       }, { status: 403 });
     }
 
