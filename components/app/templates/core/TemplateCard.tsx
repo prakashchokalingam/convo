@@ -1,10 +1,11 @@
 "use client";
 
 import React from 'react';
-import { Badge } from '@/components/shared/ui/badge';
-import { Button } from '@/components/shared/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/shared/ui/card';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/shared/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Copy, 
   Eye, 
@@ -17,6 +18,7 @@ import {
   Users 
 } from 'lucide-react';
 import { Template } from '@/lib/db/schema';
+import { cn } from '@/lib/utils';
 
 export interface TemplatePermissions {
   canClone: boolean;
@@ -92,36 +94,61 @@ export function TemplateCard({
 
   if (isLoading) {
     return (
-      <Card className="animate-pulse">
-        <CardHeader>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-3 bg-gray-200 rounded w-full mt-2"></div>
+      <Card className={`${variant === 'compact' ? 'h-auto' : 'h-full'}`}>
+        <CardHeader className={variant === 'compact' ? 'pb-3' : 'pb-4'}>
+          <div className="flex items-start justify-between">
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+            <Skeleton className="h-8 w-8 rounded-md" />
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+        <CardContent className={`${variant === 'compact' ? 'py-3' : 'py-4'} space-y-3`}>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-5 w-16" />
+            <Skeleton className="h-4 w-12" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+          </div>
         </CardContent>
-        <CardFooter>
-          <div className="h-8 bg-gray-200 rounded w-full"></div>
-        </CardFooter>
+        {variant !== 'compact' && (
+          <CardFooter className="pt-0 pb-4">
+            <div className="flex gap-2 w-full">
+              <Skeleton className="h-8 flex-1" />
+              <Skeleton className="h-8 flex-1" />
+            </div>
+          </CardFooter>
+        )}
       </Card>
     );
   }
 
   return (
-    <Card className={`group hover:shadow-md transition-shadow duration-200 ${
-      variant === 'compact' ? 'h-auto' : 'h-full'
-    }`}>
+    <Card
+      role="article"
+      className={cn(
+        "group hover:shadow-lg transition-all duration-200 border-muted/40",
+        variant === 'compact' ? 'h-auto' : 'h-full'
+      )}
+    >
       <CardHeader className={variant === 'compact' ? 'pb-3' : 'pb-4'}>
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <CardTitle className={`${variant === 'compact' ? 'text-sm' : 'text-lg'} font-semibold text-gray-900 truncate`}>
+              <CardTitle className={cn(
+                "font-semibold text-foreground truncate",
+                variant === 'compact' ? 'text-sm' : 'text-lg'
+              )}>
                 {template.name}
               </CardTitle>
               {template.isGlobal && (
                 <Badge 
-                  variant="outline" 
-                  className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                  variant="secondary" 
+                  className="text-xs bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors"
                 >
                   <Globe className="w-3 h-3 mr-1" />
                   Global
@@ -130,9 +157,10 @@ export function TemplateCard({
             </div>
             
             {template.description && (
-              <CardDescription className={`${
+              <CardDescription className={cn(
+                "text-muted-foreground",
                 variant === 'compact' ? 'text-xs line-clamp-2' : 'text-sm line-clamp-3'
-              } text-gray-600`}>
+              )}>
                 {template.description}
               </CardDescription>
             )}
@@ -144,45 +172,45 @@ export function TemplateCard({
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleAction('preview')}>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => handleAction('preview')} className="cursor-pointer">
                   <Eye className="h-4 w-4 mr-2" />
-                  Preview
+                  Preview Template
                 </DropdownMenuItem>
                 
                 {permissions.canCreateForm && (
-                  <DropdownMenuItem onClick={() => handleAction('createForm')}>
+                  <DropdownMenuItem onClick={() => handleAction('createForm')} className="cursor-pointer">
                     <Plus className="h-4 w-4 mr-2" />
                     Create Form
                   </DropdownMenuItem>
                 )}
                 
                 {permissions.canClone && (
-                  <DropdownMenuItem onClick={() => handleAction('clone')}>
+                  <DropdownMenuItem onClick={() => handleAction('clone')} className="cursor-pointer">
                     <Copy className="h-4 w-4 mr-2" />
                     Clone Template
                   </DropdownMenuItem>
                 )}
                 
                 {permissions.canEdit && (
-                  <DropdownMenuItem onClick={() => handleAction('edit')}>
+                  <DropdownMenuItem onClick={() => handleAction('edit')} className="cursor-pointer">
                     <Pencil className="h-4 w-4 mr-2" />
-                    Edit
+                    Edit Template
                   </DropdownMenuItem>
                 )}
                 
                 {permissions.canDelete && (
                   <DropdownMenuItem 
                     onClick={() => handleAction('delete')} 
-                    className="text-red-600"
+                    className="text-destructive cursor-pointer focus:text-destructive"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
+                    Delete Template
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -191,35 +219,40 @@ export function TemplateCard({
         </div>
       </CardHeader>
 
-      <CardContent className={`${variant === 'compact' ? 'py-3' : 'py-4'} space-y-3`}>
+      <CardContent className={`${variant === 'compact' ? 'py-3' : 'py-4'} space-y-4`}>
         {/* Category and Field Count */}
         <div className="flex items-center justify-between">
           {template.category && (
             <Badge 
-              className={`text-xs px-2 py-1 ${getCategoryColor(template.category)}`}
+              className={`text-xs px-2 py-1 font-medium ${getCategoryColor(template.category)}`}
             >
               {template.category}
             </Badge>
           )}
           
-          <div className="flex items-center text-xs text-gray-500">
+          <div className="flex items-center text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md">
             <FileText className="w-3 h-3 mr-1" />
-            {getFormFieldCount()} fields
+            <span className="font-medium">{getFormFieldCount()}</span>
+            <span className="ml-1">fields</span>
           </div>
         </div>
 
         {/* Usage Statistics */}
-        <div className="grid grid-cols-2 gap-4 text-xs">
-          <div className="flex items-center text-gray-600">
-            <Users className="w-3 h-3 mr-1 text-gray-400" />
-            <span className="font-medium">{template.usageCount}</span>
-            <span className="ml-1">forms created</span>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center text-xs bg-muted/30 rounded-lg p-2 hover:bg-muted/50 transition-colors">
+            <div className="flex items-center text-muted-foreground">
+              <Users className="w-3 h-3 mr-1" />
+              <span className="font-semibold text-foreground">{template.usageCount}</span>
+              <span className="ml-1">forms</span>
+            </div>
           </div>
           
-          <div className="flex items-center text-gray-600">
-            <Copy className="w-3 h-3 mr-1 text-gray-400" />
-            <span className="font-medium">{template.cloneCount}</span>
-            <span className="ml-1">clones</span>
+          <div className="flex items-center text-xs bg-muted/30 rounded-lg p-2 hover:bg-muted/50 transition-colors">
+            <div className="flex items-center text-muted-foreground">
+              <Copy className="w-3 h-3 mr-1" />
+              <span className="font-semibold text-foreground">{template.cloneCount}</span>
+              <span className="ml-1">clones</span>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -232,7 +265,7 @@ export function TemplateCard({
               <Button 
                 size="sm" 
                 onClick={() => handleAction('createForm')}
-                className="flex-1"
+                className="flex-1 hover:bg-primary/90 transition-colors"
               >
                 <Plus className="w-3 h-3 mr-1" />
                 Create Form
@@ -244,7 +277,7 @@ export function TemplateCard({
                 variant="outline" 
                 size="sm" 
                 onClick={() => handleAction('clone')}
-                className="flex-1"
+                className="flex-1 hover:bg-muted transition-colors"
               >
                 <Copy className="w-3 h-3 mr-1" />
                 Clone

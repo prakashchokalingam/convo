@@ -10,6 +10,24 @@ import {
   PERMISSION_SCENARIOS,
 } from './template-helpers';
 
+// Mock @clerk/nextjs
+vi.mock('@clerk/nextjs', () => ({
+  useUser: () => ({
+    isSignedIn: true,
+    isLoaded: true,
+    user: {
+      id: 'user_test_id_123',
+      fullName: 'Test User FullName',
+      firstName: 'Test',
+      lastName: 'User',
+      primaryEmailAddress: { emailAddress: 'test@example.com' },
+      // Add any other user properties your component might need
+    },
+  }),
+  // If your component uses other Clerk components like <UserButton />, mock them here too
+  // UserButton: () => <div data-testid="mock-user-button" />,
+}));
+
 // Mock Lucide React icons
 vi.mock('lucide-react', () => ({
   Copy: () => <div data-testid="copy-icon" />,
@@ -52,7 +70,7 @@ describe('TemplateCard Component', () => {
       expect(screen.getByText('Collect customer feedback efficiently')).toBeInTheDocument();
       expect(screen.getByText('Marketing')).toBeInTheDocument();
       expect(screen.getByText('25')).toBeInTheDocument();
-      expect(screen.getByText('forms created')).toBeInTheDocument();
+      expect(screen.getByText('forms')).toBeInTheDocument(); // Changed "forms created" to "forms"
       expect(screen.getByText('8')).toBeInTheDocument();
       expect(screen.getByText('clones')).toBeInTheDocument();
     });
@@ -188,8 +206,8 @@ describe('TemplateCard Component', () => {
       await user.click(screen.getByTestId('more-horizontal-icon'));
 
       await waitFor(() => {
-        expect(screen.getByText('Edit')).toBeInTheDocument();
-        expect(screen.getByText('Delete')).toBeInTheDocument();
+        expect(screen.getByText('Edit Template')).toBeInTheDocument(); // Changed "Edit" to "Edit Template"
+        expect(screen.getByText('Delete Template')).toBeInTheDocument(); // Changed "Delete" to "Delete Template"
       });
     });
 
@@ -210,8 +228,8 @@ describe('TemplateCard Component', () => {
       if (moreButton) {
         await user.click(moreButton);
         await waitFor(() => {
-          expect(screen.queryByText('Edit')).not.toBeInTheDocument();
-          expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+          expect(screen.queryByText('Edit Template')).not.toBeInTheDocument(); // Changed "Edit"
+          expect(screen.queryByText('Delete Template')).not.toBeInTheDocument(); // Changed "Delete"
         });
       }
     });
@@ -273,7 +291,7 @@ describe('TemplateCard Component', () => {
       );
 
       await user.click(screen.getByTestId('more-horizontal-icon'));
-      await user.click(screen.getByText('Preview'));
+      await user.click(screen.getByText('Preview Template')); // Changed "Preview" to "Preview Template"
 
       expect(mockOnAction).toHaveBeenCalledWith({
         type: 'preview',
@@ -295,7 +313,7 @@ describe('TemplateCard Component', () => {
       );
 
       await user.click(screen.getByTestId('more-horizontal-icon'));
-      await user.click(screen.getByText('Edit'));
+      await user.click(screen.getByText('Edit Template')); // Changed "Edit" to "Edit Template"
 
       expect(mockOnAction).toHaveBeenCalledWith({
         type: 'edit',
@@ -317,7 +335,7 @@ describe('TemplateCard Component', () => {
       );
 
       await user.click(screen.getByTestId('more-horizontal-icon'));
-      await user.click(screen.getByText('Delete'));
+      await user.click(screen.getByText('Delete Template')); // Changed "Delete" to "Delete Template"
 
       expect(mockOnAction).toHaveBeenCalledWith({
         type: 'delete',

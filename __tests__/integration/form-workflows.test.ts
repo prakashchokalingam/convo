@@ -9,7 +9,7 @@ import {
   DEFAULT_THEME_CONFIG,
   FIELD_TYPES 
 } from '@/lib/form-builder/constants'
-import { createMockFormConfig, createMockField } from './utils'
+import { createMockFormConfig, createMockField } from '../utils/test-helpers'
 
 describe('Form Builder Integration Tests', () => {
   describe('Complete Form Building Workflow', () => {

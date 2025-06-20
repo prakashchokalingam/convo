@@ -2,8 +2,8 @@
 
 import React from 'react'
 import { FieldConfig } from '@/lib/form-builder/types'
-import { Badge } from '@/components/shared/ui/badge'
-import { Tooltip } from '@/components/shared/ui/tooltip'
+import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ArrowDown, ArrowUp, Eye, EyeOff, AlertTriangle, Link } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -70,52 +70,60 @@ export function DependencyIndicator({ field, allFields, className }: DependencyI
   }
 
   return (
-    <div className={cn('flex items-center gap-1', className)}>
-      {hasConditionalLogic && (
-        <Tooltip
-          content={`Conditional Logic: ${getConditionalSummary()}`}
-          side="top"
-        >
-          <Badge 
-            variant="secondary" 
-            className="text-xs px-1.5 py-0.5 flex items-center gap-1"
-          >
-            {field.conditional?.show ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-            Conditional
-          </Badge>
-        </Tooltip>
-      )}
+    <TooltipProvider>
+      <div className={cn('flex items-center gap-1', className)}>
+        {hasConditionalLogic && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge 
+                variant="secondary" 
+                className="text-xs px-1.5 py-0.5 flex items-center gap-1"
+              >
+                {field.conditional?.show ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                Conditional
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>Conditional Logic: {getConditionalSummary()}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
 
-      {hasDependencies && (
-        <Tooltip
-          content={`Depends on ${dependencies.length} field${dependencies.length > 1 ? 's' : ''}: ${dependencies.map(d => d.label).join(', ')}`}
-          side="top"
-        >
-          <Badge 
-            variant="outline" 
-            className="text-xs px-1.5 py-0.5 flex items-center gap-1 border-blue-200 text-blue-700"
-          >
-            <ArrowUp className="h-3 w-3" />
-            {dependencies.length}
-          </Badge>
-        </Tooltip>
-      )}
+        {hasDependencies && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge 
+                variant="outline" 
+                className="text-xs px-1.5 py-0.5 flex items-center gap-1 border-blue-200 text-blue-700"
+              >
+                <ArrowUp className="h-3 w-3" />
+                {dependencies.length}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>Depends on {dependencies.length} field{dependencies.length > 1 ? 's' : ''}: {dependencies.map(d => d.label).join(', ')}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
 
-      {hasDependents && (
-        <Tooltip
-          content={`${dependents.length} field${dependents.length > 1 ? 's' : ''} depend${dependents.length === 1 ? 's' : ''} on this: ${dependents.map(d => d.label).join(', ')}`}
-          side="top"
-        >
-          <Badge 
-            variant="outline" 
-            className="text-xs px-1.5 py-0.5 flex items-center gap-1 border-green-200 text-green-700"
-          >
-            <ArrowDown className="h-3 w-3" />
-            {dependents.length}
-          </Badge>
-        </Tooltip>
-      )}
-    </div>
+        {hasDependents && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge 
+                variant="outline" 
+                className="text-xs px-1.5 py-0.5 flex items-center gap-1 border-green-200 text-green-700"
+              >
+                <ArrowDown className="h-3 w-3" />
+                {dependents.length}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>{dependents.length} field{dependents.length > 1 ? 's' : ''} depend{dependents.length === 1 ? 's' : ''} on this: {dependents.map(d => d.label).join(', ')}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+    </TooltipProvider>
   )
 }
 

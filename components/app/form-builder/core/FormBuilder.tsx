@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, memo } from 'react'
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -10,7 +10,7 @@ import { createFieldConfig } from '@/lib/form-builder/field-registry'
 import { FieldLibrary } from './FieldLibrary'
 import { FormCanvas } from './FormCanvas'
 import { PropertiesPanel } from './PropertiesPanel'
-import { Button } from '@/components/shared/ui/button'
+import { Button } from '@/components/ui/button'
 import { Save, Eye, Settings, Undo, Redo, Zap } from 'lucide-react'
 import ConditionalPreview from '../conditional/ConditionalPreview'
 
@@ -21,6 +21,28 @@ interface FormBuilderProps {
   mode?: 'create' | 'edit'
   className?: string
 }
+
+// Memoized drag overlay component for better performance
+const DragPreviewOverlay = memo(({ dragPreview }: { dragPreview: DragItem | undefined }) => {
+  if (!dragPreview) return null
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-white border border-gray-300 rounded-lg p-3 shadow-lg"
+    >
+      <div className="text-sm font-medium text-gray-900">
+        {dragPreview.type === 'new-field' 
+          ? `Add ${dragPreview.fieldType} field`
+          : `Moving ${dragPreview.data?.label || 'field'}`
+        }
+      </div>
+    </motion.div>
+  )
+})
+
+DragPreviewOverlay.displayName = 'DragPreviewOverlay'
 
 export function FormBuilder({ 
   initialConfig, 
@@ -597,8 +619,10 @@ export function FormBuilder({
               onClick={undo}
               disabled={!canUndo}
               className="p-2"
+              aria-label="Undo last action"
+              title="Undo (Ctrl+Z)"
             >
-              <Undo className="h-4 w-4" />
+              <Undo className="h-4 w-4" aria-hidden="true" />
             </Button>
             <Button
               variant="ghost"
@@ -606,8 +630,10 @@ export function FormBuilder({
               onClick={redo}
               disabled={!canRedo}
               className="p-2"
+              aria-label="Redo last action"
+              title="Redo (Ctrl+Y)"
             >
-              <Redo className="h-4 w-4" />
+              <Redo className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
         </div>
@@ -619,8 +645,9 @@ export function FormBuilder({
               size="sm"
               onClick={handleToggleConditionalPreview}
               className="flex items-center space-x-2"
+              aria-label="Test conditional logic in forms"
             >
-              <Zap className="h-4 w-4" />
+              <Zap className="h-4 w-4" aria-hidden="true" />
               <span>Test Logic</span>
             </Button>
           )}
@@ -629,24 +656,27 @@ export function FormBuilder({
             size="sm"
             onClick={handlePreview}
             className="flex items-center space-x-2"
+            aria-label="Preview form as users will see it"
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-4 w-4" aria-hidden="true" />
             <span>Preview</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
             className="flex items-center space-x-2"
+            aria-label="Open form settings"
           >
-            <Settings className="h-4 w-4" />
+            <Settings className="h-4 w-4" aria-hidden="true" />
             <span>Settings</span>
           </Button>
           <Button
             onClick={handleSave}
             size="sm"
             className="flex items-center space-x-2"
+            aria-label="Save form changes"
           >
-            <Save className="h-4 w-4" />
+            <Save className="h-4 w-4" aria-hidden="true" />
             <span>Save</span>
           </Button>
         </div>
@@ -706,20 +736,7 @@ export function FormBuilder({
 
             {/* Drag Overlay */}
             <DragOverlay>
-              {state.dragPreview && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white border border-gray-300 rounded-lg p-3 shadow-lg"
-                >
-                  <div className="text-sm font-medium text-gray-900">
-                    {state.dragPreview.type === 'new-field' 
-                      ? `Add ${state.dragPreview.fieldType} field`
-                      : `Moving ${state.dragPreview.data?.label || 'field'}`
-                    }
-                  </div>
-                </motion.div>
-              )}
+              <DragPreviewOverlay dragPreview={state.dragPreview} />
             </DragOverlay>
           </DndContext>
         </div>

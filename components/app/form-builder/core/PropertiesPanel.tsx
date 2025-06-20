@@ -4,13 +4,16 @@ import React, { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FormConfig, FieldConfig, ValidationRule } from '@/lib/form-builder/types'
 import { getFieldDefinition } from '@/lib/form-builder/field-registry'
-import { Button } from '@/components/shared/ui/button'
-import { Input } from '@/components/shared/ui/input'
-import { Label } from '@/components/shared/ui/label'
-import { Textarea } from '@/components/shared/ui/textarea'
-import { Switch } from '@/components/shared/ui/switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs'
-import { Separator } from '@/components/shared/ui/separator'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import ConditionalLogicBuilder from '../conditional/ConditionalLogicBuilder'
 import DependencyIndicator from '../conditional/DependencyIndicator'
 import { 
@@ -81,24 +84,28 @@ function ValidationRuleEditor({ rules, onChange }: ValidationRuleEditorProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="border border-gray-200 rounded-lg p-3 space-y-2"
           >
-            <div className="flex items-center justify-between">
-              <select
-                value={rule.type}
-                onChange={(e) => updateRule(index, { 
-                  type: e.target.value as ValidationRule['type'],
-                  message: getDefaultValidationMessage(e.target.value as ValidationRule['type']),
-                  value: getDefaultValidationValue(e.target.value as ValidationRule['type'])
-                })}
-                className="text-xs border border-gray-200 rounded px-2 py-1"
-              >
-                <option value="required">Required</option>
-                <option value="min">Minimum</option>
-                <option value="max">Maximum</option>
-                <option value="pattern">Pattern</option>
-                <option value="custom">Custom</option>
-              </select>
+            <Card className="p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <Select
+                  value={rule.type}
+                  onValueChange={(value) => updateRule(index, { 
+                    type: value as ValidationRule['type'],
+                    message: getDefaultValidationMessage(value as ValidationRule['type']),
+                    value: getDefaultValidationValue(value as ValidationRule['type'])
+                  })}
+                >
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="required">Required</SelectItem>
+                    <SelectItem value="min">Minimum</SelectItem>
+                    <SelectItem value="max">Maximum</SelectItem>
+                    <SelectItem value="pattern">Pattern</SelectItem>
+                    <SelectItem value="custom">Custom</SelectItem>
+                  </SelectContent>
+                </Select>
               
               <Button
                 variant="ghost"
@@ -135,14 +142,17 @@ function ValidationRuleEditor({ rules, onChange }: ValidationRuleEditorProps) {
               onChange={(e) => updateRule(index, { message: e.target.value })}
               className="text-xs"
             />
+            </Card>
           </motion.div>
         ))}
       </div>
       
       {rules.length === 0 && (
-        <div className="text-center py-4 text-gray-500 text-sm">
-          No validation rules added
-        </div>
+        <Card className="p-4">
+          <div className="text-center text-muted-foreground text-sm">
+            No validation rules added
+          </div>
+        </Card>
       )}
     </div>
   )
@@ -194,15 +204,17 @@ export function PropertiesPanel({
   const renderFieldProperties = () => {
     if (!selectedField) {
       return (
-        <div className="flex flex-col items-center justify-center h-64 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-            <Settings className="h-8 w-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Field Selected</h3>
-          <p className="text-sm text-gray-500">
-            Select a field from the canvas to edit its properties
-          </p>
-        </div>
+        <Card className="m-4">
+          <CardContent className="flex flex-col items-center justify-center h-64 text-center p-6">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Settings className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <CardTitle className="mb-2">No Field Selected</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Select a field from the canvas to edit its properties
+            </p>
+          </CardContent>
+        </Card>
       )
     }
 
@@ -213,25 +225,27 @@ export function PropertiesPanel({
     return (
       <div className="space-y-6">
         {/* Field Header */}
-        <div className="flex items-center space-x-3 pb-4 border-b border-gray-200">
-          {IconComponent && (
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-              isSection ? 'bg-blue-100' : 'bg-blue-100'
-            }`}>
-              <IconComponent className="h-5 w-5 text-blue-600" />
+        <Card className="mb-6">
+          <CardContent className="flex items-center space-x-3 p-4">
+            {IconComponent && (
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                isSection ? 'bg-primary/10' : 'bg-primary/10'
+              }`}>
+                <IconComponent className="h-5 w-5 text-primary" />
+              </div>
+            )}
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <CardTitle className="text-base">{definition?.label}</CardTitle>
+                <DependencyIndicator 
+                  field={selectedField}
+                  allFields={config.fields}
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">{definition?.description}</p>
             </div>
-          )}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-gray-900">{definition?.label}</h3>
-              <DependencyIndicator 
-                field={selectedField}
-                allFields={config.fields}
-              />
-            </div>
-            <p className="text-sm text-gray-500">{definition?.description}</p>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className={`grid w-full ${
@@ -410,21 +424,25 @@ export function PropertiesPanel({
               <div className="space-y-4 pt-4 border-t border-gray-200">
                 <div className="space-y-2">
                   <Label>Field Width</Label>
-                  <select
+                  <Select
                     value={(selectedField as any).styling?.width || 'full'}
-                    onChange={(e) => handleFieldUpdate({ 
+                    onValueChange={(value) => handleFieldUpdate({ 
                       styling: { 
                         ...((selectedField as any).styling || {}), 
-                        width: e.target.value 
+                        width: value 
                       } 
                     })}
-                    className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm"
                   >
-                    <option value="full">Full Width</option>
-                    <option value="half">Half Width</option>
-                    <option value="third">One Third</option>
-                    <option value="quarter">One Quarter</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full">Full Width</SelectItem>
+                      <SelectItem value="half">Half Width</SelectItem>
+                      <SelectItem value="third">One Third</SelectItem>
+                      <SelectItem value="quarter">One Quarter</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -471,13 +489,13 @@ export function PropertiesPanel({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <Card className="flex flex-col h-full rounded-none border-0 border-l">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">
+      <CardHeader className="p-4 border-b border-border">
+        <CardTitle className="text-lg">
           Properties
-        </h2>
-      </div>
+        </CardTitle>
+      </CardHeader>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
@@ -499,12 +517,12 @@ export function PropertiesPanel({
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
-        <div className="flex items-center space-x-2 text-xs text-gray-500">
+      <CardContent className="p-4 border-t border-border bg-muted/30">
+        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
           <Info className="h-3 w-3" />
           <span>Changes are saved automatically</span>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
