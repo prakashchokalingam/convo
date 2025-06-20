@@ -1,1 +1,174 @@
-# ConvoForms - AI-Powered Conversational Form Builder\n\n> **Engineering Overview**: Transform static forms into conversational experiences with AI. Built with Next.js 14, PostgreSQL, and Google Gemini.\n\n## 🚀 Quick Start\n\n```bash\n# 1. Clone and install\ngit clone <your-repo>\ncd convo\nnpm install\n\n# 2. Setup environment\ncp .env.local.example .env.local\n# Edit .env.local with your API keys\n\n# 3. Start development\nnpm run setup\nnpm run dev\n```\n\n**Ready!** Open http://localhost:3002 to develop ConvoForms.\n\n## 📚 Engineering Documentation\n\n**New Developer Setup:**\n- 🚀 [Getting Started](./docs/GETTING_STARTED.md) - Complete setup guide\n- 🏗️ [Architecture](./docs/ARCHITECTURE.md) - System design and structure\n- 🛠️ [Development](./docs/DEVELOPMENT.md) - Daily development workflow\n- ✨ [Features](./docs/FEATURES.md) - Technical feature specifications\n- 🚀 [Deployment](./docs/DEPLOYMENT.md) - Production deployment guide\n\n**Design System:**\n- 🎨 [Design System](./docs/design/shadcn-ui-design-system.md) - Complete UI design system\n- 🏗️ [Component Architecture](./docs/design/shadcn-component-architecture.md) - Component patterns\n\n## 🏗️ Technical Architecture\n\n### Core Stack\n```\nFrontend:    Next.js 14 (App Router) + TypeScript + Tailwind CSS + shadcn/ui\nDatabase:    PostgreSQL + Drizzle ORM\nAuth:        Clerk Authentication\nAI:          Google Gemini API\nDeployment:  Vercel + Supabase\nTesting:     Vitest (unit) + Playwright (E2E)\n```\n\n### Project Structure\n```\napp/\n├── (marketing)/           # Marketing site\n├── (app)/                 # SaaS application\n├── (forms)/               # Public form rendering\n└── api/                   # Backend API routes\n\ncomponents/\n├── ui/                    # shadcn/ui base components\n├── app/                   # App-specific components\n├── marketing/             # Marketing components\n└── forms/                 # Form rendering components\n\nlib/\n├── db/                    # Database utilities\n├── ai/                    # AI integration\n├── auth/                  # Authentication helpers\n└── utils/                 # Shared utilities\n```\n\n### URL Architecture\n```\nDevelopment URLs:\nMarketing:     localhost:3002/marketing\nApp:           localhost:3002/app/[workspace]\nForms:         localhost:3002/forms/[workspace]/[form]\n\nProduction URLs:\nMarketing:     convo.ai\nApp:           app.convo.ai/[workspace]\nForms:         forms.convo.ai/[workspace]/[form]\n```\n\n## 🔧 Development Commands\n\n| Command | Description |\n|---------|-------------|\n| `npm run dev` | Start development server (port 3002) |\n| `npm run db:up` | Start PostgreSQL database |\n| `npm run db:studio` | Open Drizzle Studio (database GUI) |\n| `npm run db:push` | Apply schema changes to database |\n| `npm run db:generate` | Generate migration files |\n| `npm test` | Run unit tests (Vitest) |\n| `npm run test:e2e` | Run E2E tests (Playwright) |\n| `npm run build` | Build for production |\n| `npm run lint` | Run ESLint |\n| `npm run type-check` | Run TypeScript checks |\n\n## 🧪 Testing Strategy\n\n### Unit & Integration Testing\n```bash\n# Run all tests\nnpm test\n\n# Run tests in watch mode\nnpm run test:watch\n\n# Test specific component\nnpm test -- form-builder\n```\n\n### End-to-End Testing\n```bash\n# Run E2E tests\nnpm run test:e2e\n\n# Run specific E2E test\nnpm run test:e2e -- tests/form-creation.spec.ts\n\n# Run tests in headed mode\nnpm run test:e2e:headed\n```\n\n## 🗃️ Database Management\n\n### Schema Development\n```bash\n# 1. Edit schema\nvim drizzle/schema.ts\n\n# 2. Generate migration\nnpm run db:generate\n\n# 3. Apply changes\nnpm run db:push\n\n# 4. View database\nnpm run db:studio\n```\n\n### Core Tables\n- `users` - User accounts (synced from Clerk)\n- `workspaces` - Form containers (personal/team)\n- `workspace_members` - Team access control\n- `forms` - Form definitions and schemas\n- `responses` - Form submission data\n- `workspace_activities` - Audit log\n\n## 🎨 Design System\n\n### shadcn/ui Foundation\n```typescript\n// Import base components\nimport { Button, Card, Input, Form } from '@/components/ui'\n\n// Build custom components\nimport { StatsCard } from '@/components/app/dashboard'\nimport { FormBuilder } from '@/components/app/form-builder'\n\n// Usage\n<Card className=\"hover:shadow-lg transition-shadow\">\n  <StatsCard title=\"Forms\" value={12} />\n</Card>\n```\n\n### Component Development\n- **Foundation**: Build on shadcn/ui components\n- **Styling**: Tailwind CSS with ConvoForms theme\n- **Accessibility**: WCAG 2.1 AA compliance (built-in)\n- **Dark Mode**: Automatic theme switching\n- **Mobile**: Responsive-first design\n\n## 🔐 Environment Variables\n\n```bash\n# Database\nDATABASE_URL=postgresql://...\n\n# Authentication (Clerk)\nNEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...\nCLERK_SECRET_KEY=sk_...\n\n# AI (Google Gemini)\nGOOGLE_AI_API_KEY=AIza...\n\n# App Configuration\nNEXT_PUBLIC_APP_URL=http://localhost:3002\nNODE_ENV=development\n```\n\n## 🚀 Deployment\n\n### Production Stack\n- **Frontend/API**: Vercel\n- **Database**: Supabase PostgreSQL\n- **Auth**: Clerk\n- **Storage**: Vercel Blob (optional)\n- **Monitoring**: Vercel Analytics\n\n### Deployment Steps\n1. **Setup**: Configure environment variables\n2. **Database**: Deploy to Supabase\n3. **App**: Deploy to Vercel\n4. **Domain**: Configure custom domains\n5. **Monitor**: Setup error tracking\n\nSee [Deployment Guide](./docs/DEPLOYMENT.md) for detailed instructions.\n\n## 🔍 Development Workflow\n\n### Feature Development\n1. **Branch**: Create feature branch from `main`\n2. **Develop**: Code with tests\n3. **Test**: Run unit and E2E tests\n4. **Review**: Create pull request\n5. **Deploy**: Merge to `main` auto-deploys\n\n### Code Quality\n- **TypeScript**: Full type safety\n- **ESLint**: Code linting\n- **Prettier**: Code formatting\n- **Tests**: Unit + E2E coverage\n- **Accessibility**: WCAG compliance\n\n## 📄 License\n\nMIT License - see LICENSE file for details.\n\n---\n\n**Built for developers, by developers.**\n\n*Need help? Check the [docs](./docs/) or create an issue.*\n
+# ConvoForms - AI-Powered Conversational Form Builder
+
+> **Engineering Overview**: Transform static forms into conversational experiences with AI. Built with Next.js 14, PostgreSQL, and Google Gemini.
+
+## 🚀 Quick Start
+
+```bash
+# 1. Clone and install
+git clone <your-repo-url> # Replace <your-repo-url> with the actual repository URL
+cd convoforms # Adjust if your project directory name is different
+npm install
+```
+For detailed setup including environment configuration, prerequisites, and troubleshooting, please see our comprehensive **[Getting Started Guide](./docs/GETTING_STARTED.md)**.
+
+## 📚 Engineering Documentation
+
+For a complete overview and navigation of all technical documents, please visit our **[Documentation Hub](./docs/README.md)**.
+
+**Key Documents:**
+- 🚀 [Getting Started](./docs/GETTING_STARTED.md) - Detailed setup and first steps.
+- 🏗️ [Architecture](./docs/ARCHITECTURE.md) - System design and structure.
+- 🛠️ [Development Guide](./docs/DEVELOPMENT.md) - Workflow, testing, and contribution.
+- ✨ [Features](./docs/features.md) - Overview of ConvoForms capabilities.
+- 🚀 [Deployment Guide](./docs/DEPLOYMENT.md) - Deploying to production.
+- 🎨 [Design System](./docs/design/README.md) - UI components and styling guidelines.
+
+## 🏗️ Technical Architecture
+
+### Core Stack
+```
+Frontend:    Next.js 14 (App Router) + TypeScript + Tailwind CSS + shadcn/ui
+Database:    PostgreSQL + Drizzle ORM
+Auth:        Clerk Authentication
+AI:          Google Gemini API
+Deployment:  Vercel + Supabase
+Testing:     Vitest (unit) + Playwright (E2E)
+```
+
+### Project Structure
+```
+app/
+├── (marketing)/           # Marketing site
+├── (app)/                 # SaaS application
+├── (forms)/               # Public form rendering
+└── api/                   # Backend API routes
+
+components/
+├── ui/                    # shadcn/ui base components
+├── app/                   # App-specific components
+├── marketing/             # Marketing components
+└── forms/                 # Form rendering components
+
+lib/
+├── db/                    # Database utilities
+├── ai/                    # AI integration
+├── auth/                  # Authentication helpers
+└── utils/                 # Shared utilities
+```
+
+### URL Architecture
+```
+Development URLs:
+Marketing:     localhost:3002/marketing
+App:           localhost:3002/app/[workspace]
+Forms:         localhost:3002/forms/[workspace]/[form]
+
+Production URLs:
+Marketing:     convo.ai
+App:           app.convo.ai/[workspace]
+Forms:         forms.convo.ai/[workspace]/[form]
+```
+For a more in-depth explanation of the architecture, see the **[Full Architecture Document](./docs/ARCHITECTURE.md)**.
+
+## 🔧 Development Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server (port 3002) |
+| `npm run db:up` | Start PostgreSQL database |
+| `npm run db:studio` | Open Drizzle Studio (database GUI) |
+| `npm run db:push` | Apply schema changes to database |
+| `npm run db:generate` | Generate migration files |
+| `npm test` | Run unit tests (Vitest) |
+| `npm run test:e2e` | Run E2E tests (Playwright) |
+| `npm run build` | Build for production |
+| `npm run lint` | Run ESLint |
+| `npm run type-check` | Run TypeScript checks |
+
+For detailed explanations of the development workflow, database management, and more, refer to the **[Development Guide](./docs/DEVELOPMENT.md)**.
+
+## 🧪 Testing Strategy
+
+### Unit & Integration Testing
+```bash
+npm test       # Run all unit/integration tests
+npm run test:watch # Run tests in watch mode
+```
+
+### End-to-End Testing
+```bash
+npm run test:e2e # Run all E2E tests
+```
+For more details on testing strategies, writing tests, and specific test cases, please see the **[Development Guide](./docs/DEVELOPMENT.md)** and **[E2E Testing Guide](./docs/E2E_TESTING.md)**.
+
+## 🗃️ Database Management
+
+### Schema Development
+```bash
+# 1. Edit schema: lib/db/schema.ts
+# 2. Generate migration: npm run db:generate
+# 3. Apply changes: npm run db:push
+# 4. View database: npm run db:studio
+```
+Detailed database information, including schema and management, is covered in the **[Development Guide](./docs/DEVELOPMENT.md)** and **[Architecture Document](./docs/ARCHITECTURE.md)**.
+
+## 🎨 Design System
+
+ConvoForms uses a design system based on shadcn/ui to ensure a professional, accessible, and maintainable user interface.
+Learn more about our **[Design System and Component Architecture](./docs/design/README.md)**.
+
+## 🔐 Environment Variables
+
+```bash
+# Database
+DATABASE_URL=postgresql://...
+
+# Authentication (Clerk)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+CLERK_SECRET_KEY=sk_...
+
+# AI (Google Gemini)
+GOOGLE_AI_API_KEY=AIza...
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3002
+NODE_ENV=development
+```
+
+## 🚀 Deployment
+
+### Production Stack
+- **Frontend/API**: Vercel
+- **Database**: Supabase PostgreSQL
+- **Auth**: Clerk
+- **Storage**: Vercel Blob (optional)
+- **Monitoring**: Vercel Analytics
+
+See the **[Deployment Guide](./docs/DEPLOYMENT.md)** for detailed instructions.
+
+## 🔍 Development Workflow
+
+### Feature Development
+1. **Branch**: Create feature branch from `main`
+2. **Develop**: Code with tests
+3. **Test**: Run unit and E2E tests
+4. **Review**: Create pull request
+5. **Deploy**: Merge to `main` auto-deploys
+
+### Code Quality
+- **TypeScript**: Full type safety
+- **ESLint**: Code linting
+- **Prettier**: Code formatting
+- **Tests**: Unit + E2E coverage
+- **Accessibility**: WCAG compliance
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+---
+
+**Built for developers, by developers.**
+
+*Need help? Check the [Full Documentation Hub](./docs/README.md) or create an issue.*
