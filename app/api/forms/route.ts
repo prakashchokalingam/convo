@@ -1,9 +1,9 @@
-import { auth } from "@clerk/nextjs";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@/drizzle/db";
 import { forms, responses, workspaceMembers, workspaces } from "@/drizzle/schema";
-import { eq, count, desc, and } from "drizzle-orm";
+import { eq, count, desc, and, ilike, or, gte, lt, SQL } from "drizzle-orm";
 
 /**
  * @swagger
@@ -72,40 +72,115 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '100');
+    const limit = parseInt(searchParams.get('limit') || '10'); // Default to 10
     const offset = (page - 1) * limit;
 
-    // Get forms with response counts
-    const userForms = await db
+    const workspaceId = searchParams.get('workspaceId');
+    const searchTerm = searchParams.get('searchTerm');
+    const status = searchParams.get('status'); // 'published' or 'draft'
+    const createdBy = searchParams.get('createdBy'); // userId
+    const createdAtParam = searchParams.get('createdAt'); // ISO date string YYYY-MM-DD
+
+    if (!workspaceId) {
+      return NextResponse.json({ error: "workspaceId query parameter is required" }, { status: 400 });
+    }
+
+    const conditions: SQL[] = [eq(forms.workspaceId, workspaceId)];
+
+    if (searchTerm) {
+      conditions.push(
+        or(
+          ilike(forms.title, `%${searchTerm}%`),
+          ilike(forms.description, `%${searchTerm}%`) // Assuming description can be searched
+        )! // Use non-null assertion if `or` can return undefined and conditions array expects SQL
+      );
+    }
+
+    if (status) {
+      if (status === 'published') {
+        conditions.push(eq(forms.isPublished, true));
+      } else if (status === 'draft') {
+        conditions.push(eq(forms.isPublished, false));
+      }
+    }
+
+    if (createdBy) {
+      conditions.push(eq(forms.createdBy, createdBy));
+    }
+
+    if (createdAtParam) {
+      try {
+        const date = new Date(createdAtParam);
+        if (isNaN(date.getTime())) {
+          return NextResponse.json({ error: "Invalid createdAt date format. Use YYYY-MM-DD." }, { status: 400 });
+        }
+        // Adjust to local timezone if needed, but default JS Date is UTC.
+        // For filtering a whole day, use date for start and start of next day for end.
+        const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const nextDay = new Date(startDate);
+        nextDay.setDate(startDate.getDate() + 1);
+
+        conditions.push(and(gte(forms.createdAt, startDate), lt(forms.createdAt, nextDay))!);
+      } catch (e) {
+        return NextResponse.json({ error: "Invalid createdAt date processing." }, { status: 400 });
+      }
+    }
+
+    const selectedFormFields = {
+      id: forms.id,
+      workspaceId: forms.workspaceId,
+      createdBy: forms.createdBy,
+      title: forms.title,
+      description: forms.description,
+      prompt: forms.prompt,
+      config: forms.config,
+      isConversational: forms.isConversational,
+      isPublished: forms.isPublished,
+      version: forms.version,
+      publishedAt: forms.publishedAt,
+      createdAt: forms.createdAt,
+      updatedAt: forms.updatedAt,
+    };
+
+    const userFormsData = await db
       .select({
-        id: forms.id,
-        title: forms.title,
-        description: forms.description,
-        isPublished: forms.isPublished,
-        isConversational: forms.isConversational,
-        createdAt: forms.createdAt,
-        updatedAt: forms.updatedAt,
+        ...selectedFormFields,
         responseCount: count(responses.id)
       })
       .from(forms)
       .leftJoin(responses, eq(forms.id, responses.formId))
-      .where(eq(forms.createdBy, userId))
-      .groupBy(forms.id)
+      .where(and(...conditions))
+      .groupBy(...Object.values(selectedFormFields)) // Spread all selected form fields
       .orderBy(desc(forms.updatedAt))
       .limit(limit)
       .offset(offset);
 
-    // Get total count for pagination
+    const formsWithCreator = [];
+    for (const form of userFormsData) {
+      let creatorName = 'Unknown User';
+      if (form.createdBy) {
+        try {
+          const user = await clerkClient.users.getUser(form.createdBy);
+          creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Unknown User';
+        } catch (error) {
+          console.error(`Failed to fetch user ${form.createdBy}`, error);
+          // creatorName remains 'Unknown User'
+        }
+      }
+      formsWithCreator.push({ ...form, creatorName });
+    }
+
+    // Get total count for pagination with the same filters
     const totalFormsResult = await db
       .select({ count: count() })
       .from(forms)
-      .where(eq(forms.createdBy, userId));
+      .where(and(...conditions));
 
     const totalForms = totalFormsResult[0]?.count || 0;
     const totalPages = Math.ceil(totalForms / limit);
 
     return NextResponse.json({
-      forms: userForms,
+      forms: formsWithCreator,
       pagination: {
         page,
         limit,
