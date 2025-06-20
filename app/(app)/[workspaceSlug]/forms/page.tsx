@@ -90,12 +90,3 @@ export default function FormsPage({ params }: FormsPageProps) {
   );
 }
 
-// generateMetadata remains a server-side export if possible, or needs adjustment
-// For client components, metadata is typically handled differently (e.g. using Head from next/document or next/head)
-// However, Next.js 13+ app router allows generateMetadata in client component files too.
-export function generateMetadata({ params }: { params: { workspaceSlug: string } }) {
-  return {
-    title: `Forms - ${params.workspaceSlug}`,
-    description: 'Manage your forms and create new ones',
-  };
-}
