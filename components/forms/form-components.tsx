@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Edit3, Eye, ToggleLeft, ToggleRight } from 'lucide-react';
 import { Button } from '@/components/shared/ui/button';
 import { Badge } from '@/components/shared/ui/badge';
 import { getFormsUrl, getFormEditorUrl } from '@/lib/urls/workspace-urls';
+import { format } from 'date-fns';
 
 // Enhanced components for forms functionality
 
@@ -15,12 +16,48 @@ interface Form {
   title: string;
   description?: string | null;
   isPublished: boolean;
-  createdAt: string; // Assuming createdAt is a string date
-  workspaceSlug: string; // Needed for getFormEditorUrl
+  createdAt: string; // ISO string
+  updatedAt: string; // ISO string
+  workspaceSlug: string; // Added client-side during fetch processing
+  creatorName: string; // From API
+  responseCount: number; // From API
+  isConversational: boolean; // From API
 }
 
-export function FormsList({ workspaceId, workspaceSlug }: { workspaceId: string, workspaceSlug: string }) {
+interface PaginationData {
+  page: number;
+  limit: number;
+  totalForms: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+const ITEMS_PER_PAGE = 10;
+
+export interface FormsListProps {
+  workspaceId: string;
+  workspaceSlug: string;
+  searchTerm: string;
+  statusFilter: string;
+  createdByFilter: string;
+  createdAtFilter: string;
+  currentPage: number;
+  setCurrentPage: (page: number | ((prevPage: number) => number)) => void;
+}
+
+export function FormsList({
+  workspaceId,
+  workspaceSlug,
+  searchTerm,
+  statusFilter,
+  createdByFilter,
+  createdAtFilter,
+  currentPage,
+  setCurrentPage,
+}: FormsListProps) {
   const [forms, setForms] = useState<Form[]>([]);
+  const [paginationData, setPaginationData] = useState<PaginationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,15 +65,31 @@ export function FormsList({ workspaceId, workspaceSlug }: { workspaceId: string,
     const fetchForms = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/forms?workspaceId=${workspaceId}`);
+        setError(null);
+
+        let apiUrl = `/api/forms?workspaceId=${workspaceId}&page=${currentPage}&limit=${ITEMS_PER_PAGE}`;
+        if (searchTerm) apiUrl += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+        if (statusFilter && statusFilter !== 'all') apiUrl += `&status=${statusFilter}`;
+        if (createdByFilter) apiUrl += `&createdBy=${encodeURIComponent(createdByFilter)}`;
+        if (createdAtFilter) apiUrl += `&createdAt=${createdAtFilter}`;
+
+        const response = await fetch(apiUrl);
         if (!response.ok) {
-          throw new Error('Failed to fetch forms');
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch forms');
         }
         const data = await response.json();
-        // Assuming the API returns forms with workspaceSlug attached or it's available
-        setForms(data.forms.map((form: any) => ({ ...form, workspaceSlug })));
+        const apiForms = data.forms || [];
+        const processedForms = apiForms.map((formItem: any) => ({
+          ...formItem,
+          workspaceSlug: workspaceSlug, // Add workspaceSlug for client-side navigation
+        }));
+        setForms(processedForms);
+        setPaginationData(data.pagination);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        setForms([]); // Clear forms on error
+        setPaginationData(null); // Clear pagination on error
       } finally {
         setLoading(false);
       }
@@ -45,7 +98,37 @@ export function FormsList({ workspaceId, workspaceSlug }: { workspaceId: string,
     if (workspaceId) {
       fetchForms();
     }
-  }, [workspaceId, workspaceSlug]);
+  }, [
+    workspaceId,
+    workspaceSlug,
+    searchTerm,
+    statusFilter,
+    createdByFilter,
+    createdAtFilter,
+    currentPage
+  ]);
+
+  const handleTogglePublish = async (formId: string, currentStatus: boolean) => {
+    const newStatus = !currentStatus;
+    try {
+      const response = await fetch(`/api/forms/${formId}/publish`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublished: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update form status');
+      }
+      setForms(prevForms =>
+        prevForms.map(f => (f.id === formId ? { ...f, isPublished: newStatus } : f))
+      );
+      // TODO: Add toast notification for success
+    } catch (error) {
+      console.error('Error updating form status:', error);
+      // TODO: Add toast notification for error
+    }
+  };
 
   if (loading) {
     return (
@@ -63,13 +146,15 @@ export function FormsList({ workspaceId, workspaceSlug }: { workspaceId: string,
     );
   }
 
-  if (forms.length === 0) {
+  if (forms.length === 0 && !loading) {
     return (
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-6">
           <div className="text-center py-8">
-            <div className="text-gray-500 text-sm">No forms yet</div>
-            <div className="text-gray-400 text-xs mt-1">Create your first form to get started</div>
+            <h3 className="text-lg font-medium text-gray-900">No forms found</h3>
+            <p className="text-sm text-gray-500 mt-1">
+              Try adjusting your filters or create a new form.
+            </p>
           </div>
         </div>
       </div>
@@ -77,36 +162,114 @@ export function FormsList({ workspaceId, workspaceSlug }: { workspaceId: string,
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <ul className="divide-y divide-gray-200">
-        {forms.map((form) => (
-          <li key={form.id} className="p-6 hover:bg-gray-50">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0 flex-1">
-                <Link href={getFormEditorUrl(form.workspaceSlug, form.id)} className="text-blue-600 hover:underline font-medium">
-                  {form.title}
-                </Link>
-                {form.description && (
-                  <p className="text-sm text-gray-500 mt-1 truncate">{form.description}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-4 ml-4">
-                <Badge variant={form.isPublished ? 'default' : 'outline'}
-                       className={form.isPublished ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
-                  {form.isPublished ? 'Published' : 'Draft'}
-                </Badge>
-                <span className="text-sm text-gray-500">
-                  {new Date(form.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Title
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Creator
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Created At
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Responses
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {forms.map((form) => (
+              <tr key={form.id}>
+                <td className="px-6 py-4">
+                  <Link href={getFormEditorUrl(form.workspaceSlug, form.id)} className="text-blue-600 hover:underline font-medium">
+                    {form.title}
+                  </Link>
+                  {form.description && (
+                    <p className="text-sm text-gray-500 mt-1 truncate max-w-xs">{form.description}</p>
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {form.creatorName}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {format(new Date(form.createdAt), 'MMMM d, yyyy')}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <Badge
+                    variant={form.isPublished ? 'default' : 'outline'}
+                    className={form.isPublished ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}
+                  >
+                    {form.isPublished ? 'Published' : 'Draft'}
+                  </Badge>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {form.responseCount}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div className="flex items-center justify-end space-x-2">
+                    <Link href={getFormEditorUrl(form.workspaceSlug, form.id)}>
+                      <Button variant="outline" size="sm" type="button">
+                        <Edit3 className="w-4 h-4 mr-1" />
+                        Edit
+                      </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" type="button" onClick={() => handleTogglePublish(form.id, form.isPublished)}>
+                      {form.isPublished ? <ToggleRight className="w-4 h-4 mr-1" /> : <ToggleLeft className="w-4 h-4 mr-1" />}
+                      {form.isPublished ? 'Unpublish' : 'Publish'}
+                    </Button>
+                    <Link href={`/${form.workspaceSlug}/forms/${form.id}/responses`}>
+                      <Button variant="outline" size="sm" type="button">
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Responses
+                      </Button>
+                    </Link>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {paginationData && paginationData.totalForms > 0 && (
+        <div className="mt-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-700">
+              Page <span className="font-medium">{paginationData.page}</span> of <span className="font-medium">{paginationData.totalPages}</span>
+            </p>
+          </div>
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={!paginationData.hasPrev}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={!paginationData.hasNext}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
-
 export function CreateFormButton({ workspace }: { workspace: any }) {
   return (
     <Link href={`${getFormsUrl(workspace.slug)}/new`}>
@@ -118,22 +281,62 @@ export function CreateFormButton({ workspace }: { workspace: any }) {
   );
 }
 
-export function FormsHeader({ workspace }: { workspace: any }) {
+export interface FormsHeaderProps {
+  workspace: any; // Keeping workspace for now, can be refined if not needed
+  searchTerm: string;
+  onSearchTermChange: (term: string) => void;
+  statusFilter: string;
+  onStatusFilterChange: (status: string) => void;
+  createdByFilter: string;
+  onCreatedByFilterChange: (userId: string) => void;
+  createdAtFilter: string;
+  onCreatedAtFilterChange: (date: string) => void;
+}
+
+export function FormsHeader({
+  workspace,
+  searchTerm,
+  onSearchTermChange,
+  statusFilter,
+  onStatusFilterChange,
+  createdByFilter,
+  onCreatedByFilterChange,
+  createdAtFilter,
+  onCreatedAtFilterChange,
+}: FormsHeaderProps) {
   return (
-    <div className="flex items-center justify-between">
-      <div>
+    <div className="p-4 bg-white rounded-lg border border-gray-200 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <input
           type="text"
-          placeholder="Search forms..."
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+          placeholder="Search forms by title..."
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
+          value={searchTerm}
+          onChange={(e) => onSearchTermChange(e.target.value)}
         />
-      </div>
-      <div className="flex gap-2">
-        <select className="border border-gray-300 rounded-md px-3 py-2 text-sm">
-          <option>All Forms</option>
-          <option>Published</option>
-          <option>Draft</option>
+        <select
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
+          value={statusFilter}
+          onChange={(e) => onStatusFilterChange(e.target.value)}
+        >
+          <option value="">All Statuses</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
         </select>
+        <input
+          type="text"
+          placeholder="Filter by Creator ID..."
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
+          value={createdByFilter}
+          onChange={(e) => onCreatedByFilterChange(e.target.value)}
+        />
+        <input
+          type="date"
+          placeholder="Filter by Created Date..."
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full"
+          value={createdAtFilter}
+          onChange={(e) => onCreatedAtFilterChange(e.target.value)}
+        />
       </div>
     </div>
   );
