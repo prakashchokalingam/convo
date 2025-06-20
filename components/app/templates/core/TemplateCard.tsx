@@ -107,12 +107,17 @@ export function TemplateCard({
         </CardHeader>
         <CardContent className={`${variant === 'compact' ? 'py-3' : 'py-4'} space-y-3`}>
           <div className="flex items-center justify-between">
-            <Skeleton className="h-5 w-16" />
-            <Skeleton className="h-4 w-12" />
+            <Skeleton className="h-5 w-16" /> {/* Category */}
+            <Skeleton className="h-4 w-12" /> {/* Field count */}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" /> {/* Usage count */}
+            <Skeleton className="h-4 w-full" /> {/* Clone count */}
+          </div>
+          {/* New Skeletons for metadata */}
+          <div className={`pt-2 ${variant === 'compact' ? 'space-y-1' : 'space-y-1.5'}`}>
+            <Skeleton className={`h-3 ${variant === 'compact' ? 'w-3/5' : 'w-4/6'}`} /> {/* Created At / By */}
+            {variant !== 'compact' && <Skeleton className="h-3 w-3/5" />} {/* Updated At */}
           </div>
         </CardContent>
         {variant !== 'compact' && (
@@ -219,11 +224,11 @@ export function TemplateCard({
         </div>
       </CardHeader>
 
-      <CardContent className={`${variant === 'compact' ? 'py-3' : 'py-4'} space-y-4`}>
+      <CardContent className={`${variant === 'compact' ? 'py-3' : 'py-4'} space-y-3`}> {/* Adjusted space-y for new metadata section */}
         {/* Category and Field Count */}
         <div className="flex items-center justify-between">
           {template.category && (
-            <Badge 
+            <Badge
               className={`text-xs px-2 py-1 font-medium ${getCategoryColor(template.category)}`}
             >
               {template.category}
@@ -238,7 +243,7 @@ export function TemplateCard({
         </div>
 
         {/* Usage Statistics */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3"> {/* Reduced gap slightly */}
           <div className="flex items-center text-xs bg-muted/30 rounded-lg p-2 hover:bg-muted/50 transition-colors">
             <div className="flex items-center text-muted-foreground">
               <Users className="w-3 h-3 mr-1" />
@@ -254,6 +259,38 @@ export function TemplateCard({
               <span className="ml-1">clones</span>
             </div>
           </div>
+        </div>
+
+        {/* Template Metadata */}
+        <div className={`pt-2 text-xs text-muted-foreground space-y-1 ${variant === 'compact' ? 'mt-2' : 'mt-3'}`}>
+          {variant === 'compact' ? (
+            <>
+              <div>
+                Created: {new Date(template.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {' / '}
+                {template.isGlobal ? (
+                  <span className="font-medium">By: Convo Team</span>
+                ) : (
+                  <span className="font-medium">By: User {template.createdBy?.substring(0, 8) || 'N/A'}</span>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                Created: {new Date(template.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                {' by '}
+                {template.isGlobal ? (
+                  <span className="font-medium text-foreground">Convo Team</span>
+                ) : (
+                  <span className="font-medium text-foreground">User {template.createdBy?.substring(0, 8) || 'N/A'}</span>
+                )}
+              </div>
+              <div>
+                Updated: {new Date(template.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </div>
+            </>
+          )}
         </div>
       </CardContent>
 

@@ -92,7 +92,8 @@ export function buildContextUrl(context: SubdomainContext, path: string): string
     // Development: Use query parameters to simulate subdomains
     const base = 'http://localhost:3002';
     if (context === 'marketing') return `${base}${path}`;
-    return `${base}${path}?subdomain=${context}`;
+    // Ensure `subdomain` is appended correctly, whether path already has query params or not
+    return `${base}${path}${path.includes('?') ? '&' : '?'}subdomain=${context}`;
   } else {
     // Production: Use real subdomains
     const subdomain = context === 'marketing' ? '' : `${context}.`;

@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     const workspaceId = searchParams.get('workspaceId');
     const category = searchParams.get('category');
     const search = searchParams.get('search');
-    const isGlobal = searchParams.get('isGlobal') === 'true';
+    // const isGlobal = searchParams.get('isGlobal') === 'true'; // Logic moved down
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = (page - 1) * limit;
@@ -125,16 +125,31 @@ export async function GET(request: NextRequest) {
 
     // Build query conditions
     let conditions = [];
-    
-    if (isGlobal) {
+
+    // Determine the value of isGlobal from searchParams
+    const isGlobalParam = searchParams.get('isGlobal');
+
+    if (isGlobalParam === 'true') {
       // Only global templates
       conditions.push(eq(templates.isGlobal, true));
+    } else if (isGlobalParam === 'false') {
+      // Only workspace-specific templates
+      conditions.push(
+        and(
+          eq(templates.isGlobal, false),
+          eq(templates.workspaceId, workspaceId)
+        )
+      );
     } else {
-      // Global templates OR workspace templates
+      // Default behavior: Global templates OR workspace templates for the given workspaceId
+      // This handles cases where isGlobal is not 'true' or 'false' or is missing
       conditions.push(
         or(
           eq(templates.isGlobal, true),
-          eq(templates.workspaceId, workspaceId)
+          and(
+            eq(templates.isGlobal, false), // Make sure it's a workspace template
+            eq(templates.workspaceId, workspaceId) // And it belongs to the current workspace
+          )
         )
       );
     }
