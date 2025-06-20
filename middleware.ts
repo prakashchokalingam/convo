@@ -1,5 +1,6 @@
 import { authMiddleware } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
+import { getUserDefaultWorkspace } from "@/lib/workspace-server";
 
 export default authMiddleware({
   // Configure Clerk to use our custom auth pages
@@ -82,6 +83,22 @@ export default authMiddleware({
         loginUrl.searchParams.set('redirect', req.nextUrl.pathname + req.nextUrl.search);
       }
       return NextResponse.redirect(loginUrl);
+    }
+
+    // For authenticated users, redirect from /app or /app/ to their default workspace or onboarding
+    if (auth.userId && (req.nextUrl.pathname === '/app' || req.nextUrl.pathname === '/app/')) {
+      // It's important that getUserDefaultWorkspace can work in this context.
+      // It uses auth() internally, which should pick up the userId from the middleware's auth context.
+      const workspace = await getUserDefaultWorkspace();
+
+      if (workspace && workspace.slug) {
+        const workspaceUrl = new URL(`/app/${workspace.slug}`, req.url);
+        return NextResponse.redirect(workspaceUrl);
+      } else {
+        // No default workspace found, redirect to onboarding
+        const onboardingUrl = new URL('/app/onboarding', req.url);
+        return NextResponse.redirect(onboardingUrl);
+      }
     }
     
     return NextResponse.next();

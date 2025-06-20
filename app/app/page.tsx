@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import { getUserDefaultWorkspace } from '@/lib/workspace';
+import { getUserDefaultWorkspace } from '@/lib/workspace-server';
 
 /**
  * App Root Page - /app

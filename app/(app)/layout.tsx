@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs';
 import { getSubdomainContext } from '@/lib/subdomain';
+import AppStoreInitializer from '@/components/shared/AppStoreInitializer';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -18,5 +19,5 @@ export default async function AppLayout({ children }: AppLayoutProps) {
   // Authentication checking will be done at the page level
   // since we need to allow access to login/signup pages
 
-  return <>{children}</>;
+  return <AppStoreInitializer>{children}</AppStoreInitializer>;
 }

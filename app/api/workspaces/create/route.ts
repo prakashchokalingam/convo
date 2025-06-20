@@ -7,7 +7,7 @@ import {
   canCreateDefaultWorkspace,
   getWorkspaceLimitsInfo,
   isSlugAvailable 
-} from '@/lib/workspace';
+} from '@/lib/workspace-server';
 
 // Validation schema for workspace creation
 const createWorkspaceSchema = z.object({

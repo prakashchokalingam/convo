@@ -18,7 +18,7 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react';
-import { getWorkspaceUrl } from '@/lib/workspace';
+import { getWorkspaceUrl } from '@/lib/urls/workspace-urls';
 
 interface InvitationData {
   id: string;

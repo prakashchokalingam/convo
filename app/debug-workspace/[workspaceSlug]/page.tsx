@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs';
-import { getWorkspaceBySlug, getCurrentUserWorkspaces } from '@/lib/workspace';
+import { getWorkspaceBySlug, getCurrentUserWorkspaces } from '@/lib/workspace-server';
 
 /**
  * Debug page to check workspace access

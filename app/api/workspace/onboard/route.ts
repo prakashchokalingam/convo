@@ -5,7 +5,7 @@ import { users, workspaceMembers, workspaceActivities } from '@/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
 import { createDefaultSubscription } from '@/lib/plans';
-import { createWorkspaceFromEmail, getUserDefaultWorkspace } from '@/lib/workspace';
+import { createWorkspaceFromEmail, getUserDefaultWorkspace } from '@/lib/workspace-server';
 
 export async function POST(req: NextRequest) {
   try {
