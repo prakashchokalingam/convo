@@ -68,23 +68,36 @@ test.describe('Subdomain Context Detection', () => {
 test.describe('Context URL Building', () => {
   test('should build correct URLs for development', async ({ page }) => {
     // Test URL building utility functions
-    const marketingUrl = buildContextUrl('marketing', 'pricing');
-    const appUrl = buildContextUrl('app', 'workspace/test');
+    const marketingPricingUrl = buildContextUrl('marketing', 'pricing');
+    const marketingRootUrl = buildContextUrl('marketing', '/');
+    const appWorkspaceUrl = buildContextUrl('app', 'workspace/test');
+    const appRootUrl = buildContextUrl('app', '/');
     const formsUrl = buildContextUrl('forms', 'test/form123');
+    const formsRootUrl = buildContextUrl('forms', '/');
     
-    // In development, should use query parameters
     if (process.env.NODE_ENV !== 'production') {
-      expect(marketingUrl).toContain('localhost:3002/pricing');
-      expect(appUrl).toContain('localhost:3002/workspace/test?subdomain=app');
-      expect(formsUrl).toContain('localhost:3002/test/form123?subdomain=forms');
+      expect(marketingPricingUrl).toBe('http://localhost:3002/marketing/pricing');
+      expect(marketingRootUrl).toBe('http://localhost:3002/marketing/');
+      expect(appWorkspaceUrl).toBe('http://localhost:3002/app/workspace/test');
+      expect(appRootUrl).toBe('http://localhost:3002/app/');
+      expect(formsUrl).toBe('http://localhost:3002/forms/test/form123');
+      expect(formsRootUrl).toBe('http://localhost:3002/forms/');
+    } else {
+      expect(marketingPricingUrl).toBe('https://convo.ai/pricing');
+      expect(marketingRootUrl).toBe('https://convo.ai/');
+      expect(appWorkspaceUrl).toBe('https://app.convo.ai/workspace/test');
+      expect(appRootUrl).toBe('https://app.convo.ai/');
+      expect(formsUrl).toBe('https://forms.convo.ai/test/form123');
+      expect(formsRootUrl).toBe('https://forms.convo.ai/');
     }
     
-    // Test navigation with built URLs
-    await page.goto(marketingUrl);
-    await expect(page).toHaveURL(new RegExp('.*pricing.*'));
-    
-    await page.goto(appUrl);
-    await expect(page).toHaveURL(new RegExp('.*subdomain=app.*'));
+    // Test navigation with a built URL (dev example)
+    if (process.env.NODE_ENV !== 'production') {
+      await page.goto(appWorkspaceUrl); // http://localhost:3002/app/workspace/test
+      // After middleware rewrite, browser URL remains, internal routing is to /workspace/test
+      await expect(page).toHaveURL('http://localhost:3002/app/workspace/test');
+      // The navigator.verifyContext('app') would also confirm this.
+    }
   });
   
   test('should extract workspace slug from URLs correctly', async ({ page }) => {
@@ -159,17 +172,26 @@ test.describe('Cross-Context Navigation', () => {
 
 test.describe('Error Handling and Fallbacks', () => {
   test('should handle invalid subdomain gracefully', async ({ page }) => {
-    // Navigate to invalid subdomain context
-    await page.goto('http://localhost:3002/test?subdomain=invalid');
+    // Navigate to an invalid path prefix in development
+    if (process.env.NODE_ENV !== 'production') {
+      await page.goto('http://localhost:3002/invalidprefix/test');
+    } else {
+      // In production, "invalid subdomain" is harder to test without DNS setup.
+      // We can test a non-existent page on a valid domain.
+      await page.goto(buildContextUrl('marketing', '/non-existent-page-for-prod-test'));
+    }
     
-    // Should fallback to marketing or show appropriate error
+    // Behavior might be a 404 page within the default 'marketing' context,
+    // as middleware defaults unknown paths/prefixes to marketing.
     await page.waitForLoadState('networkidle');
     
-    // Should either redirect to marketing or show error page
-    const hasMarketing = await page.locator('[data-testid="marketing-hero"]').isVisible();
-    const hasError = await page.locator('text="Error", text="Invalid"').isVisible();
-    
-    expect(hasMarketing || hasError).toBe(true);
+    // Expect a 404 page, likely within the marketing context's layout
+    // (or a generic Next.js 404 if marketing layout doesn't catch it)
+    const has404Text = await page.locator('text="Not Found", text="404", text="This page could not be found."').first().isVisible();
+    expect(has404Text).toBe(true);
+
+    // Optionally, verify it's within marketing context if possible (e.g. no app-specific elements)
+    await expect(page.locator('[data-testid="app-sidebar"]')).not.toBeVisible();
   });
   
   test('should show appropriate 404 pages per context', async ({ page }) => {

@@ -41,18 +41,28 @@ const getBaseUrls = () => {
 export function buildContextUrl(context: SubdomainContext, path: string = ''): string {
   const urls = getBaseUrls();
   const isDevelopment = process.env.NODE_ENV !== 'production';
-  
-  // Remove leading slash from path if present
-  const cleanPath = path.startsWith('/') ? path.substring(1) : path;
-  
+
+  // Ensure path starts with a slash for consistency, then remove it for joining
+  let processedPath = path.startsWith('/') ? path : `/${path}`;
+  if (processedPath === '/') processedPath = ''; // Avoid double slash if root path becomes empty
+
+  const cleanPath = processedPath.substring(1); // Remove leading slash for joining
+
   if (isDevelopment) {
-    // In development, use query parameters to simulate subdomains
-    const baseUrl = urls.base;
-    const queryParam = context === 'marketing' ? '' : `?subdomain=${context}`;
-    return `${baseUrl}/${cleanPath}${queryParam}`;
+    const baseUrl = urls.base; // http://localhost:3002
+    // New path-based structure: http://localhost:3002/context/path
+    // For marketing root, ensure it's /marketing/ not /marketing
+    if (context === 'marketing' && cleanPath === '') {
+      return `${baseUrl}/marketing/`;
+    }
+    return `${baseUrl}/${context}/${cleanPath}`;
   }
   
   // In production, use actual subdomains
+  // For root paths, ensure a trailing slash
+  if (cleanPath === '') {
+    return `${urls[context]}/`;
+  }
   return `${urls[context]}/${cleanPath}`;
 }
 
@@ -139,16 +149,15 @@ export class SubdomainNavigator {
     const isDevelopment = process.env.NODE_ENV !== 'production';
     
     if (isDevelopment) {
-      // In development, check query parameters
-      if (expectedContext === 'marketing') {
-        expect(currentUrl).not.toContain('?subdomain=');
-      } else {
-        expect(currentUrl).toContain(`subdomain=${expectedContext}`);
-      }
+      const baseUrl = getBaseUrls().base;
+      // In development, check path prefixes
+      // Example: http://localhost:3002/app/dashboard
+      const expectedPathPrefix = `${baseUrl}/${expectedContext}/`;
+      expect(currentUrl.startsWith(expectedPathPrefix)).toBe(true);
     } else {
       // In production, check actual subdomain
-      const urls = getBaseUrls();
-      expect(currentUrl).toContain(urls[expectedContext]);
+      const expectedBaseUrl = getBaseUrls()[expectedContext];
+      expect(currentUrl.startsWith(expectedBaseUrl)).toBe(true);
     }
   }
   

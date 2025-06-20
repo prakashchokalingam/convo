@@ -28,15 +28,17 @@ export function getSubdomainContext(): SubdomainContext {
   if (typeof window !== 'undefined') {
     // CLIENT-SIDE DETECTION (in browser)
     const hostname = window.location.hostname;
-    const searchParams = new URLSearchParams(window.location.search);
     
     if (process.env.NODE_ENV === 'development') {
-      // Development: Check for ?subdomain= query parameter
-      // Examples: ?subdomain=app, ?subdomain=forms
-      const subdomain = searchParams.get('subdomain');
-      if (subdomain === 'app') return 'app';
-      if (subdomain === 'forms') return 'forms';
-      return 'marketing'; // Default for localhost:3002/
+      // Development: Detect context from pathname
+      // Examples: /app/dashboard -> app, /forms/submit -> forms, /marketing/about -> marketing
+      const pathSegments = window.location.pathname.split('/');
+      const firstSegment = pathSegments[1]; // Pathname starts with '/', so segment 0 is empty
+
+      if (firstSegment === 'app') return 'app';
+      if (firstSegment === 'forms') return 'forms';
+      // Default to marketing for paths like /marketing/..., / (root), or any other path
+      return 'marketing';
     } else {
       // Production: Check actual subdomain in hostname
       // Examples: app.convo.ai, forms.convo.ai
@@ -64,10 +66,20 @@ export function getSubdomainContext(): SubdomainContext {
       return 'marketing';
     }
     
-    // Development fallback
+    // Development fallback:
+    // This fallback is hit if 'x-subdomain-context' header is NOT set by middleware in dev.
+    // Middleware should be the primary source of context server-side.
+    // We can't easily get the pathname here server-side without more complex parsing if the header is missing.
+    // Log a warning and default to 'marketing'. The middleware should be fixed.
+    if (process.env.NODE_ENV === 'development' && host && host.includes('localhost')) {
+      console.warn(
+        "getSubdomainContext: 'x-subdomain-context' header not found in development. " +
+        "Middleware might not be correctly setting the context. Defaulting to 'marketing'."
+      );
+    }
     return 'marketing';
   } catch (error) {
-    // Fallback if headers are not available (shouldn't happen normally)
+    // Fallback if headers are not available (e.g. during build or non-request environments)
     return 'marketing';
   }
 }
@@ -83,21 +95,29 @@ export function getSubdomainContext(): SubdomainContext {
  * @returns Complete URL with proper subdomain or query parameter
  * 
  * Examples:
- * - buildContextUrl('app', '/workspace') → 'localhost:3002/workspace?subdomain=app' (dev)
+ * - buildContextUrl('marketing', '/workspace') → 'http://localhost:3002/marketing/workspace' (dev)
+ * - buildContextUrl('marketing', '/workspace') → 'https://convo.ai/workspace' (prod)
+ * - buildContextUrl('app', '/workspace') → 'http://localhost:3002/app/workspace' (dev)
  * - buildContextUrl('app', '/workspace') → 'https://app.convo.ai/workspace' (prod)
- * - buildContextUrl('forms', '/contact/123') → 'localhost:3002/contact/123?subdomain=forms' (dev)
+ * - buildContextUrl('forms', '/contact/123') → 'http://localhost:3002/forms/contact/123' (dev)
+ * - buildContextUrl('forms', '/workspace') → 'https://forms.convo.ai/workspace' (prod)
  */
 export function buildContextUrl(context: SubdomainContext, path: string): string {
+  // Ensure path starts with a slash and handle root path correctly
+  const normalizedPath = path === '/' ? '' : path;
+
   if (process.env.NODE_ENV === 'development') {
-    // Development: Use query parameters to simulate subdomains
     const base = 'http://localhost:3002';
-    if (context === 'marketing') return `${base}${path}`;
-    // Ensure `subdomain` is appended correctly, whether path already has query params or not
-    return `${base}${path}${path.includes('?') ? '&' : '?'}subdomain=${context}`;
+    // Prepend context to path, e.g., /app/workspace or /marketing/about
+    return `${base}/${context}${normalizedPath}`;
   } else {
     // Production: Use real subdomains
-    const subdomain = context === 'marketing' ? '' : `${context}.`;
-    return `https://${subdomain}convo.ai${path}`;
+    if (context === 'marketing') {
+      return `https://convo.ai${normalizedPath === '' ? '/' : normalizedPath}`;
+    }
+    // For 'app' and 'forms'
+    const subdomain = `${context}.`;
+    return `https://${subdomain}convo.ai${normalizedPath === '' ? '/' : normalizedPath}`;
   }
 }
 
