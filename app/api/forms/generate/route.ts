@@ -16,9 +16,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const prompt = formData.get("prompt") as string;
-    const workspaceId = formData.get("workspaceId") as string;
+    const { prompt, workspaceId } = await request.json();
 
     if (!prompt) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
@@ -154,8 +152,7 @@ Create a form configuration for: ${prompt}`;
       version: 1,
     }).returning();
 
-    // Redirect to form editor
-    return NextResponse.redirect(new URL(`/app/${workspaceId}/forms/${newForm.id}/edit`, request.url));
+    return NextResponse.json({ formId: newForm.id, title: newForm.title }, { status: 201 });
   } catch (error) {
     console.error("Error generating form:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
