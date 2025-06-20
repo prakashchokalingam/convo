@@ -21,6 +21,7 @@ import {
   Layout
 } from 'lucide-react';
 import { Template } from '@/lib/db/schema';
+import { getFormEditorUrl } from '@/lib/urls/workspace-urls';
 
 /**
  * Enhanced Form Creation Page with Template Integration
@@ -128,7 +129,7 @@ export default function NewFormPage() {
       const data = await response.json();
       
       // Navigate to the form editor
-      router.push(`/${workspace.slug}/forms/${data.form.id}`);
+      router.push(getFormEditorUrl(workspace.slug, data.form.id));
       
     } catch (error) {
       console.error('Error creating form from template:', error);
@@ -187,7 +188,7 @@ export default function NewFormPage() {
       const data = await response.json();
       
       // Navigate to the form editor
-      router.push(`/${workspace.slug}/forms/${data.form.id}`);
+      router.push(getFormEditorUrl(workspace.slug, data.form.id));
       
     } catch (error) {
       console.error('Error creating form:', error);

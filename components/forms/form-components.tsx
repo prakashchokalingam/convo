@@ -1,27 +1,115 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/shared/ui/button';
+import { Badge } from '@/components/shared/ui/badge';
+import { getFormsUrl, getFormEditorUrl } from '@/lib/urls/workspace-urls';
 
 // Enhanced components for forms functionality
 
-export function FormsList({ workspaceId }: { workspaceId: string }) {
-  return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="p-6">
-        <div className="text-center py-8">
-          <div className="text-gray-500 text-sm">No forms yet</div>
-          <div className="text-gray-400 text-xs mt-1">Create your first form to get started</div>
+// Define a type for the form object
+interface Form {
+  id: string;
+  title: string;
+  description?: string | null;
+  isPublished: boolean;
+  createdAt: string; // Assuming createdAt is a string date
+  workspaceSlug: string; // Needed for getFormEditorUrl
+}
+
+export function FormsList({ workspaceId, workspaceSlug }: { workspaceId: string, workspaceSlug: string }) {
+  const [forms, setForms] = useState<Form[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchForms = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/forms?workspaceId=${workspaceId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch forms');
+        }
+        const data = await response.json();
+        // Assuming the API returns forms with workspaceSlug attached or it's available
+        setForms(data.forms.map((form: any) => ({ ...form, workspaceSlug })));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (workspaceId) {
+      fetchForms();
+    }
+  }, [workspaceId, workspaceSlug]);
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+        <p className="text-gray-500">Loading forms...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (forms.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200">
+        <div className="p-6">
+          <div className="text-center py-8">
+            <div className="text-gray-500 text-sm">No forms yet</div>
+            <div className="text-gray-400 text-xs mt-1">Create your first form to get started</div>
+          </div>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200">
+      <ul className="divide-y divide-gray-200">
+        {forms.map((form) => (
+          <li key={form.id} className="p-6 hover:bg-gray-50">
+            <div className="flex items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <Link href={getFormEditorUrl(form.workspaceSlug, form.id)} className="text-blue-600 hover:underline font-medium">
+                  {form.title}
+                </Link>
+                {form.description && (
+                  <p className="text-sm text-gray-500 mt-1 truncate">{form.description}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-4 ml-4">
+                <Badge variant={form.isPublished ? 'default' : 'outline'}
+                       className={form.isPublished ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
+                  {form.isPublished ? 'Published' : 'Draft'}
+                </Badge>
+                <span className="text-sm text-gray-500">
+                  {new Date(form.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 export function CreateFormButton({ workspace }: { workspace: any }) {
   return (
-    <Link href={`/${workspace.slug}/forms/new`}>
+    <Link href={`${getFormsUrl(workspace.slug)}/new`}>
       <Button className="bg-blue-600 text-white hover:bg-blue-700">
         <Plus className="w-4 h-4 mr-2" />
         Create Form
