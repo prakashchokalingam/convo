@@ -1,5 +1,5 @@
-// Server-side workspace operations (database dependencies)
-// DO NOT import this file in client components
+// IMPORTANT: This file contains server-side code only.
+// Do not import this file into client components.
 
 import { db } from '@/drizzle/db';
 import { workspaces, workspaceMembers, users } from '@/drizzle/schema';
@@ -10,9 +10,6 @@ import { cache } from 'react';
 import { createId } from '@paralleldrive/cuid2';
 import type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
 import { getWorkspaceUrl } from '@/lib/context';
-
-// Re-export types for server components
-export type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
 
 // Get all workspaces accessible by current user
 export const getCurrentUserWorkspaces = cache(async (): Promise<WorkspaceWithRole[]> => {

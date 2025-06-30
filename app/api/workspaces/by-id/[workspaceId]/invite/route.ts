@@ -6,7 +6,7 @@ import { createId } from '@paralleldrive/cuid2';
 import { eq, and } from 'drizzle-orm';
 import { canInviteToWorkspace } from '@/lib/plans';
 import { checkWorkspacePermission, ActivityLogger } from '@/lib/rbac';
-import { validateWorkspaceAccess } from '@/lib/workspace';
+import { validateWorkspaceAccess } from '@/lib/workspace-server';
 import { sendInvitationEmail } from '@/lib/email';
 import { withErrorHandling, createSuccessResponse, ApiError, ErrorCodes, requireAuth, validateRequiredFields, requirePermission } from '@/lib/api-errors';
 import crypto from 'crypto';

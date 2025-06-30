@@ -5,20 +5,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Bell, Search, Command } from 'lucide-react';
+import { useAppStore } from '@/lib/store/appStore';
 
-// Import client-safe types
-import type { WorkspaceWithRole } from '@/lib/types/workspace';
-interface AppHeaderProps {
-  workspace: WorkspaceWithRole;
-}
+// Removed WorkspaceWithRole import as it's not directly used by props anymore
+// import type { WorkspaceWithRole } from '@/lib/types/workspace';
 
-export function AppHeader({ workspace }: AppHeaderProps) {
-  // Ensure workspace is valid
-  if (!workspace) {
+// No more props needed for AppHeader after refactor
+// interface AppHeaderProps {
+// }
+
+export function AppHeader() {
+  const { currentWorkspace, isInitialized } = useAppStore();
+
+  // Handle loading state or if no workspace is active
+  // This also covers the case where the store is not yet initialized
+  if (!isInitialized || !currentWorkspace) {
     return (
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-center px-4 sm:px-6">
-          <div className="text-sm text-muted-foreground">Loading...</div>
+        <div className="container flex h-16 items-center justify-between px-4 sm:px-6">
+          {/* Show basic logo and UserButton even in loading/no workspace state */}
+          <h1 className="text-xl font-semibold text-foreground">ConvoForms</h1>
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "h-8 w-8"
+              }
+            }}
+          />
         </div>
       </header>
     );
@@ -28,8 +41,9 @@ export function AppHeader({ workspace }: AppHeaderProps) {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center px-4 sm:px-6">
         {/* Left: Logo/Brand */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <h1 className="text-xl font-semibold text-foreground">ConvoForms</h1>
+          {currentWorkspace && <Badge variant="outline">{currentWorkspace.name}</Badge>}
         </div>
 
         {/* Center: Enhanced Search */}

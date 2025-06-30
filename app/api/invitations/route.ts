@@ -6,7 +6,7 @@ import { createId } from '@paralleldrive/cuid2';
 import { eq, and } from 'drizzle-orm';
 import { ActivityLogger } from '@/lib/rbac';
 import { sendWelcomeEmail } from '@/lib/email';
-import { getWorkspaceUrl } from '@/lib/workspace';
+import { getWorkspaceUrl } from '@/lib/workspace-server';
 
 // GET - Validate invitation token and get invitation details
 export async function GET(req: NextRequest) {

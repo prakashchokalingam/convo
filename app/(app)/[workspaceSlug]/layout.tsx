@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs';
-import { getCurrentWorkspace } from '@/lib/workspace';
+import { getCurrentWorkspace } from '@/lib/workspace-server';
 import { getSubdomainContext } from '@/lib/subdomain';
 import { AppHeader } from '@/components/app/dashboard/app-header';
 import { AppSidebar } from '@/components/app/dashboard/app-sidebar';
