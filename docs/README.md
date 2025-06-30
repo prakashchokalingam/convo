@@ -2,48 +2,48 @@
 
 Welcome to the central documentation hub for ConvoForms! This page provides an overview of all technical documentation available.
 
-## 🚀 Getting Started & Core Concepts
+To understand how this documentation is organized, please see our **[Documentation Structure Guide](./docs_structure.md)**.
+
+## 🚀 Core Documentation
+
+These are essential reads for understanding and contributing to ConvoForms:
 
 - **[Getting Started](./GETTING_STARTED.md)**: Your first stop. Detailed guide to set up the project, understand prerequisites, and run ConvoForms locally.
-- **[Features](./features.md)**: Discover what ConvoForms can do, from AI form generation to conversational mode and team collaboration.
 - **[Architecture](./ARCHITECTURE.md)**: Deep dive into the system design, URL structure, file organization, data flow, AI integration, and security aspects.
-
-## 🛠️ Development & Contribution
-
 - **[Development Guide](./DEVELOPMENT.md)**: Comprehensive guide for daily development, including database operations, testing contexts, common tasks, debugging, file organization, and Git workflow.
-- **[Environment Variables](./ENVIRONMENT.md)**: Details on configuring necessary environment variables for local development and production.
-- **[API Documentation](./API_DOCUMENTATION.md)**: Information regarding the backend API endpoints. (Note: Also see the Swagger section for generated API docs).
-- **[End-to-End Testing](./E2E_TESTING.md)**: Guide on how E2E tests are structured and how to run them.
+- **[Features](./features.md)**: Discover what ConvoForms can do, from AI form generation to conversational mode and team collaboration.
 
-## 🎨 Design System
+## 🛠️ Development Resources
+
+- **[Environment Variables](./ENVIRONMENT.md)**: Details on configuring necessary environment variables for local development and production.
+- **[API Documentation (General)](./API_DOCUMENTATION.md)**: Information regarding the backend API endpoints.
+    - For auto-generated, detailed API specifications, see **[Swagger API Documentation](./swagger/README.md)** (includes link to generated `openapi.json`).
+- **[Testing Strategy](./DEVELOPMENT.md#testing)**: (Link to testing section within Development Guide)
+    - **[End-to-End Testing Guide](./E2E_TESTING.md)**: Specific guide on how E2E tests are structured and how to run them.
+    - **[E2E Quick Start Guide](./guides/E2E_QUICK_START.md)**: (Moved from root) A guide for getting started quickly with E2E testing.
+
+## 🎨 Design & UI
 
 - **[Design Overview](./design/README.md)**: Introduction to our design philosophy and the `shadcn/ui` based design system.
 - **[shadcn/ui Design System](./design/shadcn-ui-design-system.md)**: Detailed specification of the UI design system.
 - **[Component Architecture](./design/shadcn-component-architecture.md)**: Patterns and structure for UI components.
 
+## ⚙️ Implementation Deep Dives & Technical Details
+
+This section covers specific features or technical areas in more detail:
+
+- **[Automatic Workspace Creation](./technical_details/implementation-automatic-workspace-creation.md)**: Technical details on this feature. (Previously `implementation-automatic-workspace-creation.md`)
+- **[Workspace Type Migration](./technical_details/implementation-workspace-type-migration.md)**: Documentation for migrating workspace types. (Previously `implementation-workspace-type-migration.md`)
+- **[Workspace Implementation Details](./technical_details/WORKSPACE_IMPLEMENTATION.md)**: (Moved from root) In-depth details on workspace functionality.
+- **[Use Cases & Scenarios](./cases/README.md)**: This directory contains documents detailing specific scenarios, edge cases, or in-depth explanations of particular features or past technical decisions. It serves as a knowledge base for non-standard situations or detailed feature explorations.
+
 ## 🚀 Deployment & Operations
 
-- **[Deployment Guide](./DEPLOYMENT.md)**: Step-by-step instructions for deploying ConvoForms to production environments, including recommended setups (Vercel + Supabase) and alternative options.
+- **[Deployment Guide](./DEPLOYMENT.md)**: Step-by-step instructions for deploying ConvoForms to production environments.
 
-## ⚙️ Advanced Topics & Specific Implementations
+## 🗂️ Project Management & Planning (Internal)
 
-- **[Swagger API Generation](./swagger/)**: Information on how API documentation is generated using Swagger. You can find the generated OpenAPI spec in the `swagger/generated/` subdirectory.
-- **[Implementation: Automatic Workspace Creation](./implementation-automatic-workspace-creation.md)**: Technical details on the automatic workspace creation feature.
-- **[Implementation: Workspace Type Migration](./implementation-workspace-type-migration.md)**: Documentation for migrating workspace types.
-- **[Priority Action Plan](./PRIORITY_ACTION_PLAN.md)**: Document outlining priority tasks (may be more for project management).
-
-## 🧪 Test Cases & Quality Assurance
-
-- **[Test Cases Overview](./cases/README.md)**: Introduction to how test cases are organized and structured for various features.
-    - **Authentication Cases**: `cases/authentication.md`
-    - **Form Builder Cases**: `cases/form-builder.md`
-    - **Form Generation Cases**: `cases/form-generation.md`
-    - ... and many more specific feature test cases in `docs/cases/`.
-
-## 🗂️ Other Documentation
-
-- **[E2E Quick Start Guide](../../E2E_QUICK_START.md)**: A guide for getting started with E2E testing. (Located in root)
-- **[Workspace Implementation Details](../../WORKSPACE_IMPLEMENTATION.md)**: Details on workspace implementation. (Located in root)
+- **[Priority Action Plan](./PRIORITY_ACTION_PLAN.md)**: Document outlining priority tasks (primarily for project tracking).
 
 ---
 
