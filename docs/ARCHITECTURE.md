@@ -31,49 +31,60 @@ We use **route groups** and **subdomain simulation** for clean separation:
 - **Marketing**: `convo.ai` (e.g., `https://convo.ai/pricing`)
 - **App**: `app.convo.ai` (e.g., `https://app.convo.ai/workspace-slug/settings`)
 - **Forms**: `forms.convo.ai` (e.g., `https://forms.convo.ai/workspace-slug/form-id`)
+- **Admin**: `admin.convo.ai` (e.g., `https://admin.convo.ai/overview`)
 
 ### Development URLs (Path-based)
 - **Marketing**: `localhost:3002/marketing` (e.g., `http://localhost:3002/marketing/pricing`)
 - **App**: `localhost:3002/app` (e.g., `http://localhost:3002/app/workspace-slug/settings`)
 - **Forms**: `localhost:3002/forms` (e.g., `http://localhost:3002/forms/workspace-slug/form-id`)
+- **Admin**: `localhost:3002/admin` (e.g., `http://localhost:3002/admin/overview`)
 
 ## File Structure
 
 ```
 app/
-├── page.tsx                    # 🏠 Marketing homepage
-├── (app)/                      # 📱 SaaS App (auth required)
-│   ├── layout.tsx              # App-wide layout + auth check
-│   ├── login/page.tsx          # Login page
-│   ├── signup/page.tsx         # Signup page
-│   ├── onboarding/page.tsx     # Workspace creation
-│   └── [workspaceSlug]/        # Workspace routes
-│       ├── page.tsx            # Dashboard
-│       ├── forms/              # Form management
-│       ├── settings/           # Workspace settings
-│       └── members/            # Team management
-├── (forms)/                    # 📝 Public Forms (no auth)
-│   ├── layout.tsx              # Forms-only layout
-│   └── [type]/[formId]/        # Public form submission
+├── marketing/                # 🌐 Marketing pages (e.g., homepage, pricing)
+│   └── page.tsx              # Example: Marketing homepage (if moved from app/page.tsx)
+├── app/                      # 📱 SaaS App (e.g., app.convo.ai, localhost:3002/app)
+│   ├── layout.tsx            # Layout for the main application
+│   ├── login/page.tsx        # Login page
+│   ├── signup/page.tsx       # Signup page
+│   ├── onboarding/page.tsx   # Workspace creation
+│   └── [workspaceSlug]/      # Workspace-specific routes
+│       ├── page.tsx          # Dashboard
+│       ├── forms/            # Form management
+│       └── ...               # Other app features (settings, members)
+├── admin/                    # 🛡️ Admin Dashboard (e.g., admin.convo.ai, localhost:3002/admin)
+│   ├── layout.tsx            # Layout for the admin section
+│   ├── overview/page.tsx     # Admin overview page
+│   └── ...                   # Other admin features (workspaces, users)
+├── forms/                    # 📝 Public Forms (e.g., forms.convo.ai, localhost:3002/forms)
+│   ├── layout.tsx            # Layout for public forms
+│   └── [workspaceSlug]/[formId]/ # Public form submission page
 │       └── page.tsx
-└── api/                        # 🔧 Backend APIs
-    ├── forms/                  # Form CRUD operations
-    └── setup-workspace/        # Workspace creation
+├── api/                      # 🔧 Backend APIs
+│   ├── ...                   # API routes
+└── layout.tsx                # Root layout (applies to all, including marketing if not overridden)
+└── page.tsx                  # Root page (often the main marketing homepage)
 ```
+*Note: `app/page.tsx` is often the marketing homepage. If marketing has its own layout and more pages, it might be in `app/marketing/`.*
 
 ## Key Components
 
-### Route Groups
-We use Next.js route groups for clean organization:
-- `(app)/` - All authenticated app routes
-- `(forms)/` - All public form submission routes
-- Root level - Marketing pages
+### Directory-based Routing
+Next.js uses directory structure within `app/` for routing:
+- `app/app/...` maps to `/app/...` URLs (main application, `app.convo.ai`).
+- `app/admin/...` maps to `/admin/...` URLs (admin dashboard, `admin.convo.ai`).
+- `app/forms/...` maps to `/forms/...` URLs (public forms, `forms.convo.ai`).
+- `app/marketing/...` or root `app/page.tsx` for marketing site (`convo.ai`).
+Route groups like `(groupName)` can still be used for organization without affecting URL paths, if needed.
 
 ### Context Detection
-The app detects which "context" you're in:
+The app detects which "context" (or part of the site) you're in, often via middleware:
 ```typescript
-// lib/subdomain.ts
-export function getSubdomainContext(): 'marketing' | 'app' | 'forms'
+// Example logic in middleware.ts
+// let context: 'marketing' | 'app' | 'forms' | 'admin' = 'marketing';
+// Based on hostname (prod) or path prefix (dev)
 ```
 
 This determines:
