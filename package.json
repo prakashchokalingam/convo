@@ -108,6 +108,7 @@
     "drizzle-kit": "^0.31.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
+    "glob": "^10.3.10",
     "jsdom": "^23.0.1",
     "postcss": "^8",
     "swagger-jsdoc": "^6.2.8",

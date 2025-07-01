@@ -359,3 +359,80 @@ export async function createWorkspaceFromEmail(
     name: workspace.name
   };
 }
+
+// Admin specific functions
+import { clerkClient } from '@clerk/nextjs/server';
+import { subscriptions } from '@/drizzle/schema'; // Ensure subscriptions is imported if not already
+import type { Workspace } from '@/drizzle/schema';
+
+export interface AdminWorkspaceInfo extends Workspace {
+  ownerName: string | null;
+  ownerEmail: string | null;
+  plan: string;
+}
+
+export const getAllWorkspacesForAdmin = async (): Promise<AdminWorkspaceInfo[]> => {
+  try {
+    const allWorkspaces = await db.select().from(workspaces).orderBy(desc(workspaces.createdAt));
+
+    if (!allWorkspaces.length) {
+      return [];
+    }
+
+    const augmentedWorkspaces: AdminWorkspaceInfo[] = [];
+
+    for (const ws of allWorkspaces) {
+      let ownerName: string | null = 'N/A';
+      let ownerEmail: string | null = 'N/A';
+      let plan = 'Free'; // Default plan
+
+      // Fetch owner details from Clerk
+      if (ws.ownerId) {
+        try {
+          const owner = await clerkClient.users.getUser(ws.ownerId);
+          ownerName = owner.firstName && owner.lastName ? `${owner.firstName} ${owner.lastName}` : (owner.firstName || owner.lastName || null);
+          if (!ownerName && owner.username) {
+            ownerName = owner.username;
+          }
+          const primaryEmail = owner.emailAddresses.find(e => e.id === owner.primaryEmailAddressId);
+          ownerEmail = primaryEmail ? primaryEmail.emailAddress : (owner.emailAddresses[0]?.emailAddress || 'No primary email');
+        } catch (clerkError) {
+          console.error(`Failed to fetch owner details for ${ws.ownerId}:`, clerkError);
+          ownerName = 'Error fetching user';
+          ownerEmail = 'Error fetching user';
+        }
+      }
+
+      // Fetch subscription plan
+      if (ws.ownerId) {
+        try {
+          const subscription = await db
+            .select({ plan: subscriptions.plan })
+            .from(subscriptions)
+            .where(eq(subscriptions.userId, ws.ownerId))
+            .orderBy(desc(subscriptions.createdAt)) // In case of multiple, take the latest
+            .limit(1);
+
+          if (subscription.length > 0 && subscription[0].plan) {
+            plan = subscription[0].plan;
+          }
+        } catch (dbError) {
+          console.error(`Failed to fetch subscription for owner ${ws.ownerId}:`, dbError);
+          plan = 'Error fetching plan';
+        }
+      }
+
+      augmentedWorkspaces.push({
+        ...ws,
+        ownerName,
+        ownerEmail,
+        plan,
+      });
+    }
+
+    return augmentedWorkspaces;
+  } catch (error) {
+    console.error('Error getting all workspaces for admin:', error);
+    return [];
+  }
+};

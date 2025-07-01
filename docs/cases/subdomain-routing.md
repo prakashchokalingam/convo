@@ -1,6 +1,8 @@
-# Subdomain Routing Test Cases
+# Subdomain Routing Test Cases (Legacy Query Parameter System)
 
-**Status**: 🚧 Implemented, Needs Testing
+**Status**: 🛑 Deprecated. This document describes the previous routing system that used query parameters for development. For the current path-based routing system, please refer to `path-based-routing.md`.
+
+**Original Status**: 🚧 Implemented, Needs Testing
 
 ## Test Case 1: Marketing Site Context (Root Domain)
 ### When
@@ -22,7 +24,7 @@
 
 ## Test Case 2: App Context Detection
 ### When
-- User visits `app.convo.ai/*` or `localhost:3002/*?subdomain=app`
+- User visits `app.convo.ai/*` (production) or `localhost:3002/app/*` (development)
 - App context should be detected
 
 ### Then
@@ -40,7 +42,7 @@
 
 ## Test Case 3: Forms Context Detection
 ### When
-- User visits `forms.convo.ai/{type}/{formId}` or `localhost:3002/{type}/{formId}?subdomain=forms`
+- User visits `forms.convo.ai/{type}/{formId}` (production) or `localhost:3002/forms/{type}/{formId}` (development)
 - Forms context should be detected
 
 ### Then
@@ -67,11 +69,11 @@
 - Development vs production handling
 
 ### Verify
-- [ ] `buildContextUrl('app', '/path')` generates correct URL
+- [ ] `buildContextUrl('app', '/path')` generates correct URL (e.g., `https://app.convo.ai/path` or `http://localhost:3002/app/path`)
 - [ ] `getWorkspaceUrl(slug)` builds proper workspace URLs
 - [ ] `getPublicFormUrl(type, formId)` creates valid form URLs
-- [ ] Development mode uses query parameters
-- [ ] Production mode uses actual subdomains
+- [ ] Development mode uses path prefixes (e.g., `/app`, `/forms`)
+- [ ] Production mode uses actual subdomains (e.g., `app.convo.ai`)
 
 ## Test Case 5: Cross-Context Navigation
 ### When
@@ -101,10 +103,10 @@
 - Easy context switching for testing
 
 ### Verify
-- [ ] `?subdomain=app` simulates app context
-- [ ] `?subdomain=forms` simulates forms context
-- [ ] No subdomain defaults to marketing
-- [ ] Context detection logic identical to production
+- [ ] Navigating to `/app/*` paths simulates app context in development
+- [ ] Navigating to `/forms/*` paths simulates forms context in development
+- [ ] Navigating to `/marketing/*` (or `/`) paths simulates marketing context in development
+- [ ] Context detection logic for production relies on hostnames, dev on paths
 - [ ] Easy switching between contexts during development
 
 ## Test Case 7: Error Handling and Fallbacks

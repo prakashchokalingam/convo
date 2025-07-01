@@ -1,4 +1,4 @@
-# ConvoForms Development Priority Action Plan
+# Convo Development Priority Action Plan
 
 ## 🚨 CRITICAL: Revenue-Blocking Features (Start Immediately)
 
@@ -71,9 +71,9 @@ npm run db:studio
 ### Test Current Implementation
 ```bash
 # Test all contexts
-http://localhost:3002/ (marketing)
-http://localhost:3002/login?subdomain=app (app)
-http://localhost:3002/contact/test?subdomain=forms (forms)
+http://localhost:3002/marketing (marketing, or / which redirects)
+http://localhost:3002/app/login (app)
+http://localhost:3002/forms/contact/test (forms)
 ```
 
 ## 🎯 Revenue Path to $500 MRR

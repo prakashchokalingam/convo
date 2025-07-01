@@ -1,15 +1,28 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Convo Forms API",
+    "title": "Convo API",
     "version": "1.0.0",
-    "description": "API for managing conversational forms and workspaces",
-    "x-generated-at": "2025-06-09T12:46:36.453Z"
+    "description": "\n      **Convo API Documentation**\n      \n      A comprehensive API for managing conversational forms, workspaces, and user interactions.\n      \n      ## Authentication\n      This API uses Clerk for authentication. Include your session token in the Authorization header:\n      `Authorization: Bearer <your-token>`\n      \n      ## Rate Limiting\n      API requests are rate limited per user:\n      - **Free Plan**: 100 requests/hour\n      - **Pro Plan**: 1000 requests/hour\n      - **Enterprise**: Custom limits\n      \n      Rate limit headers are included in all responses:\n      - `X-RateLimit-Limit`: Maximum requests allowed\n      - `X-RateLimit-Remaining`: Requests remaining in current window\n      - `X-RateLimit-Reset`: Time when the limit resets (Unix timestamp)\n    ",
+    "contact": {
+      "name": "API Support",
+      "email": "support@convo.ai"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    },
+    "x-generated-at": "2025-07-01T10:52:11.739Z",
+    "x-generator": "convo-forms-swagger-generator"
   },
   "servers": [
     {
       "url": "http://localhost:3002",
       "description": "Development server"
+    },
+    {
+      "url": "https://convo.ai/api",
+      "description": "Production server"
     }
   ],
   "components": {
@@ -18,7 +31,56 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT",
-        "description": "Clerk session token"
+        "description": "Clerk session token for user authentication"
+      },
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key for programmatic access"
+      }
+    },
+    "parameters": {
+      "PageParam": {
+        "in": "query",
+        "name": "page",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1
+        },
+        "description": "Page number for pagination"
+      },
+      "LimitParam": {
+        "in": "query",
+        "name": "limit",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10
+        },
+        "description": "Number of items per page"
+      },
+      "WorkspaceIdParam": {
+        "in": "path",
+        "name": "workspaceId",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$"
+        },
+        "description": "Unique workspace identifier"
+      },
+      "FormIdParam": {
+        "in": "path",
+        "name": "id",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$"
+        },
+        "description": "Unique form identifier"
       }
     },
     "responses": {
@@ -35,7 +97,148 @@
                 },
                 "message": {
                   "type": "string",
-                  "example": "Authentication required"
+                  "example": "Authentication required to access this resource"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "AUTH_REQUIRED"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Access forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Forbidden"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Insufficient permissions to access this resource"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "INSUFFICIENT_PERMISSIONS"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Not Found"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "The requested resource was not found"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "NOT_FOUND"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Validation Error"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Request validation failed"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "VALIDATION_ERROR"
+                },
+                "details": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "example": "email"
+                      },
+                      "message": {
+                        "type": "string",
+                        "example": "Invalid email format"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "RateLimitError": {
+        "description": "Rate limit exceeded",
+        "headers": {
+          "X-RateLimit-Limit": {
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Request limit per time window"
+          },
+          "X-RateLimit-Remaining": {
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Requests remaining in current window"
+          },
+          "X-RateLimit-Reset": {
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Time when rate limit resets (Unix timestamp)"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Rate Limit Exceeded"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Too many requests. Please try again later."
+                },
+                "code": {
+                  "type": "string",
+                  "example": "RATE_LIMIT_EXCEEDED"
+                },
+                "retryAfter": {
+                  "type": "integer",
+                  "example": 3600,
+                  "description": "Seconds until rate limit resets"
                 }
               }
             }
@@ -56,6 +259,10 @@
                 "message": {
                   "type": "string",
                   "example": "An unexpected error occurred"
+                },
+                "code": {
+                  "type": "string",
+                  "example": "INTERNAL_ERROR"
                 }
               }
             }
@@ -64,56 +271,1431 @@
       }
     },
     "schemas": {
-      "Form": {
+      "PaginationMeta": {
         "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "example": 10
+          },
+          "totalItems": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 42
+          },
+          "totalPages": {
+            "type": "integer",
+            "minimum": 0,
+            "example": 5
+          },
+          "hasNext": {
+            "type": "boolean",
+            "example": true
+          },
+          "hasPrev": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "page",
+          "limit",
+          "totalItems",
+          "totalPages",
+          "hasNext",
+          "hasPrev"
+        ]
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation completed successfully"
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
+      "AdminStatsResponse": {
+        "type": "object",
+        "description": "Response for admin statistics API.",
+        "properties": {
+          "totalUsers": {
+            "type": "integer",
+            "description": "Total number of registered users.",
+            "example": 150
+          },
+          "totalWorkspaces": {
+            "type": "integer",
+            "description": "Total number of created workspaces.",
+            "example": 200
+          },
+          "activeSubscriptions": {
+            "type": "integer",
+            "description": "Total number of active subscriptions.",
+            "example": 75
+          }
+        },
+        "required": [
+          "totalUsers",
+          "totalWorkspaces",
+          "activeSubscriptions"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Generic error response structure.",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "A description of the error.",
+            "example": "Resource not found"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "description": "User profile information from Clerk authentication",
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "description": "Clerk user ID",
+            "example": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx"
           },
-          "userId": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "isPublished": {
-            "type": "boolean"
-          },
-          "isConversational": {
-            "type": "boolean"
-          },
-          "config": {
+          "email": {
             "type": "string",
-            "description": "Form configuration as JSON"
+            "format": "email",
+            "description": "User's email address",
+            "example": "john.doe@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "User's first name",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "User's last name",
+            "example": "Doe"
+          },
+          "username": {
+            "type": "string",
+            "description": "Unique username for workspace URLs",
+            "example": "johndoe"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to user's profile picture",
+            "example": "https://img.clerk.dev/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yTmlXckV3dURCQ1E3WGladG9Yem5jYkE1WUQifQ"
           },
           "createdAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Account creation timestamp",
+            "example": "2024-01-15T10:30:00Z"
           },
           "updatedAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Last profile update timestamp",
+            "example": "2024-01-20T14:45:00Z"
           }
         },
         "required": [
           "id",
-          "userId",
+          "email",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "Workspace": {
+        "type": "object",
+        "description": "Workspace for organizing forms and team collaboration",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique workspace identifier",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "description": "Workspace display name",
+            "example": "Acme Corp Forms",
+            "maxLength": 100
+          },
+          "slug": {
+            "type": "string",
+            "description": "URL-friendly workspace identifier",
+            "example": "acme-corp",
+            "pattern": "^[a-z0-9-]+$",
+            "maxLength": 50
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "team"
+            ],
+            "description": "Workspace type",
+            "example": "team"
+          },
+          "ownerId": {
+            "type": "string",
+            "description": "Owner's user ID",
+            "example": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx"
+          },
+          "description": {
+            "type": "string",
+            "description": "Workspace description",
+            "example": "Customer feedback and lead generation forms",
+            "maxLength": 500
+          },
+          "avatarUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Workspace logo/avatar URL",
+            "example": "https://example.com/logo.png"
+          },
+          "settings": {
+            "type": "object",
+            "description": "Workspace configuration settings",
+            "properties": {
+              "theme": {
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark"
+                ],
+                "default": "light"
+              },
+              "timezone": {
+                "type": "string",
+                "example": "UTC"
+              },
+              "notifications": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "browser": {
+                    "type": "boolean",
+                    "default": true
+                  }
+                }
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Workspace creation timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last workspace update timestamp",
+            "example": "2024-01-20T14:45:00Z"
+          }
+        },
+        "required": [
+          "id",
           "name",
-          "config"
+          "slug",
+          "type",
+          "ownerId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "WorkspaceMember": {
+        "type": "object",
+        "description": "User membership in a workspace with role-based permissions",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique membership identifier",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Associated workspace ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "userId": {
+            "type": "string",
+            "description": "Member's user ID",
+            "example": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "admin",
+              "member",
+              "viewer"
+            ],
+            "description": "Member's role and permissions",
+            "example": "member"
+          },
+          "invitedBy": {
+            "type": "string",
+            "description": "User ID who sent the invitation",
+            "example": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx"
+          },
+          "invitedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Invitation timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When user joined the workspace",
+            "example": "2024-01-15T11:00:00Z"
+          },
+          "lastSeenAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last activity timestamp",
+            "example": "2024-01-20T14:45:00Z"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "userId",
+          "role",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "Form": {
+        "type": "object",
+        "description": "Form definition with fields and settings",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique form identifier",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Parent workspace ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Creator's user ID",
+            "example": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx"
+          },
+          "title": {
+            "type": "string",
+            "description": "Form title",
+            "example": "Customer Feedback Survey",
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "description": "Form description",
+            "example": "Help us improve our service by sharing your feedback",
+            "maxLength": 1000
+          },
+          "prompt": {
+            "type": "string",
+            "description": "AI generation prompt used to create this form",
+            "example": "Create a customer feedback form with rating and comment fields"
+          },
+          "isConversational": {
+            "type": "boolean",
+            "description": "Whether form uses conversational mode",
+            "example": false,
+            "default": false
+          },
+          "isPublished": {
+            "type": "boolean",
+            "description": "Whether form is published and accepting responses",
+            "example": true,
+            "default": false
+          },
+          "config": {
+            "$ref": "#/components/schemas/FormConfig"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/FormSettings"
+          },
+          "version": {
+            "type": "integer",
+            "description": "Form version number",
+            "example": 1,
+            "default": 1
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When form was published",
+            "example": "2024-01-15T12:00:00Z"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Form creation timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last form update timestamp",
+            "example": "2024-01-20T14:45:00Z"
+          },
+          "responseCount": {
+            "type": "integer",
+            "description": "Total number of responses (computed field)",
+            "example": 142,
+            "readOnly": true
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "createdBy",
+          "title",
+          "config",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "FormConfig": {
+        "type": "object",
+        "description": "Form structure and field definitions",
+        "properties": {
+          "fields": {
+            "type": "array",
+            "description": "Array of form fields",
+            "items": {
+              "$ref": "#/components/schemas/FormField"
+            }
+          },
+          "settings": {
+            "$ref": "#/components/schemas/FormDisplaySettings"
+          },
+          "styling": {
+            "$ref": "#/components/schemas/FormStyling"
+          }
+        },
+        "required": [
+          "fields"
+        ]
+      },
+      "FormField": {
+        "type": "object",
+        "description": "Individual form field definition",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique field identifier",
+            "example": "field_1"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "text",
+              "email",
+              "phone",
+              "select",
+              "multiselect",
+              "textarea",
+              "number",
+              "date",
+              "file",
+              "signature",
+              "rating"
+            ],
+            "description": "Field input type",
+            "example": "text"
+          },
+          "label": {
+            "type": "string",
+            "description": "Field label displayed to users",
+            "example": "Full Name",
+            "maxLength": 200
+          },
+          "placeholder": {
+            "type": "string",
+            "description": "Placeholder text",
+            "example": "Enter your full name",
+            "maxLength": 200
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Whether field is required",
+            "example": true,
+            "default": false
+          },
+          "order": {
+            "type": "integer",
+            "description": "Field display order",
+            "example": 1,
+            "minimum": 0
+          },
+          "options": {
+            "type": "array",
+            "description": "Options for select/multiselect fields",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Option 1",
+              "Option 2",
+              "Option 3"
+            ]
+          },
+          "validation": {
+            "$ref": "#/components/schemas/FieldValidation"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "label",
+          "required",
+          "order"
+        ]
+      },
+      "FieldValidation": {
+        "type": "object",
+        "description": "Field validation rules",
+        "properties": {
+          "minLength": {
+            "type": "integer",
+            "description": "Minimum character length",
+            "example": 2,
+            "minimum": 0
+          },
+          "maxLength": {
+            "type": "integer",
+            "description": "Maximum character length",
+            "example": 100,
+            "minimum": 1
+          },
+          "pattern": {
+            "type": "string",
+            "description": "RegEx validation pattern",
+            "example": "^[A-Za-z\\s]+$"
+          },
+          "min": {
+            "type": "number",
+            "description": "Minimum numeric value",
+            "example": 0
+          },
+          "max": {
+            "type": "number",
+            "description": "Maximum numeric value",
+            "example": 100
+          }
+        }
+      },
+      "FormDisplaySettings": {
+        "type": "object",
+        "description": "Form display and behavior settings",
+        "properties": {
+          "submitText": {
+            "type": "string",
+            "description": "Custom submit button text",
+            "example": "Send Feedback",
+            "default": "Submit"
+          },
+          "redirectUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to redirect after submission",
+            "example": "https://example.com/thank-you"
+          },
+          "emailNotifications": {
+            "type": "boolean",
+            "description": "Send email notifications for responses",
+            "example": true,
+            "default": false
+          },
+          "collectEmail": {
+            "type": "boolean",
+            "description": "Automatically collect submitter email",
+            "example": true,
+            "default": false
+          },
+          "requireAuth": {
+            "type": "boolean",
+            "description": "Require user authentication to submit",
+            "example": false,
+            "default": false
+          }
+        }
+      },
+      "FormStyling": {
+        "type": "object",
+        "description": "Form visual customization",
+        "properties": {
+          "backgroundColor": {
+            "type": "string",
+            "description": "Background color (hex)",
+            "example": "#ffffff",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "textColor": {
+            "type": "string",
+            "description": "Text color (hex)",
+            "example": "#333333",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "buttonColor": {
+            "type": "string",
+            "description": "Button color (hex)",
+            "example": "#007bff",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "fontFamily": {
+            "type": "string",
+            "description": "Font family",
+            "example": "Inter, sans-serif"
+          }
+        }
+      },
+      "FormSettings": {
+        "type": "object",
+        "description": "Form behavior and integration settings",
+        "properties": {
+          "allowMultipleSubmissions": {
+            "type": "boolean",
+            "description": "Allow multiple submissions from same user",
+            "example": false,
+            "default": true
+          },
+          "collectAnalytics": {
+            "type": "boolean",
+            "description": "Collect analytics data",
+            "example": true,
+            "default": true
+          },
+          "enableCaptcha": {
+            "type": "boolean",
+            "description": "Enable CAPTCHA protection",
+            "example": false,
+            "default": false
+          },
+          "webhookUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Webhook URL for response notifications",
+            "example": "https://api.example.com/webhook"
+          }
+        }
+      },
+      "FormResponse": {
+        "type": "object",
+        "description": "User response to a form",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique response identifier",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "formId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Associated form ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Associated workspace ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data (field ID -> value mapping)",
+            "example": {
+              "field_1": "John Doe",
+              "field_2": "john@example.com",
+              "field_3": 4
+            },
+            "additionalProperties": true
+          },
+          "isComplete": {
+            "type": "boolean",
+            "description": "Whether response is complete",
+            "example": true,
+            "default": false
+          },
+          "submitterEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "Submitter's email address",
+            "example": "john@example.com"
+          },
+          "submitterName": {
+            "type": "string",
+            "description": "Submitter's name",
+            "example": "John Doe"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/ResponseMetadata"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Response creation timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last response update timestamp",
+            "example": "2024-01-20T14:45:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "formId",
+          "workspaceId",
+          "data",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ResponseMetadata": {
+        "type": "object",
+        "description": "Additional metadata about the response submission",
+        "properties": {
+          "ipAddress": {
+            "type": "string",
+            "description": "Submitter's IP address (anonymized)",
+            "example": "192.168.1.xxx"
+          },
+          "userAgent": {
+            "type": "string",
+            "description": "Browser user agent string",
+            "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+          },
+          "referrer": {
+            "type": "string",
+            "format": "uri",
+            "description": "Page that referred to the form",
+            "example": "https://example.com/contact"
+          },
+          "submissionTime": {
+            "type": "integer",
+            "description": "Time spent filling form (seconds)",
+            "example": 120
+          },
+          "deviceInfo": {
+            "$ref": "#/components/schemas/DeviceInfo"
+          }
+        }
+      },
+      "DeviceInfo": {
+        "type": "object",
+        "description": "Device and browser information",
+        "properties": {
+          "browser": {
+            "type": "string",
+            "description": "Browser name and version",
+            "example": "Chrome 91.0.4472.124"
+          },
+          "os": {
+            "type": "string",
+            "description": "Operating system",
+            "example": "Windows 10"
+          },
+          "device": {
+            "type": "string",
+            "description": "Device type",
+            "example": "Desktop"
+          },
+          "viewport": {
+            "type": "object",
+            "description": "Browser viewport dimensions",
+            "properties": {
+              "width": {
+                "type": "integer",
+                "example": 1920
+              },
+              "height": {
+                "type": "integer",
+                "example": 1080
+              }
+            }
+          }
+        }
+      },
+      "WorkspaceInvitation": {
+        "type": "object",
+        "description": "Invitation to join a workspace",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique invitation identifier",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Target workspace ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Invitee's email address",
+            "example": "newmember@example.com"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "member",
+              "viewer"
+            ],
+            "description": "Role to assign when invitation is accepted",
+            "example": "member"
+          },
+          "invitedBy": {
+            "type": "string",
+            "description": "User ID who sent the invitation",
+            "example": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx"
+          },
+          "token": {
+            "type": "string",
+            "description": "Unique invitation token",
+            "example": "inv_abc123def456"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Invitation expiration timestamp",
+            "example": "2024-01-22T10:30:00Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "expired",
+              "revoked"
+            ],
+            "description": "Current invitation status",
+            "example": "pending"
+          },
+          "emailStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "sent",
+              "delivered",
+              "failed",
+              "bounced"
+            ],
+            "description": "Email delivery status",
+            "example": "delivered"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Invitation creation timestamp",
+            "example": "2024-01-15T10:30:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "workspaceId",
+          "email",
+          "role",
+          "invitedBy",
+          "token",
+          "expiresAt",
+          "status"
+        ]
+      },
+      "CreateWorkspaceRequest": {
+        "type": "object",
+        "description": "Request to create a new workspace",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Workspace name",
+            "example": "Acme Corp Forms",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "slug": {
+            "type": "string",
+            "description": "URL-friendly workspace identifier",
+            "example": "acme-corp",
+            "pattern": "^[a-z0-9-]+$",
+            "minLength": 2,
+            "maxLength": 50
+          },
+          "description": {
+            "type": "string",
+            "description": "Workspace description",
+            "example": "Customer feedback and lead generation forms",
+            "maxLength": 500
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "team"
+            ],
+            "description": "Workspace type",
+            "example": "team",
+            "default": "team"
+          }
+        },
+        "required": [
+          "name",
+          "slug"
+        ]
+      },
+      "UpdateWorkspaceRequest": {
+        "type": "object",
+        "description": "Request to update workspace details",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "New workspace name",
+            "example": "Updated Workspace Name",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "description": "New workspace description",
+            "example": "Updated description",
+            "maxLength": 500
+          },
+          "settings": {
+            "type": "object",
+            "description": "Workspace settings",
+            "properties": {
+              "theme": {
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark"
+                ]
+              },
+              "timezone": {
+                "type": "string",
+                "example": "America/New_York"
+              }
+            }
+          }
+        }
+      },
+      "CreateFormRequest": {
+        "type": "object",
+        "description": "Request to create a new form",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Form title",
+            "example": "Customer Feedback Survey",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "description": "Form description",
+            "example": "Help us improve our service",
+            "maxLength": 1000
+          },
+          "isConversational": {
+            "type": "boolean",
+            "description": "Enable conversational mode",
+            "example": false,
+            "default": false
+          },
+          "prompt": {
+            "type": "string",
+            "description": "AI generation prompt (for AI-generated forms)",
+            "example": "Create a customer feedback form with rating and comment fields",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "UpdateFormRequest": {
+        "type": "object",
+        "description": "Request to update form details",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "New form title",
+            "example": "Updated Form Title",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "description": "New form description",
+            "example": "Updated description",
+            "maxLength": 1000
+          },
+          "config": {
+            "$ref": "#/components/schemas/FormConfig"
+          },
+          "isConversational": {
+            "type": "boolean",
+            "description": "Enable/disable conversational mode",
+            "example": true
+          },
+          "isPublished": {
+            "type": "boolean",
+            "description": "Publish/unpublish form",
+            "example": true
+          }
+        }
+      },
+      "InviteMemberRequest": {
+        "type": "object",
+        "description": "Request to invite a user to workspace",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Invitee's email address",
+            "example": "newmember@example.com"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "member",
+              "viewer"
+            ],
+            "description": "Role to assign",
+            "example": "member",
+            "default": "member"
+          }
+        },
+        "required": [
+          "email",
+          "role"
+        ]
+      },
+      "UpdateMemberRequest": {
+        "type": "object",
+        "description": "Request to update member role",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "member",
+              "viewer"
+            ],
+            "description": "New role to assign",
+            "example": "admin"
+          }
+        },
+        "required": [
+          "role"
+        ]
+      },
+      "WorkspaceListResponse": {
+        "type": "object",
+        "description": "List of workspaces response",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Workspace"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "owner",
+                        "admin",
+                        "member",
+                        "viewer"
+                      ],
+                      "description": "Current user's role in this workspace"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "message": {
+            "type": "string",
+            "example": "Workspaces retrieved successfully"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "WorkspaceResponse": {
+        "type": "object",
+        "description": "Single workspace response",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Workspace"
+          },
+          "message": {
+            "type": "string",
+            "example": "Workspace retrieved successfully"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "FormListResponse": {
+        "type": "object",
+        "description": "Paginated list of forms response",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Form"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          },
+          "message": {
+            "type": "string",
+            "example": "Forms retrieved successfully"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "pagination"
+        ]
+      },
+      "SingleFormEntityResponse": {
+        "type": "object",
+        "description": "API response wrapper for a single Form entity.",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/Form"
+          },
+          "message": {
+            "type": "string",
+            "example": "Form retrieved successfully"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "ResponseListResponse": {
+        "type": "object",
+        "description": "Paginated list of form responses",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormResponse"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          },
+          "message": {
+            "type": "string",
+            "example": "Responses retrieved successfully"
+          }
+        },
+        "required": [
+          "success",
+          "data",
+          "pagination"
+        ]
+      },
+      "MemberListResponse": {
+        "type": "object",
+        "description": "List of workspace members response",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceMember"
+            }
+          },
+          "message": {
+            "type": "string",
+            "example": "Members retrieved successfully"
+          }
+        },
+        "required": [
+          "success",
+          "data"
+        ]
+      },
+      "InvitationListResponse": {
+        "type": "object",
+        "description": "List of workspace invitations response",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceInvitation"
+            }
+          },
+          "message": {
+            "type": "string",
+            "example": "Invitations retrieved successfully"
+          }
+        },
+        "required": [
+          "success",
+          "data"
         ]
       }
     }
   },
+  "tags": [
+    {
+      "name": "Forms",
+      "description": "Form creation, management, and publishing operations"
+    },
+    {
+      "name": "Workspaces",
+      "description": "Workspace and team management"
+    },
+    {
+      "name": "Members",
+      "description": "Workspace member management and invitations"
+    },
+    {
+      "name": "Responses",
+      "description": "Form response collection and analytics"
+    },
+    {
+      "name": "Invitations",
+      "description": "User and workspace invitation management"
+    },
+    {
+      "name": "Usage",
+      "description": "Usage analytics and billing information"
+    },
+    {
+      "name": "Documentation",
+      "description": "API documentation and metadata"
+    },
+    {
+      "name": "Admin",
+      "description": "Admin-specific operations and management"
+    }
+  ],
   "paths": {
-    "/api/forms": {
+    "/api/admin/stats": {
       "get": {
-        "summary": "List user forms",
+        "summary": "Retrieve application statistics for admins",
+        "description": "Provides key statistics about the application, such as total users,\ntotal workspaces, and active subscriptions.\nRequires admin privileges.\n",
         "tags": [
-          "Forms"
+          "Admin"
+        ],
+        "security": [
+          {
+            "clerkAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved application statistics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminStatsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - User not authenticated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User not an authorized admin or admin access not configured.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error - Failed to fetch statistics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/docs": {
+      "get": {
+        "summary": "Get OpenAPI specification",
+        "description": "Returns the complete OpenAPI specification for the Convo Forms API",
+        "tags": [
+          "Documentation"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "yaml"
+              ],
+              "default": "json"
+            },
+            "description": "Response format (json or yaml)"
+          },
+          {
+            "in": "query",
+            "name": "version",
+            "schema": {
+              "type": "string",
+              "default": "latest"
+            },
+            "description": "API version to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OpenAPI specification",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "OpenAPI 3.0 specification object"
+                }
+              },
+              "application/x-yaml": {
+                "schema": {
+                  "type": "string",
+                  "description": "OpenAPI specification in YAML format"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "API documentation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Not Found"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "API documentation not found. Please run 'npm run docs:generate' to generate documentation."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "summary": "Regenerate API documentation",
+        "description": "Triggers regeneration of the OpenAPI specification",
+        "tags": [
+          "Documentation"
         ],
         "security": [
           {
@@ -122,16 +1704,35 @@
         ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved forms",
+            "description": "Documentation regenerated successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "forms": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Form"
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "API documentation regenerated successfully"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "routesCount": {
+                          "type": "integer",
+                          "example": 25
+                        },
+                        "schemasCount": {
+                          "type": "integer",
+                          "example": 15
+                        },
+                        "generatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
                       }
                     }
                   }
@@ -147,12 +1748,1608 @@
           }
         }
       }
+    },
+    "/api/forms/{id}": {
+      "get": {
+        "summary": "Get a specific form",
+        "description": "Retrieves detailed information about a specific form.\nOnly returns forms that belong to the authenticated user.\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FormIdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Form retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Form"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "id": "550e8400-e29b-41d4-a716-446655440000",
+                      "userId": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx",
+                      "name": "Customer Feedback Survey",
+                      "description": "Collect valuable customer feedback",
+                      "config": "{\"fields\":[{\"id\":\"field_1\",\"type\":\"text\",\"label\":\"Name\",\"required\":true,\"order\":1}]}",
+                      "isConversational": false,
+                      "isPublished": true,
+                      "createdAt": "2024-01-15T10:30:00Z",
+                      "updatedAt": "2024-01-20T14:45:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a specific form",
+        "description": "Updates form properties such as name, description, configuration, and publish status.\nOnly the form owner can update their forms.\n\n**Updatable Fields:**\n- name: Form display name\n- description: Form description\n- config: Form structure and fields (JSON)\n- isConversational: Enable/disable conversational mode\n- isPublished: Publish/unpublish the form\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FormIdParam"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFormRequest"
+              },
+              "examples": {
+                "updateBasicInfo": {
+                  "summary": "Update basic form information",
+                  "value": {
+                    "name": "Updated Customer Survey",
+                    "description": "Updated description for our customer feedback form"
+                  }
+                },
+                "publishForm": {
+                  "summary": "Publish a form",
+                  "value": {
+                    "isPublished": true
+                  }
+                },
+                "updateConfig": {
+                  "summary": "Update form configuration",
+                  "value": {
+                    "config": {
+                      "fields": [
+                        {
+                          "id": "field_1",
+                          "type": "text",
+                          "label": "Full Name",
+                          "required": true,
+                          "order": 1
+                        },
+                        {
+                          "id": "field_2",
+                          "type": "email",
+                          "label": "Email Address",
+                          "required": true,
+                          "order": 2
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Form updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "form": {
+                      "$ref": "#/components/schemas/Form"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Form updated successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a specific form",
+        "description": "Permanently deletes a form and all associated data including responses.\nOnly the form owner can delete their forms.\n\n**⚠️ Warning:** This action cannot be undone. All form responses will be permanently deleted.\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/FormIdParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Form deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Form deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/forms/{id}/save-as-template": {
+      "post": {
+        "summary": "Save form as template",
+        "description": "Creates a new template based on an existing form's configuration.\nThe form's config field is converted to the template's formSchema format.\nRequires create_template permission in the form's workspace.\n",
+        "tags": [
+          "Forms",
+          "Templates"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Form ID to save as template"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "description": "Template name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Template description"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "HR",
+                      "Marketing",
+                      "Support",
+                      "Sales",
+                      "Education",
+                      "Healthcare",
+                      "Other"
+                    ],
+                    "description": "Business category"
+                  },
+                  "thumbnailUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Template preview image"
+                  }
+                }
+              },
+              "examples": {
+                "saveAsTemplate": {
+                  "summary": "Save customer survey form as template",
+                  "value": {
+                    "name": "Customer Satisfaction Survey Template",
+                    "description": "Reusable template for customer satisfaction surveys",
+                    "category": "Marketing"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Template created successfully from form",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "template": {
+                      "$ref": "#/components/schemas/Template"
+                    },
+                    "form": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Template created successfully from form"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/forms": {
+      "get": {
+        "summary": "List user's forms with statistics",
+        "description": "Retrieves a paginated list of forms belonging to the authenticated user.",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            },
+            "description": "Number of forms per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved forms",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "forms": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Form"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "integer"
+                        },
+                        "limit": {
+                          "type": "integer"
+                        },
+                        "totalForms": {
+                          "type": "integer"
+                        },
+                        "totalPages": {
+                          "type": "integer"
+                        },
+                        "hasNext": {
+                          "type": "boolean"
+                        },
+                        "hasPrev": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new form",
+        "description": "Creates a new form in the specified workspace. The user must have\ncreate_form permission in the workspace (member role or above).\n",
+        "tags": [
+          "Forms"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workspaceId",
+                  "title",
+                  "config"
+                ],
+                "properties": {
+                  "workspaceId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Target workspace ID"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "description": "Form title"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Form description (optional)"
+                  },
+                  "config": {
+                    "type": "string",
+                    "description": "Form configuration as JSON string"
+                  },
+                  "isConversational": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether form is in conversational mode"
+                  },
+                  "isPublished": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether form is published"
+                  }
+                }
+              },
+              "examples": {
+                "createForm": {
+                  "summary": "Create a new form",
+                  "value": {
+                    "workspaceId": "550e8400-e29b-41d4-a716-446655440000",
+                    "title": "Customer Feedback Survey",
+                    "description": "Collect feedback from our customers",
+                    "config": "{\"fields\":[{\"id\":\"feedback\",\"type\":\"textarea\",\"label\":\"Your Feedback\",\"required\":true}]}",
+                    "isConversational": false,
+                    "isPublished": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Form created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "form": {
+                      "$ref": "#/components/schemas/Form"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Form created successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/templates/{id}/clone": {
+      "post": {
+        "summary": "Clone a template to a workspace",
+        "description": "Creates a copy of an existing template (either global or workspace-specific)\ninto the specified target workspace.\nPermissions are checked based on the source template type and target workspace.\n",
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the source template to clone."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workspaceId"
+                ],
+                "properties": {
+                  "workspaceId": {
+                    "type": "string",
+                    "description": "ID of the target workspace where the template will be cloned."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Optional custom name for the cloned template. If not provided, appends \"(Copy)\"."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Template cloned successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "template": {
+                      "$ref": "#/components/schemas/Template"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Template cloned successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g., missing targetWorkspaceId)."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden (insufficient permissions or access denied)."
+          },
+          "404": {
+            "description": "Source template not found."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/api/templates/{id}/create-form": {
+      "post": {
+        "summary": "Create a form from template",
+        "description": "Creates a new form using the specified template as a starting point.\nCopies the template's form schema and increments the template's usage count.\nRequires create_form permission in the target workspace.\n",
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Template ID to create form from"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "workspaceId",
+                  "name"
+                ],
+                "properties": {
+                  "workspaceId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Target workspace ID for the new form"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Name for the new form"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Description for the new form (optional)"
+                  },
+                  "isConversational": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to enable conversational mode"
+                  },
+                  "isPublished": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether to publish the form immediately"
+                  }
+                }
+              },
+              "examples": {
+                "createFormFromTemplate": {
+                  "summary": "Create form from job application template",
+                  "value": {
+                    "workspaceId": "550e8400-e29b-41d4-a716-446655440000",
+                    "name": "Software Engineer Application",
+                    "description": "Application form for software engineering positions",
+                    "isConversational": true,
+                    "isPublished": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Form created successfully from template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "form": {
+                      "$ref": "#/components/schemas/Form"
+                    },
+                    "template": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Form created successfully from template"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/templates/{id}": {
+      "get": {
+        "summary": "Get a specific template",
+        "description": "Retrieves detailed information about a specific template.\nReturns global templates or workspace templates the user has access to.\n",
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Template ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Template retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Template"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "id": "550e8400-e29b-41d4-a716-446655440000",
+                      "name": "Job Application Form",
+                      "description": "Comprehensive job application form template",
+                      "category": "HR",
+                      "isGlobal": true,
+                      "usageCount": 145,
+                      "cloneCount": 23,
+                      "formSchema": {
+                        "fields": [
+                          {
+                            "id": "full_name",
+                            "type": "text",
+                            "label": "Full Name",
+                            "required": true
+                          }
+                        ]
+                      },
+                      "createdAt": "2024-01-15T10:30:00Z",
+                      "updatedAt": "2024-01-20T14:45:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a specific template",
+        "description": "Updates template properties such as name, description, form schema, and category.\nOnly workspace templates can be updated, and only by users with edit_template permission.\nGlobal templates cannot be modified by users.\n",
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Template ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "description": "Template name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Template description"
+                  },
+                  "formSchema": {
+                    "type": "object",
+                    "description": "Form configuration schema"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "HR",
+                      "Marketing",
+                      "Support",
+                      "Sales",
+                      "Education",
+                      "Healthcare",
+                      "Other"
+                    ],
+                    "description": "Business category"
+                  },
+                  "thumbnailUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Template preview image"
+                  }
+                }
+              },
+              "examples": {
+                "updateTemplate": {
+                  "summary": "Update template information",
+                  "value": {
+                    "name": "Updated Customer Survey",
+                    "description": "Updated description for customer feedback template",
+                    "category": "Marketing"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Template updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "template": {
+                      "$ref": "#/components/schemas/Template"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Template updated successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a specific template",
+        "description": "Permanently deletes a template. Only workspace templates can be deleted,\nand only by users with edit_template permission. Global templates cannot be deleted.\n\n⚠️ Warning: This action cannot be undone. Forms created from this template will not be affected.\n",
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Template ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Template deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Template deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/templates": {
+      "get": {
+        "summary": "List templates with filtering",
+        "description": "Retrieves templates available to the user. Returns both global templates \nand workspace-specific templates based on user permissions.\n",
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "workspaceId",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Workspace ID to filter templates for"
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter templates by category (HR, Marketing, Support, Sales)"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search templates by name or description"
+          },
+          {
+            "in": "query",
+            "name": "isGlobal",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by global templates only"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "description": "Number of templates per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "templates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Template"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "integer"
+                        },
+                        "limit": {
+                          "type": "integer"
+                        },
+                        "totalTemplates": {
+                          "type": "integer"
+                        },
+                        "totalPages": {
+                          "type": "integer"
+                        },
+                        "hasNext": {
+                          "type": "boolean"
+                        },
+                        "hasPrev": {
+                          "type": "boolean"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new template",
+        "description": "Creates a new template in the specified workspace. \nRequires create_template permission.\n",
+        "tags": [
+          "Templates"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "formSchema",
+                  "workspaceId"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 255,
+                    "description": "Template name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Template description"
+                  },
+                  "formSchema": {
+                    "type": "object",
+                    "description": "Form configuration schema"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "HR",
+                      "Marketing",
+                      "Support",
+                      "Sales",
+                      "Education",
+                      "Healthcare",
+                      "Other"
+                    ],
+                    "description": "Business category"
+                  },
+                  "workspaceId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "Target workspace ID"
+                  },
+                  "thumbnailUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "Optional template preview image"
+                  }
+                }
+              },
+              "examples": {
+                "createTemplate": {
+                  "summary": "Create a new template",
+                  "value": {
+                    "name": "Customer Onboarding Form",
+                    "description": "Standard form for new customer onboarding",
+                    "category": "Sales",
+                    "workspaceId": "550e8400-e29b-41d4-a716-446655440000",
+                    "formSchema": {
+                      "fields": [
+                        {
+                          "id": "company_name",
+                          "type": "text",
+                          "label": "Company Name",
+                          "required": true
+                        },
+                        {
+                          "id": "contact_email",
+                          "type": "email",
+                          "label": "Contact Email",
+                          "required": true
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Template created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "template": {
+                      "$ref": "#/components/schemas/Template"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Template created successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/workspaces/{workspaceSlug}": {
+      "get": {
+        "summary": "Get workspace by slug",
+        "description": "Retrieves a specific workspace by its slug. The user must be a member\nof the workspace to access it. Returns workspace details along with\nthe user's role in the workspace.\n",
+        "tags": [
+          "Workspaces"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspaceSlug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Workspace slug (URL identifier)",
+            "example": "acme-corp"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "workspace": {
+                          "$ref": "#/components/schemas/WorkspaceWithRole"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Workspace retrieved successfully"
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "success": true,
+                      "data": {
+                        "workspace": {
+                          "id": "550e8400-e29b-41d4-a716-446655440000",
+                          "name": "Acme Corp Forms",
+                          "slug": "acme-corp",
+                          "type": "team",
+                          "ownerId": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx",
+                          "description": "Customer feedback forms",
+                          "avatarUrl": null,
+                          "settings": "{\"theme\":\"light\"}",
+                          "role": "owner",
+                          "createdAt": "2024-01-15T10:30:00Z",
+                          "updatedAt": "2024-01-20T14:45:00Z"
+                        }
+                      },
+                      "message": "Workspace retrieved successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Access denied to workspace",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Access denied to workspace"
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "ACCESS_DENIED"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Not Found"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Workspace not found"
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "NOT_FOUND"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/workspaces": {
+      "post": {
+        "summary": "Create a new workspace",
+        "description": "Creates a new workspace for organizing forms and team collaboration.\nThe authenticated user becomes the owner of the workspace.\n\n**Features:**\n- Automatic owner assignment\n- Unique slug validation\n- Plan limit enforcement\n- Activity logging\n- Default settings initialization\n",
+        "tags": [
+          "Workspaces"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkspaceRequest"
+              },
+              "examples": {
+                "teamWorkspace": {
+                  "summary": "Create a team workspace",
+                  "value": {
+                    "name": "Acme Corp Forms",
+                    "slug": "acme-corp",
+                    "description": "Customer feedback and lead generation forms",
+                    "type": "team"
+                  }
+                },
+                "personalWorkspace": {
+                  "summary": "Create a personal workspace",
+                  "value": {
+                    "name": "John's Personal Forms",
+                    "slug": "john-personal",
+                    "type": "personal"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Workspace created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "workspace": {
+                          "$ref": "#/components/schemas/Workspace"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Workspace created successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Validation Error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Slug can only contain lowercase letters, numbers, and hyphens"
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "INVALID_FORMAT"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Plan limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Plan limit exceeded"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "You have reached the maximum number of workspaces for your plan"
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "PLAN_LIMIT_EXCEEDED"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Workspace slug already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Conflict"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Workspace URL is already taken"
+                    },
+                    "code": {
+                      "type": "string",
+                      "example": "ALREADY_EXISTS"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "get": {
+        "summary": "List all workspaces for the current user",
+        "description": "Retrieves all workspaces where the authenticated user is a member.\nIncludes the user's role in each workspace.\n\n**Returned Data:**\n- Workspace basic information\n- User's role in each workspace\n- Ordered by creation date\n",
+        "tags": [
+          "Workspaces"
+        ],
+        "security": [
+          {
+            "ClerkAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspaces retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceListResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "success": true,
+                      "data": {
+                        "workspaces": [
+                          {
+                            "id": "550e8400-e29b-41d4-a716-446655440000",
+                            "name": "Acme Corp Forms",
+                            "slug": "acme-corp",
+                            "type": "team",
+                            "ownerId": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx",
+                            "description": "Customer feedback forms",
+                            "role": "owner",
+                            "createdAt": "2024-01-15T10:30:00Z",
+                            "updatedAt": "2024-01-20T14:45:00Z"
+                          },
+                          {
+                            "id": "550e8400-e29b-41d4-a716-446655440001",
+                            "name": "Marketing Team",
+                            "slug": "marketing-team",
+                            "type": "team",
+                            "ownerId": "user_2NiWrEwuDBCQ7XiZpFxGD7CpYKx",
+                            "role": "member",
+                            "createdAt": "2024-01-10T08:00:00Z"
+                          }
+                        ]
+                      },
+                      "message": "Workspaces retrieved successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
     }
-  },
-  "tags": [
-    {
-      "name": "Forms",
-      "description": "Form management operations"
-    }
-  ]
+  }
 }

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createNavigator } from './utils/subdomain';
+import { createNavigator, buildContextUrl } from './utils/subdomain';
 import { createFormHelpers, assertFormExists, assertFormFieldExists } from './utils/form-helpers';
 import { createTestContactForm, generateFormSubmissionData, AI_PROMPTS } from './utils/test-data';
 
@@ -375,12 +375,3 @@ test.describe('Mobile Form Experience', () => {
     await expect(page.locator('[name="phone"][inputmode="tel"]')).toBeVisible();
   });
 });
-
-// Helper function for URL building (should match the subdomain utils)
-function buildContextUrl(context: string, path: string): string {
-  const isDevelopment = process.env.NODE_ENV !== 'production';
-  if (isDevelopment) {
-    return `http://localhost:3002/${path}?subdomain=${context}`;
-  }
-  return `https://${context}.convo.ai/${path}`;
-}

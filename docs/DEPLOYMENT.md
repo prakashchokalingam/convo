@@ -70,22 +70,38 @@ NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 ### 3. Custom Domain Setup
 
 **Configure Subdomains:**
-1. **Main domain**: `convo.ai` → Vercel app
-2. **App subdomain**: `app.convo.ai` → Same Vercel app  
-3. **Forms subdomain**: `forms.convo.ai` → Same Vercel app
+1. **Main domain**: `convo.ai` → Vercel app (typically serves marketing pages or redirects)
+2. **App subdomain**: `app.convo.ai` → Same Vercel app (routes to `/app/*` via middleware or Vercel config)
+3. **Forms subdomain**: `forms.convo.ai` → Same Vercel app (routes to `/forms/*` via middleware or Vercel config)
+4. **Admin subdomain**: `admin.convo.ai` → Same Vercel app (routes to `/admin/*` via Vercel rewrite configuration)
 
 **DNS Configuration:**
 ```
 Type    Name    Value
-CNAME   @       your-app.vercel.app
-CNAME   app     your-app.vercel.app  
+CNAME   @       your-app.vercel.app # Or your Vercel project's specific CNAME target
+CNAME   app     your-app.vercel.app
 CNAME   forms   your-app.vercel.app
+CNAME   admin   your-app.vercel.app
 ```
 
 **In Vercel Dashboard:**
-- Go to Domains
-- Add `convo.ai`, `app.convo.ai`, `forms.convo.ai`
-- Verify DNS configuration
+- Go to Project → Settings → Domains.
+- Add `convo.ai`, `app.convo.ai`, `forms.convo.ai`, and `admin.convo.ai`.
+- Ensure DNS records are verified.
+- **Vercel Rewrites for Subdomains (Example):**
+  While `middleware.ts` handles some subdomain logic by inspecting host headers, for clean production URLs like `admin.convo.ai` directly serving content from an application path like `/admin`, Vercel rewrites are often used. This can be configured in `vercel.json` or sometimes directly in the Vercel dashboard settings if simpler path mapping is needed.
+  A `vercel.json` might include:
+  ```json
+  {
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/marketing/$1", "has": [{ "type": "host", "value": "convo.ai" }] },
+      { "source": "/(.*)", "destination": "/app/$1", "has": [{ "type": "host", "value": "app.convo.ai" }] },
+      { "source": "/(.*)", "destination": "/forms/$1", "has": [{ "type": "host", "value": "forms.convo.ai" }] },
+      { "source": "/(.*)", "destination": "/admin/$1", "has": [{ "type": "host", "value": "admin.convo.ai" }] }
+    ]
+  }
+  ```
+  *Note: The existing `middleware.ts` also performs context switching based on hostnames. Ensure Vercel rewrites and middleware logic are complementary and do not conflict. For instance, middleware might handle the path rewrite internally after Vercel routes the subdomain to the Next.js app, or Vercel rewrites could handle it before the request hits the Next.js app. The project summary indicates middleware handles path-based routing for `app.` and `forms.` by rewriting to `/app` and `/forms` respectively. A similar approach or Vercel rewrites would be needed for `admin.convo.ai` to map to `/admin`.*
 
 ## 🔧 Alternative Deployment Options
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/shared/ui/button";
+import { getLoginUrl, getSignupUrl } from "@/lib/subdomain";
 import { ThemeToggle } from "@/components/shared/theme/theme-toggle";
 import { Menu, X, ChevronDown } from "lucide-react";
 
@@ -19,7 +20,7 @@ export function Header() {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-lg">C</span>
             </div>
-            <span className="text-xl font-semibold">ConvoForms</span>
+            <span className="text-xl font-semibold">Convo</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -76,10 +77,10 @@ export function Header() {
           {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center space-x-3">
             <Button variant="ghost" size="sm" asChild>
-              <Link href="https://app.convoforms.com/sign-in">Sign In</Link>
+              <Link href={getLoginUrl()}>Sign In</Link>
             </Button>
             <Button size="sm" className="shadow-sm" asChild>
-              <Link href="https://app.convoforms.com/sign-up">Get Started</Link>
+              <Link href={getSignupUrl()}>Get Started</Link>
             </Button>
           </div>
 

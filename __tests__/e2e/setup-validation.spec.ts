@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { buildContextUrl } from './utils/subdomain';
 
 /**
  * Smoke test to verify E2E setup is working correctly
@@ -38,7 +39,7 @@ test.describe('E2E Setup Validation', () => {
   
   test('should handle app context routing', async ({ page }) => {
     // Try to access app context
-    await page.goto('/?subdomain=app');
+    await page.goto(buildContextUrl('app', '/')); // Navigates to /app
     
     // Should either show login or dashboard (depending on auth state)
     const hasLogin = await page.locator('text="Sign in", text="Login"').isVisible();

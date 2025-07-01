@@ -2,7 +2,7 @@
 
 ## Overview
 
-ConvoForms uses Playwright for comprehensive end-to-end testing across the complex subdomain-based architecture. The E2E tests cover the complete user journey from marketing site to form submission.
+Convo uses Playwright for comprehensive end-to-end testing across the complex subdomain-based architecture. The E2E tests cover the complete user journey from marketing site to form submission.
 
 ## Quick Start
 
@@ -109,13 +109,13 @@ CLERK_SECRET_KEY=...
 
 ## Subdomain Testing Strategy
 
-ConvoForms' subdomain architecture requires special handling in tests:
+Convo's subdomain architecture requires special handling in tests:
 
-### Development Mode
-Uses query parameters to simulate subdomains:
-- Marketing: `localhost:3002/`
-- App: `localhost:3002/?subdomain=app`
-- Forms: `localhost:3002/workspace/form?subdomain=forms`
+### Development Mode (Path-based)
+Uses path prefixes to define contexts:
+- Marketing: `http://localhost:3002/marketing` (e.g., `/marketing/pricing`)
+- App: `http://localhost:3002/app` (e.g., `/app/workspace-slug/settings`)
+- Forms: `http://localhost:3002/forms` (e.g., `/forms/workspace-slug/form-id`)
 
 ### Production Mode
 Uses actual subdomains:
@@ -362,4 +362,4 @@ const metrics = await page.evaluate(() => performance.getEntriesByType('navigati
 await expect(page).toPassAxeChecks();
 ```
 
-This E2E testing setup ensures ConvoForms works correctly across all user journeys and contexts, providing confidence in deployments and catching regressions early.
+This E2E testing setup ensures Convo works correctly across all user journeys and contexts, providing confidence in deployments and catching regressions early.

@@ -29,7 +29,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: '/',
       },
     ],
-    sitemap: 'https://convoforms.com/sitemap.xml',
-    host: 'https://convoforms.com',
+    sitemap: 'https://convo.ai/sitemap.xml',
+    host: 'https://convo.ai',
   }
 }

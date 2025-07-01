@@ -72,19 +72,21 @@ test.describe('Context URL Building', () => {
     const appUrl = buildContextUrl('app', 'workspace/test');
     const formsUrl = buildContextUrl('forms', 'test/form123');
     
-    // In development, should use query parameters
+    // In development, should use path-based contexts
     if (process.env.NODE_ENV !== 'production') {
-      expect(marketingUrl).toContain('localhost:3002/pricing');
-      expect(appUrl).toContain('localhost:3002/workspace/test?subdomain=app');
-      expect(formsUrl).toContain('localhost:3002/test/form123?subdomain=forms');
+      expect(marketingUrl).toBe('http://localhost:3002/marketing/pricing');
+      expect(appUrl).toBe('http://localhost:3002/app/workspace/test');
+      expect(formsUrl).toBe('http://localhost:3002/forms/test/form123');
     }
     
     // Test navigation with built URLs
     await page.goto(marketingUrl);
-    await expect(page).toHaveURL(new RegExp('.*pricing.*'));
+    await expect(page).toHaveURL('http://localhost:3002/marketing/pricing');
     
     await page.goto(appUrl);
-    await expect(page).toHaveURL(new RegExp('.*subdomain=app.*'));
+    // Depending on auth state, this might redirect to /app/login or stay on /app/workspace/test
+    // The core check is that it's under the /app path now.
+    await expect(page.url()).toMatch(/^http:\/\/localhost:3002\/app\//);
   });
   
   test('should extract workspace slug from URLs correctly', async ({ page }) => {

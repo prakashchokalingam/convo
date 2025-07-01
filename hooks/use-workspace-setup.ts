@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { buildContextUrl } from '@/lib/subdomain';
 
 interface SetupWorkspaceData {
   email?: string;
