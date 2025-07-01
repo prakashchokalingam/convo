@@ -373,6 +373,10 @@ export const swaggerConfig: SwaggerDefinition = {
       name: 'Documentation',
       description: 'API documentation and metadata',
     },
+    {
+      name: 'Admin',
+      description: 'Admin-specific operations and management',
+    }
   ],
 };
 

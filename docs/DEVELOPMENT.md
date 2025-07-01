@@ -358,6 +358,36 @@ npm run dev -- -p 3003
 # Navigate to /app/* paths for authenticated routes (e.g., http://localhost:3002/app/login)
 ```
 
+## 🛡️ Admin Dashboard Development
+
+The application includes an admin dashboard with specific development patterns.
+
+### Accessing the Admin Dashboard
+-   **Local URL**: `http://localhost:3002/admin/overview` (or `/admin/workspaces`)
+-   **Authentication**: Requires a user authenticated via Clerk whose email is listed in the `ADMIN_EMAILS` environment variable (comma-separated).
+-   See `README.md` for `ADMIN_EMAILS` setup.
+
+### Admin Pages
+-   Admin pages are located under `app/(admin)/admin/`.
+-   The layout `app/(admin)/admin/layout.tsx` handles page-level authentication and authorization.
+
+### Admin API Routes
+-   **Namespace**: Admin-specific API routes should be placed under `app/api/admin/`. For example, `app/api/admin/stats/route.ts`.
+-   **Authorization**: All admin API routes **must** be protected using the `withAdminApiAuth` higher-order function from `lib/admin-api-auth.ts`. This helper verifies that the authenticated user's email is in `ADMIN_EMAILS`.
+
+    ```typescript
+    // Example: app/api/admin/some-action/route.ts
+    import { NextRequest, NextResponse } from 'next/server';
+    import { withAdminApiAuth } from '@/lib/admin-api-auth';
+
+    export const GET = withAdminApiAuth(async (req, { authResult }) => {
+      // authResult.userId is available if needed
+      // ... your admin logic here
+      return NextResponse.json({ message: "Admin action successful" });
+    });
+    ```
+-   **Swagger Documentation**: All admin API routes must be documented using JSDoc comments for Swagger generation, similar to other API routes. Ensure you use the "Admin" tag. Schemas specific to admin APIs can be defined in `docs/swagger/schemas/admin-api-schemas.ts`.
+
 ## 📋 Development Checklist
 
 ### Before Starting Work
