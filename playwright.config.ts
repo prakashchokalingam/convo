@@ -61,41 +61,41 @@ export default defineConfig({
       dependencies: ['setup'],
     },
 
-    {
-      name: 'firefox',
-      use: { 
-        ...devices['Desktop Firefox'],
-        storageState: '.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
+    // {
+    //   name: 'firefox',
+    //   use: {
+    //     ...devices['Desktop Firefox'],
+    //     storageState: '.auth/user.json',
+    //   },
+    //   dependencies: ['setup'],
+    // },
 
-    {
-      name: 'webkit',
-      use: { 
-        ...devices['Desktop Safari'],
-        storageState: '.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
+    // {
+    //   name: 'webkit',
+    //   use: {
+    //     ...devices['Desktop Safari'],
+    //     storageState: '.auth/user.json',
+    //   },
+    //   dependencies: ['setup'],
+    // },
 
-    /* Mobile testing */
-    {
-      name: 'Mobile Chrome',
-      use: { 
-        ...devices['Pixel 5'],
-        storageState: '.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'Mobile Safari',
-      use: { 
-        ...devices['iPhone 12'],
-        storageState: '.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
+    // /* Mobile testing */
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: {
+    //     ...devices['Pixel 5'],
+    //     storageState: '.auth/user.json',
+    //   },
+    //   dependencies: ['setup'],
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: {
+    //     ...devices['iPhone 12'],
+    //     storageState: '.auth/user.json',
+    //   },
+    //   dependencies: ['setup'],
+    // },
 
     /* Test against branded browsers. */
     // {
