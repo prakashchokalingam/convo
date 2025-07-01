@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs';
 import { db } from '@/drizzle/db';
-import { users, workspaces, workspaceMembers, workspaceActivities } from '@/drizzle/schema';
+import { users, workspaces, workspaceMembers, workspaceActivities, subscriptions } from '@/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
 import { createDefaultSubscription } from '@/lib/plans';
+import { sendSlackNotification, formatWorkspaceCreationMessage } from '@/lib/slack';
 
 export async function POST(req: NextRequest) {
   try {
@@ -124,6 +125,28 @@ export async function POST(req: NextRequest) {
       workspaceSlug,
       workspaceName: `${firstName || 'My'} Workspace`
     });
+
+    // Send Slack notification
+    try {
+      const userSubscription = await db.query.subscriptions.findFirst({
+        where: eq(subscriptions.userId, userId),
+      });
+
+      const notificationMessage = formatWorkspaceCreationMessage(
+        'New Workspace Created (Signup)',
+        'Success',
+        {
+          workspaceId: workspaceId,
+          workspaceName: `${firstName || 'My'} Workspace`,
+          creatorEmail: email || 'N/A',
+          plan: userSubscription?.plan || 'free', // Default to 'free' if not found, though it should exist
+        }
+      );
+      await sendSlackNotification(notificationMessage);
+    } catch (slackError) {
+      console.error('Error sending Slack notification during setup:', slackError);
+      // Do not fail the request if Slack notification fails
+    }
 
     return NextResponse.json({ 
       success: true, 

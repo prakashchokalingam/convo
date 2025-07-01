@@ -8,6 +8,10 @@ import {
   getWorkspaceLimitsInfo,
   isSlugAvailable 
 } from '@/lib/workspace-server';
+import { db } from '@/drizzle/db';
+import { users, subscriptions } from '@/drizzle/schema';
+import { eq } from 'drizzle-orm';
+import { sendSlackNotification, formatWorkspaceCreationMessage } from '@/lib/slack';
 
 // Validation schema for workspace creation
 const createWorkspaceSchema = z.object({
@@ -110,6 +114,31 @@ export async function POST(req: NextRequest) {
       workspaceName: workspace.name,
       workspaceType: workspace.type
     });
+
+    // Send Slack notification
+    try {
+      const currentUser = await db.query.users.findFirst({
+        where: eq(users.id, userId),
+      });
+      const userSubscription = await db.query.subscriptions.findFirst({
+        where: eq(subscriptions.userId, userId),
+      });
+
+      const notificationMessage = formatWorkspaceCreationMessage(
+        'New Workspace Created (Manual)',
+        'Success',
+        {
+          workspaceId: workspace.id,
+          workspaceName: workspace.name,
+          creatorEmail: currentUser?.email || 'N/A',
+          plan: userSubscription?.plan || 'N/A', // Or a default plan if applicable
+        }
+      );
+      await sendSlackNotification(notificationMessage);
+    } catch (slackError) {
+      console.error('Error sending Slack notification during manual workspace creation:', slackError);
+      // Do not fail the request if Slack notification fails
+    }
 
     return NextResponse.json({
       success: true,
