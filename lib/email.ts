@@ -28,7 +28,7 @@ export interface WelcomeEmailData {
 }
 
 // Default sender configuration
-const DEFAULT_FROM = process.env.RESEND_FROM_EMAIL || 'ConvoForms <noreply@convoforms.com>';
+const DEFAULT_FROM = process.env.RESEND_FROM_EMAIL || 'ConvoForms <noreply@convo.ai>';
 
 /**
  * Send an email using Resend
@@ -172,7 +172,7 @@ function generateInvitationEmailHTML(data: InvitationEmailData): string {
         </div>
         
         <div class="footer">
-          <p>© ${new Date().getFullYear()} ConvoForms. All rights reserved.</p>
+          <p>© ${new Date().getFullYear()} Convo. All rights reserved.</p>
           <p>If you didn't expect this invitation, you can safely ignore this email.</p>
         </div>
       </div>
@@ -203,8 +203,8 @@ This invitation expires on ${data.expiresAt.toLocaleDateString()}.
 If you can't click the link above, copy and paste it into your browser.
 
 ---
-ConvoForms - Create beautiful, conversational forms
-© ${new Date().getFullYear()} ConvoForms. All rights reserved.
+Convo - Create beautiful, conversational forms
+© ${new Date().getFullYear()} Convo. All rights reserved.
 
 If you didn't expect this invitation, you can safely ignore this email.
   `.trim();
@@ -263,7 +263,7 @@ function generateWelcomeEmailHTML(data: WelcomeEmailData): string {
         </div>
         
         <div class="footer">
-          <p>© ${new Date().getFullYear()} ConvoForms. All rights reserved.</p>
+          <p>© ${new Date().getFullYear()} Convo. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -295,8 +295,8 @@ If you have any questions or need help getting started, don't hesitate to reach 
 Happy form building!
 
 ---
-ConvoForms
-© ${new Date().getFullYear()} ConvoForms. All rights reserved.
+Convo
+© ${new Date().getFullYear()} Convo. All rights reserved.
   `.trim();
 }
 

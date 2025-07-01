@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import AppStoreInitializer from '@/components/shared/AppStoreInitializer';
 
 /**
  * App Layout
@@ -17,5 +18,5 @@ interface AppLayoutProps {
 export default async function AppLayout({ children }: AppLayoutProps) {
   // App layout - context is guaranteed by path structure
   // Authentication handled at page level for flexibility
-  return <>{children}</>;
+  return <AppStoreInitializer>{children}</AppStoreInitializer>;
 }

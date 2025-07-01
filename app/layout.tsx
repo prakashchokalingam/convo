@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ConvoForms - AI-Powered Conversational Forms",
+  title: "Convo - AI-Powered Conversational Forms",
   description: "Create engaging conversational forms with AI in seconds.",
 };
 

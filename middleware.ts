@@ -41,33 +41,47 @@ export default authMiddleware({
   ],
   
   beforeAuth: (req) => {
-    const { nextUrl } = req;
+    const { nextUrl, headers: reqHeaders } = req;
+    const hostname = reqHeaders.get('host') || '';
+    const pathname = nextUrl.pathname;
+    let context: 'marketing' | 'app' | 'forms' = 'marketing'; // Default context
+
+    if (process.env.NODE_ENV === 'development') {
+      if (pathname.startsWith('/app')) {
+        context = 'app';
+      } else if (pathname.startsWith('/forms')) {
+        context = 'forms';
+      } else { // Includes /marketing and /
+        context = 'marketing';
+      }
+    } else { // Production
+      if (hostname.startsWith('app.')) {
+        context = 'app';
+      } else if (hostname.startsWith('forms.')) {
+        context = 'forms';
+      } else { // Root domain convo.ai
+        context = 'marketing';
+      }
+    }
+
+    // Prepare response headers
+    const responseHeaders = new Headers(req.headers);
+    responseHeaders.set('x-subdomain-context', context);
     
     // Root path handling - redirect to marketing
     if (nextUrl.pathname === '/') {
-      return NextResponse.redirect(new URL('/marketing', req.url));
+      // For redirects, the context header might primarily be for any intermediate processing,
+      // as the final request will be to /marketing.
+      return NextResponse.redirect(new URL('/marketing', req.url), { headers: responseHeaders });
     }
     
-    // Backwards compatibility: Handle old query parameter format
-    const subdomain = nextUrl.searchParams.get('subdomain');
-    if (subdomain) {
-      let redirectPath = nextUrl.pathname;
-      
-      if (subdomain === 'app') {
-        redirectPath = '/app' + nextUrl.pathname;
-      } else if (subdomain === 'forms') {
-        redirectPath = '/forms' + nextUrl.pathname;
-      } else if (subdomain === 'marketing') {
-        redirectPath = '/marketing' + nextUrl.pathname;
-      }
-      
-      if (redirectPath !== nextUrl.pathname) {
-        return NextResponse.redirect(new URL(redirectPath, req.url));
-      }
-    }
-    
-    // Continue to auth
-    return NextResponse.next();
+    // Continue to auth (subdomain query param logic removed)
+    // Pass the modified headers to the next middleware/handler
+    return NextResponse.next({
+      request: {
+        headers: responseHeaders,
+      },
+    });
   },
   
   async afterAuth(auth, req, evt) {

@@ -75,7 +75,7 @@
 ### Manual Testing
 
 #### Test 1: New User Signup
-1. Go to `http://localhost:3002/signup?subdomain=app`
+1. Go to `http://localhost:3002/app/signup`
 2. Sign up with new email (e.g., `test.user@example.com`)
 3. Verify animated workspace creation
 4. Confirm redirect to `/{workspace}/dashboard?welcome=true`

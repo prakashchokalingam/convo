@@ -4,7 +4,7 @@
 **Migration**: From subdomain query parameters to clean path-based routing
 
 ## Overview
-ConvoForms is migrating from complex subdomain simulation (using query parameters in dev) to clean path-based routing that's consistent across environments.
+Convo is migrating from complex subdomain simulation (using query parameters in dev) to clean path-based routing that's consistent across environments.
 
 ### URL Structure
 ```
@@ -175,10 +175,10 @@ Production Rewrites:
 - Automatic redirects from old URLs
 
 ### Verify
-- [ ] Old `?subdomain=app` URLs redirect to `/app/*`
-- [ ] Old `?subdomain=forms` URLs redirect to `/forms/*`
-- [ ] Shared form links continue working
-- [ ] User bookmarks redirect correctly
+- [ ] Old `?subdomain=app` URLs are no longer actively processed by middleware (consider if redirects are needed for SEO/bookmarks).
+- [ ] Old `?subdomain=forms` URLs are no longer actively processed by middleware (consider if redirects are needed for SEO/bookmarks).
+- [ ] Shared form links (using new URL structure) continue working
+- [ ] User bookmarks (if using old URLs) would need manual updating or specific redirect rules if implemented.
 - [ ] Search engine indexed URLs redirect properly
 
 ---

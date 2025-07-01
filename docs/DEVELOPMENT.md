@@ -1,6 +1,6 @@
 # 🛠️ Development Guide
 
-This guide covers everything you need for day-to-day development on ConvoForms.
+This guide covers everything you need for day-to-day development on Convo.
 
 ## 🚀 Daily Development Workflow
 
@@ -13,8 +13,8 @@ npm run db:up
 npm run dev
 
 # 3. Open your browser
-# Marketing: http://localhost:3002/
-# App: http://localhost:3002/login?subdomain=app
+# Marketing: http://localhost:3002/marketing (or / which redirects)
+# App: http://localhost:3002/app/login
 ```
 
 ### During Development
@@ -59,7 +59,7 @@ npm run db:studio
 # pgAdmin web interface (alternative)
 npm run pgadmin
 # Then visit: http://localhost:5050
-# Email: admin@convoforms.com
+# Email: admin@convo.ai
 # Password: admin123
 ```
 
@@ -88,14 +88,14 @@ ConvoForms has three different "contexts" that you can test:
 
 ### App Context (SaaS Dashboard)
 ```bash
-# URL: http://localhost:3002/login?subdomain=app
+# URL: http://localhost:3002/app/login
 # What it shows: Login, dashboard, form builder
 # Authentication: Required
 ```
 
 ### Forms Context (Public Form Submission)
 ```bash
-# URL: http://localhost:3002/contact/[form-id]?subdomain=forms
+# URL: http://localhost:3002/forms/contact/[form-id]
 # What it shows: Public form for users to fill
 # Authentication: Not required
 ```
@@ -355,7 +355,7 @@ npm run dev -- -p 3003
 ```bash
 # Solution: Check Clerk keys in .env.local
 # Make sure you're in the right context:
-# Use ?subdomain=app for authenticated routes
+# Navigate to /app/* paths for authenticated routes (e.g., http://localhost:3002/app/login)
 ```
 
 ## 📋 Development Checklist
@@ -378,4 +378,4 @@ npm run dev -- -p 3003
 - [ ] Database migrations are applied
 - [ ] Error monitoring is configured
 
-This development guide should help you work efficiently on ConvoForms. Remember to commit early and often, test your changes, and ask questions when stuck!
+This development guide should help you work efficiently on Convo. Remember to commit early and often, test your changes, and ask questions when stuck!

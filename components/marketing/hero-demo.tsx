@@ -26,7 +26,7 @@ export function HeroDemo() {
                   </div>
                   <div className="flex-1 mx-4">
                     <div className="bg-gray-700 rounded px-3 py-1 text-sm text-gray-300">
-                      convoforms.com/demo
+                      convo.ai/demo
                     </div>
                   </div>
                 </div>

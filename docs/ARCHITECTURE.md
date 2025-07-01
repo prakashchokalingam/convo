@@ -1,10 +1,10 @@
-# 🏗️ ConvoForms Architecture
+# 🏗️ Convo Architecture
 
-This document explains how ConvoForms is built and organized.
+This document explains how Convo is built and organized.
 
 ## High-Level Overview
 
-ConvoForms is a **Next.js 14 application** with these main parts:
+Convo is a **Next.js 14 application** with these main parts:
 
 ```
 🌐 Frontend (Next.js + React)
@@ -28,14 +28,14 @@ ConvoForms is a **Next.js 14 application** with these main parts:
 We use **route groups** and **subdomain simulation** for clean separation:
 
 ### Production URLs
-- **Marketing**: `convo.ai`
-- **App**: `app.convo.ai/workspace`
-- **Forms**: `forms.convo.ai/contact/form123`
+- **Marketing**: `convo.ai` (e.g., `https://convo.ai/pricing`)
+- **App**: `app.convo.ai` (e.g., `https://app.convo.ai/workspace-slug/settings`)
+- **Forms**: `forms.convo.ai` (e.g., `https://forms.convo.ai/workspace-slug/form-id`)
 
-### Development URLs
-- **Marketing**: `localhost:3002/`
-- **App**: `localhost:3002/workspace?subdomain=app`
-- **Forms**: `localhost:3002/contact/form123?subdomain=forms`
+### Development URLs (Path-based)
+- **Marketing**: `localhost:3002/marketing` (e.g., `http://localhost:3002/marketing/pricing`)
+- **App**: `localhost:3002/app` (e.g., `http://localhost:3002/app/workspace-slug/settings`)
+- **Forms**: `localhost:3002/forms` (e.g., `http://localhost:3002/forms/workspace-slug/form-id`)
 
 ## File Structure
 
@@ -179,7 +179,7 @@ components/
 1. **Start database**: `npm run db:up`
 2. **Start app**: `npm run dev`
 3. **Make changes**: Hot reload automatically
-4. **Test different contexts**: Add `?subdomain=app` or `?subdomain=forms`
+4. **Test different contexts**: Navigate to paths like `/app` or `/forms` (e.g., `http://localhost:3002/app/dashboard`)
 
 ### Database Changes
 1. **Edit schema**: `lib/db/schema.ts`

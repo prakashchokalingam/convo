@@ -6,10 +6,10 @@ import type { SwaggerDefinition } from 'swagger-jsdoc';
 export const swaggerConfig: SwaggerDefinition = {
   openapi: '3.0.0',
   info: {
-    title: 'Convo Forms API',
+    title: 'Convo API',
     version: '1.0.0',
     description: `
-      **Convo Forms API Documentation**
+      **Convo API Documentation**
       
       A comprehensive API for managing conversational forms, workspaces, and user interactions.
       
@@ -30,7 +30,7 @@ export const swaggerConfig: SwaggerDefinition = {
     `,
     contact: {
       name: 'API Support',
-      email: 'support@convoforms.com',
+      email: 'support@convo.ai',
     },
     license: {
       name: 'MIT',
@@ -43,7 +43,7 @@ export const swaggerConfig: SwaggerDefinition = {
       description: 'Development server',
     },
     {
-      url: 'https://api.convoforms.com',
+      url: 'https://convo.ai/api', // Updated to new production API base URL
       description: 'Production server',
     },
   ],

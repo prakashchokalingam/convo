@@ -1,10 +1,10 @@
-# 🚀 Getting Started with ConvoForms
+# 🚀 Getting Started with Convo
 
-Welcome to ConvoForms! This guide picks up after you've cloned the repository and installed dependencies as outlined in the main `README.md`. It will help you get the application running locally.
+Welcome to Convo! This guide picks up after you've cloned the repository and installed dependencies as outlined in the main `README.md`. It will help you get the application running locally.
 
-## What is ConvoForms?
+## What is Convo?
 
-ConvoForms is an AI-powered form builder that turns boring static forms into engaging conversations. Users can:
+Convo is an AI-powered form builder that turns boring static forms into engaging conversations. Users can:
 - Generate forms using natural language prompts ("Create a job application form")
 - Toggle any form into "conversational mode" (chat-like interface)
 - Collect responses and analyze data
@@ -61,7 +61,7 @@ Once the database is ready and schema is applied:
 npm run dev
 ```
 
-🎉 **Success!** Open [http://localhost:3002](http://localhost:3002) in your browser to see your ConvoForms application.
+🎉 **Success!** Open [http://localhost:3002](http://localhost:3002) in your browser to see your Convo application.
 
 ## What You'll See
 
@@ -83,17 +83,17 @@ npm run dev
 
 ## Key URLs in Development
 
-- **Marketing Site**: `http://localhost:3002/`
-- **Application Login**: `http://localhost:3002/login?subdomain=app` (or navigate through the marketing site)
-- **Your Workspace Dashboard (example)**: `http://localhost:3002/your-workspace-slug?subdomain=app`
-- **Public Form URL (example)**: `http://localhost:3002/contact/your-form-id?subdomain=forms`
+- **Marketing Site**: `http://localhost:3002/marketing` (or `http://localhost:3002/` which redirects to `/marketing`)
+- **Application Login**: `http://localhost:3002/app/login`
+- **Your Workspace Dashboard (example)**: `http://localhost:3002/app/your-workspace-slug`
+- **Public Form URL (example)**: `http://localhost:3002/forms/contact/your-form-id`
 
 ## Next Steps
 
 With the application running, you might want to:
-- Read the **[Architecture Document](./ARCHITECTURE.md)** to understand how ConvoForms is built.
+- Read the **[Architecture Document](./ARCHITECTURE.md)** to understand how Convo is built.
 - Check the **[Development Guide](./DEVELOPMENT.md)** for insights into the daily development workflow, coding standards, and more.
-- Explore the **[Features Overview](./features.md)** to see the full capabilities of ConvoForms.
+- Explore the **[Features Overview](./features.md)** to see the full capabilities of Convo.
 
 ## Troubleshooting
 

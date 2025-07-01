@@ -1,5 +1,6 @@
 import { Page, expect, Locator } from '@playwright/test';
 import { TestForm, generateFormSubmissionData } from './test-data';
+import { buildContextUrl } from './subdomain';
 
 /**
  * Form testing utilities for E2E tests
@@ -290,7 +291,9 @@ export class FormAnalytics {
    * Navigate to form analytics
    */
   async viewFormAnalytics(workspaceSlug: string, formId: string) {
-    await this.page.goto(`/${workspaceSlug}/forms/${formId}/analytics?subdomain=app`);
+    const analyticsPath = `/${workspaceSlug}/forms/${formId}/analytics`;
+    const url = buildContextUrl('app', analyticsPath);
+    await this.page.goto(url);
     await this.page.waitForSelector('[data-testid="analytics-dashboard"]');
   }
   

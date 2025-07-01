@@ -19,16 +19,18 @@ const getBaseUrls = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production';
   
   if (isDevelopment) {
+    // In development, contexts are path-based from the root origin.
     return {
-      base: 'http://localhost:3002',
-      marketing: 'http://localhost:3002',
-      app: 'http://localhost:3002',
-      forms: 'http://localhost:3002'
+      base: 'http://localhost:3002', // Root for all dev paths
+      marketing: 'http://localhost:3002/marketing',
+      app: 'http://localhost:3002/app',
+      forms: 'http://localhost:3002/forms'
     };
   }
   
+  // Production URLs remain subdomain-based
   return {
-    base: 'https://convo.ai',
+    base: 'https://convo.ai', // Marketing root
     marketing: 'https://convo.ai',
     app: 'https://app.convo.ai',
     forms: 'https://forms.convo.ai'
@@ -36,24 +38,35 @@ const getBaseUrls = () => {
 };
 
 /**
- * Builds context-aware URLs for different subdomains
+ * Builds context-aware URLs for different subdomains/paths for E2E tests.
+ * This should mirror the logic in `lib/subdomain.ts buildContextUrl`.
  */
 export function buildContextUrl(context: SubdomainContext, path: string = ''): string {
-  const urls = getBaseUrls();
   const isDevelopment = process.env.NODE_ENV !== 'production';
-  
-  // Remove leading slash from path if present
-  const cleanPath = path.startsWith('/') ? path.substring(1) : path;
-  
+  const normalizedPath = path === '/' || path === '' ? '' : (path.startsWith('/') ? path : `/${path}`);
+
   if (isDevelopment) {
-    // In development, use query parameters to simulate subdomains
-    const baseUrl = urls.base;
-    const queryParam = context === 'marketing' ? '' : `?subdomain=${context}`;
-    return `${baseUrl}/${cleanPath}${queryParam}`;
+    const base = 'http://localhost:3002';
+    if (context === 'marketing') {
+      // Marketing pages are under /marketing path segment
+      if (normalizedPath === '' || normalizedPath === '/') return `${base}/marketing`;
+      return `${base}/marketing${normalizedPath}`;
+    } else if (context === 'app') {
+      return `${base}/app${normalizedPath}`;
+    } else { // context === 'forms'
+      return `${base}/forms${normalizedPath}`;
+    }
+  } else {
+    // Production: Use real subdomains
+    const prodDomain = 'convo.ai'; // Assuming this is the target prod domain
+    let subdomainPart = '';
+    if (context === 'app') {
+      subdomainPart = 'app.';
+    } else if (context === 'forms') {
+      subdomainPart = 'forms.';
+    }
+    return `https://${subdomainPart}${prodDomain}${normalizedPath === '' && context !== 'marketing' ? '/' : normalizedPath}`;
   }
-  
-  // In production, use actual subdomains
-  return `${urls[context]}/${cleanPath}`;
 }
 
 /**
@@ -139,16 +152,29 @@ export class SubdomainNavigator {
     const isDevelopment = process.env.NODE_ENV !== 'production';
     
     if (isDevelopment) {
-      // In development, check query parameters
-      if (expectedContext === 'marketing') {
-        expect(currentUrl).not.toContain('?subdomain=');
-      } else {
-        expect(currentUrl).toContain(`subdomain=${expectedContext}`);
+      // In development, check path prefixes
+      const parsedUrl = new URL(currentUrl);
+      if (expectedContext === 'app') {
+        expect(parsedUrl.pathname).toMatch(/^\/app(\/.*)?$/);
+      } else if (expectedContext === 'forms') {
+        expect(parsedUrl.pathname).toMatch(/^\/forms(\/.*)?$/);
+      } else { // marketing
+        // Marketing can be /marketing/* or just / if it's the root redirect target before JS hydration.
+        // For simplicity after navigation, we expect it to be /marketing or /marketing/...
+        expect(parsedUrl.pathname).toMatch(/^\/marketing(\/.*)?$/);
       }
     } else {
       // In production, check actual subdomain
-      const urls = getBaseUrls();
-      expect(currentUrl).toContain(urls[expectedContext]);
+      // This part of the logic can remain similar if getBaseUrls() is updated,
+      // or we can be more specific with hostname.
+      const hostname = new URL(currentUrl).hostname;
+      if (expectedContext === 'app') {
+        expect(hostname).toBe('app.convo.ai');
+      } else if (expectedContext === 'forms') {
+        expect(hostname).toBe('forms.convo.ai');
+      } else { // marketing
+        expect(hostname).toBe('convo.ai');
+      }
     }
   }
   

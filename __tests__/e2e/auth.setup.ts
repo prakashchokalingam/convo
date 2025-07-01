@@ -1,5 +1,6 @@
 import { test as setup, expect } from '@playwright/test';
 import { generateTestUser, createTestWorkspace } from './utils/test-data';
+import { buildContextUrl } from './utils/subdomain';
 
 const authFile = '.auth/user.json';
 
@@ -15,10 +16,12 @@ setup('authenticate', async ({ page }) => {
   
   try {
     // Navigate to signup page (app context)
-    await page.goto('/?subdomain=app');
+    // Using buildContextUrl to get the correct path for app's signup page
+    await page.goto(buildContextUrl('app', '/signup'));
     await page.waitForLoadState('networkidle');
     
     // Check if we're already on the login page or need to navigate
+    // The above goto should directly land on signup or login if signup needs login first.
     const currentUrl = page.url();
     if (!currentUrl.includes('/sign-')) {
       // Navigate to signup
@@ -53,7 +56,8 @@ setup('authenticate', async ({ page }) => {
     
     // Check if we reached onboarding or need to navigate there
     if (!page.url().includes('onboarding')) {
-      await page.goto('/onboarding?subdomain=app');
+      // Navigate to onboarding using the app context path
+      await page.goto(buildContextUrl('app', '/onboarding'));
     }
     
     // Wait for onboarding page to load
