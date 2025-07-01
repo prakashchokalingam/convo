@@ -143,6 +143,9 @@ NODE_ENV=development
 
 # Admin Dashboard
 ADMIN_EMAILS="admin1@example.com,admin2@example.com" # Comma-separated list of emails allowed to access the admin dashboard.
+
+# Slack Notifications
+SLACK_WEBHOOK_URL="https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX" # Webhook URL for Slack notifications (e.g., for new workspace creations)
 ```
 
 ## 🚀 Deployment

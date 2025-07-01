@@ -185,6 +185,7 @@ Track form performance:
 - **Email Services** - Auto-responders via Resend
 - **CRM Systems** - HubSpot, Salesforce integration
 - **Payment Processing** - Stripe for paid forms
+- **Slack Notifications for Workspace Creation**: Get notified in a configured Slack channel when new workspaces are created, either through user signup or manual creation. This helps in tracking new user/team onboarding for marketing and administrative purposes.
 
 ## 💳 Pricing Plans
 
