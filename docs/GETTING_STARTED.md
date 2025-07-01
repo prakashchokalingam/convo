@@ -95,6 +95,28 @@ With the application running, you might want to:
 - Check the **[Development Guide](./DEVELOPMENT.md)** for insights into the daily development workflow, coding standards, and more.
 - Explore the **[Features Overview](./features.md)** to see the full capabilities of Convo.
 
+## Understanding the Project Structure (High-Level)
+
+To help you navigate the codebase, here's a brief overview of the main directories:
+
+-   **`app/`**: This is where the Next.js application lives. It's further divided using route groups:
+    -   `(marketing)/`: Code for the public-facing website (e.g., landing pages, pricing).
+    -   `(app)/`: Code for the core application that users interact with after logging in (e.g., dashboard, form builder, settings). This area requires authentication.
+    -   `(forms)/`: Code for rendering and handling public form submissions. These are the forms that end-users fill out.
+    -   `api/`: Contains all backend API route handlers.
+-   **`components/`**: Reusable React components are stored here.
+    -   `ui/`: Base UI elements, often from a library like shadcn/ui.
+    -   `shared/`: Components used across different parts of the application (e.g., marketing, app, forms).
+    -   `app/`, `marketing/`, `forms/`: Components specific to those parts of the application.
+-   **`lib/`**: Contains shared utilities, helper functions, database logic, AI integrations, etc.
+    -   `db/`: Database schema, queries, and ORM configuration.
+    -   `ai/`: Functions related to AI form generation.
+    -   `auth/`: Authentication-related helpers.
+-   **`docs/`**: All project documentation, including this guide.
+-   **`__tests__/`**: Contains all automated tests (unit, integration, E2E).
+
+This structure helps separate concerns and makes it easier to locate code related to specific parts of the application. For a more detailed explanation, refer to the **[Architecture Document](./ARCHITECTURE.md)**.
+
 ## Troubleshooting
 
 **Database won't start or `db:push` fails?**

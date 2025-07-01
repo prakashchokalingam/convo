@@ -16,13 +16,23 @@ For detailed setup including environment configuration, prerequisites, and troub
 
 For a complete overview and navigation of all technical documents, please visit our **[Documentation Hub](./docs/README.md)**.
 
-**Key Documents:**
-- 🚀 [Getting Started](./docs/GETTING_STARTED.md) - Detailed setup and first steps.
-- 🏗️ [Architecture](./docs/ARCHITECTURE.md) - System design and structure.
-- 🛠️ [Development Guide](./docs/DEVELOPMENT.md) - Workflow, testing, and contribution.
-- ✨ [Features](./docs/features.md) - Overview of ConvoForms capabilities.
-- 🚀 [Deployment Guide](./docs/DEPLOYMENT.md) - Deploying to production.
-- 🎨 [Design System](./docs/design/README.md) - UI components and styling guidelines.
+### ✨ For New Developers
+If you're new to ConvoForms, we recommend starting with these documents to get up to speed quickly:
+1.  🚀 **[Getting Started Guide](./docs/GETTING_STARTED.md)**: Covers setting up your local development environment and making your first contributions.
+2.  🏗️ **[Architecture Overview](./docs/ARCHITECTURE.md)**: Explains the high-level structure of the application, key technologies, and how different parts interact.
+3.  🛠️ **[Development Workflow](./docs/DEVELOPMENT.md)**: Details our coding standards, testing procedures, and day-to-day development practices.
+
+### 🔑 Key Documents
+- 🚀 **[Getting Started](./docs/GETTING_STARTED.md)** - Detailed setup and first steps.
+- 🏗️ **[Architecture](./docs/ARCHITECTURE.md)** - System design and structure.
+- 🛠️ **[Development Guide](./docs/DEVELOPMENT.md)** - Workflow, testing, and contribution.
+- ✨ **[Features](./docs/features.md)** - Overview of ConvoForms capabilities.
+- 📖 **[Documentation Structure](./docs/docs_structure.md)** - A guide to how our documentation is organized.
+- 🚀 **[Deployment Guide](./docs/DEPLOYMENT.md)** - Deploying to production.
+- 🎨 **[Design System](./docs/design/README.md)** - UI components and styling guidelines.
+- 🗂️ **[Use Cases & Scenarios](./docs/cases/README.md)** - Detailed documentation for specific scenarios, edge cases, or in-depth explanations of particular features or past technical decisions.
+
+A comprehensive list of all documents can be found in the **[Documentation Hub](./docs/README.md)**.
 
 ## 🏗️ Technical Architecture
 
