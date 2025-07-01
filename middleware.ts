@@ -44,10 +44,12 @@ export default authMiddleware({
     const { nextUrl, headers: reqHeaders } = req;
     const hostname = reqHeaders.get('host') || '';
     const pathname = nextUrl.pathname;
-    let context: 'marketing' | 'app' | 'forms' = 'marketing'; // Default context
+    let context: 'marketing' | 'app' | 'forms' | 'admin' = 'marketing'; // Default context
 
     if (process.env.NODE_ENV === 'development') {
-      if (pathname.startsWith('/app')) {
+      if (pathname.startsWith('/admin')) {
+        context = 'admin';
+      } else if (pathname.startsWith('/app')) {
         context = 'app';
       } else if (pathname.startsWith('/forms')) {
         context = 'forms';
@@ -55,7 +57,9 @@ export default authMiddleware({
         context = 'marketing';
       }
     } else { // Production
-      if (hostname.startsWith('app.')) {
+      if (hostname.startsWith('admin.')) {
+        context = 'admin';
+      } else if (hostname.startsWith('app.')) {
         context = 'app';
       } else if (hostname.startsWith('forms.')) {
         context = 'forms';
