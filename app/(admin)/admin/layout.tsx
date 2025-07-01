@@ -58,6 +58,9 @@ export default async function AdminLayout({
             <aside className="w-64 bg-background border-r p-4">
               <nav className="flex flex-col space-y-2">
                 <h2 className="text-lg font-semibold mb-4">Admin Dashboard</h2>
+                <Link href="/admin/overview" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground">
+                  Overview
+                </Link>
                 <Link href="/admin/workspaces" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground">
                   Workspaces
                 </Link>

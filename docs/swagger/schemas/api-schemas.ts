@@ -768,9 +768,9 @@
  *           example: "Forms retrieved successfully"
  *       required: [success, data, pagination]
  *
- *     FormResponse:
+ *     SingleFormEntityResponse:
  *       type: object
- *       description: Single form response
+ *       description: API response wrapper for a single Form entity.
  *       properties:
  *         success:
  *           type: boolean
