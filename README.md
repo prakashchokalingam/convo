@@ -71,6 +71,12 @@ Forms:         forms.convo.ai/[workspace]/[form]
 ```
 For a more in-depth explanation of the architecture, see the **[Full Architecture Document](./docs/ARCHITECTURE.md)**.
 
+### Admin Dashboard
+The application includes an admin dashboard accessible to authorized users.
+- **Development URL**: `localhost:3002/admin` (after logging in as an admin user)
+- **Production URL**: `admin.convo.ai` (requires DNS and Vercel rewrite configuration)
+- **Access Control**: Managed by the `ADMIN_EMAILS` environment variable.
+
 ## 🔧 Development Commands
 
 | Command | Description |
@@ -134,6 +140,9 @@ GOOGLE_AI_API_KEY=AIza...
 # App Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3002
 NODE_ENV=development
+
+# Admin Dashboard
+ADMIN_EMAILS="admin1@example.com,admin2@example.com" # Comma-separated list of emails allowed to access the admin dashboard.
 ```
 
 ## 🚀 Deployment
