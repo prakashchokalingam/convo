@@ -51,7 +51,7 @@ export const useAppStore = create<StoreType>((set, get) => ({
         isInitialized: true,
         isLoading: false,
       });
-    } catch (error)
+    } catch (error) {
       console.error('Error loading bootstrap data:', error);
       // Keep previous state or clear parts of it? For now, just stop loading.
       // Consider setting isInitialized to true even on error to prevent infinite loading states.

@@ -1,3 +1,5 @@
+'use client'; // Make AppLayout a client component
+
 import { ReactNode } from 'react';
 import AppStoreInitializer from '@/components/shared/AppStoreInitializer';
 
@@ -15,7 +17,7 @@ interface AppLayoutProps {
   children: ReactNode;
 }
 
-export default async function AppLayout({ children }: AppLayoutProps) {
+export default function AppLayout({ children }: AppLayoutProps) {
   // App layout - context is guaranteed by path structure
   // Authentication handled at page level for flexibility
   return <AppStoreInitializer>{children}</AppStoreInitializer>;
