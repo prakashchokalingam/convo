@@ -319,10 +319,6 @@ export default function NewFormPage() {
       {/* Future AI Option - Coming Soon */}
       <Card
         className="mt-6 border-2 border-transparent hover:border-purple-200 cursor-pointer"
-        onClick={() => {
-          setSelectedMethod('ai');
-          setCreationStep('details');
-        }}
       >
         <CardHeader>
           <div className="flex items-center gap-3 mb-2">
@@ -337,7 +333,23 @@ export default function NewFormPage() {
             placeholder="Describe your form in plain English and let AI build it for you automatically."
             className="mt-1"
             rows={3}
+            value={aiPrompt} // Bind value to state
+            onChange={(e) => setAiPrompt(e.target.value)} // Update state on change
+            onClick={(e) => e.stopPropagation()} // Prevent click from bubbling to Card
           />
+          <div className="mt-4 flex justify-end">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent click from bubbling to Card
+                setSelectedMethod('ai');
+                setCreationStep('details');
+              }}
+              disabled={!aiPrompt.trim()} // Disable if prompt is empty
+            >
+              Generate Form
+              <Sparkles className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </CardHeader>
       </Card>
     </div>
