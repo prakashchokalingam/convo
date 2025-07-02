@@ -1,6 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures'; // Import from custom fixtures
+// import { clerkSetup } from '@clerk/testing/playwright'; // No longer needed here
 import { createNavigator } from './utils/subdomain';
 import { generateTestUser, createTestWorkspace } from './utils/test-data';
+
+// test.use(clerkSetup()); // This is now handled by the extended 'test' in fixtures.ts
 
 /**
  * Authentication and Onboarding E2E Tests
@@ -16,11 +19,13 @@ test.describe('Authentication Flow', () => {
     
     // 1. Navigate to marketing site
     await navigator.toMarketing();
+    await page.waitForFunction(() => (window as any).Clerk?.isReady());
     await expect(page).toHaveURL(/.*convo\.ai.*|.*localhost:3002.*/);
     
     // 2. Navigate to signup
     await page.click('[data-testid="signup-cta"], [href*="sign-up"], text="Get Started"');
     await navigator.waitForAuthRedirect();
+    await page.waitForFunction(() => (window as any).Clerk?.isReady());
     
     // 3. Complete signup form
     await page.waitForSelector('[data-clerk-loading="false"]', { timeout: 10000 });
@@ -55,6 +60,7 @@ test.describe('Authentication Flow', () => {
     
     // 1. Navigate to login
     await navigator.toApp('/login');
+    await page.waitForFunction(() => (window as any).Clerk?.isReady());
     await page.waitForSelector('[data-clerk-loading="false"]');
     
     // 2. Fill login form (using known test credentials)
@@ -75,6 +81,7 @@ test.describe('Authentication Flow', () => {
     
     // 1. Navigate to signup
     await navigator.toApp('/signup');
+    await page.waitForFunction(() => (window as any).Clerk?.isReady());
     await page.waitForSelector('[data-clerk-loading="false"]');
     
     // 2. Try to submit without required fields
@@ -102,6 +109,7 @@ test.describe('Authentication Flow', () => {
     
     // Assuming we're logged in (using auth state from setup)
     await navigator.toApp('/onboarding');
+    await page.waitForFunction(() => (window as any).Clerk?.isReady());
     await page.waitForSelector('[data-testid="workspace-creation-form"]');
     
     // Try to create workspace with existing slug
@@ -118,6 +126,7 @@ test.describe('Authentication Flow', () => {
     
     // Navigate to authenticated area
     await navigator.toApp();
+    await page.waitForFunction(() => (window as any).Clerk?.isReady());
     await page.waitForSelector('[data-testid="user-menu"]');
     
     // Open user menu and logout
@@ -142,6 +151,7 @@ test.describe('Onboarding Edge Cases', () => {
     
     // Navigate to onboarding (assuming authenticated)
     await navigator.toApp('/onboarding');
+    await page.waitForFunction(() => (window as any).Clerk?.isReady());
     await page.waitForSelector('[data-testid="workspace-creation-form"]');
     
     // Fill form
@@ -169,6 +179,7 @@ test.describe('Onboarding Edge Cases', () => {
     const navigator = createNavigator(page);
     
     await navigator.toApp('/onboarding');
+    await page.waitForFunction(() => (window as any).Clerk?.isReady());
     await page.waitForSelector('[data-testid="workspace-creation-form"]');
     
     // Test invalid slug formats

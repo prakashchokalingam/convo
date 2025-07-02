@@ -48,7 +48,8 @@ export default defineConfig({
   projects: [
     {
       name: 'setup',
-      testMatch: /.*\.setup\.ts/,
+      testMatch: /00-auth\.setup\.spec\.ts/, // Point to the new setup file
+      // No teardown needed here specifically unless it's different from global
     },
     
     {
@@ -119,7 +120,9 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000, // 2 minutes
     env: {
-      NODE_ENV: 'test',
+      NODE_ENV: 'development', // Changed from 'test' to 'development'
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+      CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     }
   },
 

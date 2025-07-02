@@ -1,18 +1,18 @@
 // IMPORTANT: This file contains server-side code only.
 // Do not import this file into client components.
 
-import { db } from '@/drizzle/db';
-import { workspaces, workspaceMembers, users } from '@/drizzle/schema';
+import { db } from '@/lib/db';
+import { workspaces, workspaceMembers, users } from '@/lib/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import { cache } from 'react';
+// import { cache } from 'react'; // Removed React.cache import
 import { createId } from '@paralleldrive/cuid2';
 import type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
 import { getWorkspaceUrl } from '@/lib/context';
 
 // Get all workspaces accessible by current user
-export const getCurrentUserWorkspaces = cache(async (): Promise<WorkspaceWithRole[]> => {
+export const getCurrentUserWorkspaces = async (): Promise<WorkspaceWithRole[]> => {
   try {
     const { userId } = auth();
     if (!userId) return [];
@@ -41,10 +41,10 @@ export const getCurrentUserWorkspaces = cache(async (): Promise<WorkspaceWithRol
     console.error('Error getting user workspaces:', error);
     return [];
   }
-});
+};
 
 // Get user's default workspace
-export const getUserDefaultWorkspace = cache(async (): Promise<WorkspaceWithRole | null> => {
+export const getUserDefaultWorkspace = async (): Promise<WorkspaceWithRole | null> => {
   try {
     const { userId } = auth();
     if (!userId) return null;
@@ -79,10 +79,10 @@ export const getUserDefaultWorkspace = cache(async (): Promise<WorkspaceWithRole
     console.error('Error getting default workspace:', error);
     return null;
   }
-});
+};
 
 // Get workspace by slug with user access check
-export const getWorkspaceBySlug = cache(async (slug: string): Promise<WorkspaceWithRole | null> => {
+export const getWorkspaceBySlug = async (slug: string): Promise<WorkspaceWithRole | null> => {
   try {
     const { userId } = auth();
     if (!userId) return null;
@@ -116,7 +116,7 @@ export const getWorkspaceBySlug = cache(async (slug: string): Promise<WorkspaceW
     console.error('Error getting workspace by slug:', error);
     return null;
   }
-});
+};
 
 // Get current workspace from URL context
 export async function getCurrentWorkspace(workspaceSlug?: string): Promise<WorkspaceWithRole> {
@@ -362,8 +362,8 @@ export async function createWorkspaceFromEmail(
 
 // Admin specific functions
 import { clerkClient } from '@clerk/nextjs/server';
-import { subscriptions } from '@/drizzle/schema'; // Ensure subscriptions is imported if not already
-import type { Workspace } from '@/drizzle/schema';
+import { subscriptions } from '@/lib/db/schema'; // Ensure subscriptions is imported if not already
+import type { Workspace } from '@/lib/db/schema';
 
 export interface AdminWorkspaceInfo extends Workspace {
   ownerName: string | null;
