@@ -319,12 +319,6 @@ export default function NewFormPage() {
       {/* Future AI Option - Coming Soon */}
       <Card
         className="mt-6 border-2 border-transparent hover:border-purple-200 cursor-pointer"
-        onClick={() => {
-          // Only transition if the click is not on the Textarea itself
-          // This will be handled by the new Generate button later.
-          // setSelectedMethod('ai');
-          // setCreationStep('details');
-        }}
       >
         <CardHeader>
           <div className="flex items-center gap-3 mb-2">
