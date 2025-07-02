@@ -4,8 +4,10 @@ import { UserButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Search, Command } from 'lucide-react';
+import { Bell, Search, Command, Plus } from 'lucide-react'; // Added Plus
 import { useAppStore } from '@/lib/store/appStore';
+import Link from 'next/link'; // Added Link
+import { getFormsUrl } from '@/lib/urls/workspace-urls'; // Added getFormsUrl
 
 // Removed WorkspaceWithRole import as it's not directly used by props anymore
 // import type { WorkspaceWithRole } from '@/lib/types/workspace';
@@ -63,8 +65,17 @@ export function AppHeader() {
             </div>
           </div>
           
-          {/* Right: Notifications + User */}
+          {/* Action Buttons Area */}
           <div className="flex items-center gap-2">
+            {/* NEW "Create Form" Button */}
+            <Button size="sm" asChild>
+              <Link href={getFormsUrl(currentWorkspace.slug, '/new')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Form
+              </Link>
+            </Button>
+
+            {/* Existing Notifications Button */}
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="h-4 w-4" />
               <Badge 
@@ -75,6 +86,7 @@ export function AppHeader() {
               </Badge>
             </Button>
             
+            {/* Existing UserButton */}
             <UserButton 
               appearance={{
                 elements: {
