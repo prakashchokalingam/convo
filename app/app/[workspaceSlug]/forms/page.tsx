@@ -16,14 +16,19 @@ export default async function FormsPage({ params }: FormsPageProps) {
       {/* Forms Header with Search and Filters */}
       <FormsHeader workspace={workspace} />
 
-      {/* Create Form Button */}
-      <div className="flex justify-between items-center">
+      {/* Page Title and Create Form Button */}
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Forms</h1>
           <p className="mt-1 text-sm text-gray-500">
             Create and manage your conversational forms
           </p>
         </div>
+        {/* CreateFormButton is now part of FormsHeader or rendered separately if needed */}
+      </div>
+
+      {/* Create Form Button - Moved to be a direct child for consistent spacing */}
+      <div className="flex justify-end">
         <CreateFormButton workspace={workspace} />
       </div>
 
