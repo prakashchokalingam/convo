@@ -168,32 +168,24 @@ export function AppSidebar({ workspace }: AppSidebarProps) {
     return hasPermission(workspace.role, item.requiresRole);
   };
 
+  const dashboardBasePath = getWorkspaceUrl(workspace.slug);
+
   const isActiveLink = (href: string) => {
-    // Remove query parameters for comparison
+    const cleanCurrentPath = pathname.split('?')[0];
     const cleanHref = href.split('?')[0];
-    
-    // For dashboard, exact match
-    if (cleanHref === `/${workspace.slug}`) {
-      return pathname === `/${workspace.slug}`;
+
+    if (cleanHref === dashboardBasePath) {
+      // Exact match for the dashboard path
+      return cleanCurrentPath === dashboardBasePath;
     }
     
-    // For other pages, check if pathname starts with href
-    return pathname.startsWith(cleanHref);
+    // For other pages, check if the current path starts with the link's href.
+    return cleanCurrentPath.startsWith(cleanHref);
   };
 
   return (
     <aside className="w-64 border-r bg-muted/10 h-[calc(100vh-64px)]">
       <div className="flex h-full flex-col gap-2 p-4">
-        {/* Quick Create Button */}
-        <Card className="p-4">
-          <Button className="w-full" size="sm" asChild>
-            <Link href={getFormsUrl(workspace.slug, '/new')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Form
-            </Link>
-          </Button>
-        </Card>
-
         {/* Navigation */}
         <nav className="flex flex-col space-y-1">
           {navItems.map((item) => {
