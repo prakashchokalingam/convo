@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { getWorkspaceUrl } from '@/lib/urls/workspace-urls';
 
 interface AnimationStage {
   id: string;
@@ -95,7 +96,8 @@ export function AnimatedWorkspaceCreation() {
           sessionStorage.removeItem('newWorkspace');
           
           // Redirect with welcome parameter for new workspace
-          router.push(`/${workspaceSlug}/dashboard?welcome=true`);
+          const workspaceUrl = getWorkspaceUrl(workspaceSlug, '?welcome=true');
+          router.push(workspaceUrl);
         } else {
           throw new Error('Workspace data not found');
         }

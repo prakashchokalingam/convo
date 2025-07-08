@@ -77,6 +77,7 @@ export default function TemplatesPage() {
         <TabsContent value="global" className="mt-6">
           <GlobalTemplatesTab 
             workspaceId={workspace.id}
+            workspaceSlug={workspace.slug}
             userRole={userRole}
             canCreateTemplates={canCreateTemplates}
           />
@@ -86,6 +87,7 @@ export default function TemplatesPage() {
         <TabsContent value="workspace" className="mt-6">
           <UserTemplatesTab 
             workspaceId={workspace.id}
+            workspaceSlug={workspace.slug}
             userRole={userRole}
             canCreateTemplates={canCreateTemplates}
             onCreateTemplate={() => setShowCreateDialog(true)}
@@ -98,6 +100,7 @@ export default function TemplatesPage() {
         isOpen={showCreateDialog}
         onClose={() => setShowCreateDialog(false)}
         workspaceId={workspace.id}
+        workspaceSlug={workspace.slug}
         onSuccess={() => {
           setShowCreateDialog(false);
           // Switch to workspace tab to show the new template

@@ -20,7 +20,7 @@ export function getWorkspaceUrl(workspaceSlug: string, path: string = ''): strin
 }
 
 export function getWorkspaceDashboardUrl(workspaceSlug: string): string {
-  return getBaseWorkspaceUrl(workspaceSlug);
+  return `/app/${workspaceSlug}/dashboard`;
 }
 
 export function getFormsUrl(workspaceSlug: string): string {

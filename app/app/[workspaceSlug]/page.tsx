@@ -1,9 +1,6 @@
-import { Suspense } from 'react';
-import { getCurrentWorkspace } from '@/lib/workspace-server';
-import { WelcomeBanner } from '@/components/app/dashboard/welcome-banner';
-import { DashboardStats, RecentForms, QuickActions } from '@/components/app/dashboard/dashboard-components';
+import { redirect } from 'next/navigation';
 
-interface WorkspaceDashboardProps {
+interface WorkspaceRootProps {
   params: {
     workspaceSlug: string;
   };
@@ -12,49 +9,13 @@ interface WorkspaceDashboardProps {
   };
 }
 
-export default async function WorkspaceDashboard({ 
+export default async function WorkspaceRoot({ 
   params, 
   searchParams 
-}: WorkspaceDashboardProps) {
-  const workspace = await getCurrentWorkspace(params.workspaceSlug);
-  const isWelcome = searchParams.welcome === 'true';
-
-  return (
-    <div className="space-y-6">
-      {/* Welcome Banner for new users */}
-      {isWelcome && (
-        <WelcomeBanner workspace={workspace} />
-      )}
-
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          Welcome to {workspace.name}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {workspace.description || 'Create and manage your conversational forms'}
-        </p>
-      </div>
-
-      {/* Quick Actions */}
-      <QuickActions workspace={workspace} />
-
-      {/* Dashboard Stats */}
-      <Suspense fallback={<div>Loading stats...</div>}>
-        <DashboardStats workspaceId={workspace.id} />
-      </Suspense>
-
-      {/* Recent Forms */}
-      <Suspense fallback={<div>Loading forms...</div>}>
-        <RecentForms workspaceId={workspace.id} />
-      </Suspense>
-    </div>
-  );
-}
-
-export function generateMetadata({ params }: { params: { workspaceSlug: string } }) {
-  return {
-    title: `${params.workspaceSlug} Dashboard`,
-    description: 'Manage your forms and responses',
-  };
+}: WorkspaceRootProps) {
+  const dashboardUrl = `/app/${params.workspaceSlug}/dashboard`;
+  const searchParamsString = new URLSearchParams(searchParams).toString();
+  const redirectUrl = searchParamsString ? `${dashboardUrl}?${searchParamsString}` : dashboardUrl;
+  
+  redirect(redirectUrl);
 }

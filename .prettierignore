@@ -1,0 +1,14 @@
+node_modules
+.next
+.env*
+build
+dist
+coverage
+*.log
+.git
+.husky
+.vscode
+.DS_Store
+public/
+*.min.js
+*.min.css

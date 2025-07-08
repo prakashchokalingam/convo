@@ -17,11 +17,13 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/shared/ui/alert';
+import { getFormsUrl } from '@/lib/urls/workspace-urls';
 
 interface TemplateCreateDialogProps {
   isOpen: boolean;
   onClose: () => void;
   workspaceId: string;
+  workspaceSlug: string;
   onSuccess?: () => void;
 }
 
@@ -46,6 +48,7 @@ export function TemplateCreateDialog({
   isOpen,
   onClose,
   workspaceId,
+  workspaceSlug,
   onSuccess
 }: TemplateCreateDialogProps) {
   const router = useRouter();
@@ -82,7 +85,8 @@ export function TemplateCreateDialog({
       category: templateData.category || '',
     });
     
-    router.push(`/${workspaceId}/forms/new?${params}`);
+    const newFormUrl = getFormsUrl(workspaceSlug) + `/new?${params}`;
+    router.push(newFormUrl);
     handleClose();
   };
 
@@ -135,7 +139,8 @@ export function TemplateCreateDialog({
       const data = await response.json();
       
       // Success - redirect to edit the template
-      router.push(`/${workspaceId}/forms/new?templateId=${data.template.id}&mode=template`);
+      const editTemplateUrl = getFormsUrl(workspaceSlug) + `/new?templateId=${data.template.id}&mode=template`;
+      router.push(editTemplateUrl);
       
       if (onSuccess) {
         onSuccess();

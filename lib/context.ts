@@ -85,7 +85,7 @@ export const getSignupUrl = (redirect?: string) => {
 
 export const getOnboardingUrl = () => '/app/onboarding';
 
-export const getWorkspaceUrl = (workspaceSlug: string) => `/app/${workspaceSlug}`;
+export const getWorkspaceUrl = (workspaceSlug: string) => `/app/${workspaceSlug}/dashboard`;
 
 export const getFormsListUrl = (workspaceSlug: string) => `/app/${workspaceSlug}/forms`;
 

@@ -9,9 +9,11 @@ import { Template } from '@/lib/db/schema';
 import { Globe, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/shared/ui/alert';
 import { Button } from '@/components/shared/ui/button';
+import { getFormEditorUrl } from '@/lib/urls/workspace-urls';
 
 interface GlobalTemplatesTabProps {
   workspaceId: string;
+  workspaceSlug: string;
   userRole: string;
   canCreateTemplates: boolean;
 }
@@ -23,7 +25,8 @@ interface GlobalTemplatesTabProps {
  * Templates are fetched from the API and filtered to show only global ones.
  */
 export function GlobalTemplatesTab({ 
-  workspaceId, 
+  workspaceId,
+  workspaceSlug, 
   userRole, 
   canCreateTemplates 
 }: GlobalTemplatesTabProps) {
@@ -166,7 +169,8 @@ export function GlobalTemplatesTab({
       const data = await response.json();
       
       // Navigate to the form editor
-      router.push(`/${workspaceId}/forms/${data.form.id}`);
+      const formEditorUrl = getFormEditorUrl(workspaceSlug, data.form.id);
+      router.push(formEditorUrl);
       
     } catch (error) {
       console.error('Error creating form from template:', error);

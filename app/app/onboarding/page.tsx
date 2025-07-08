@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs';
 import { getCurrentUserWorkspaces } from '@/lib/workspace-server';
 import { AnimatedWorkspaceCreation } from '@/components/app/onboarding/animated-workspace-creation';
+import { getWorkspaceUrl } from '@/lib/urls/workspace-urls';
 
 export default async function OnboardingPage() {
   const { userId } = auth();
@@ -16,7 +17,7 @@ export default async function OnboardingPage() {
     if (workspaces.length > 0) {
       // User has existing workspace - redirect WITHOUT welcome parameter
       const primaryWorkspace = workspaces.find(w => w.type === 'default') || workspaces[0];
-      const workspaceUrl = `/${primaryWorkspace.slug}/dashboard`;
+      const workspaceUrl = getWorkspaceUrl(primaryWorkspace.slug);
       console.log('🏠 User has existing workspace, redirecting to:', workspaceUrl);
       redirect(workspaceUrl);
     }

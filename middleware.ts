@@ -20,7 +20,9 @@ export default authMiddleware({
     
     // Public auth routes  
     "/app/login",
+    "/app/login/sso-callback",
     "/app/signup",
+    "/app/signup/sso-callback",
     
     // Public form routes
     "/forms",
@@ -110,7 +112,7 @@ export default authMiddleware({
       const workspace = await getUserDefaultWorkspace();
 
       if (workspace && workspace.slug) {
-        const workspaceUrl = new URL(`/app/${workspace.slug}`, req.url);
+        const workspaceUrl = new URL(`/app/${workspace.slug}/dashboard`, req.url);
         return NextResponse.redirect(workspaceUrl);
       } else {
         // No default workspace found, redirect to onboarding

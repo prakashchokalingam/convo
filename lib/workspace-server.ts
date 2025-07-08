@@ -49,6 +49,7 @@ export const getUserDefaultWorkspace = async (): Promise<WorkspaceWithRole | nul
     const { userId } = auth();
     if (!userId) return null;
 
+    // First try to find a default workspace owned by the user
     const defaultWorkspace = await db
       .select({
         id: workspaces.id,
@@ -74,7 +75,32 @@ export const getUserDefaultWorkspace = async (): Promise<WorkspaceWithRole | nul
       )
       .limit(1);
 
-    return defaultWorkspace[0] as WorkspaceWithRole || null;
+    if (defaultWorkspace[0]) {
+      return defaultWorkspace[0] as WorkspaceWithRole;
+    }
+
+    // If no default workspace found, fall back to any workspace the user has access to
+    const anyWorkspace = await db
+      .select({
+        id: workspaces.id,
+        name: workspaces.name,
+        slug: workspaces.slug,
+        type: workspaces.type,
+        ownerId: workspaces.ownerId,
+        description: workspaces.description,
+        avatarUrl: workspaces.avatarUrl,
+        settings: workspaces.settings,
+        role: workspaceMembers.role,
+        createdAt: workspaces.createdAt,
+        updatedAt: workspaces.updatedAt,
+      })
+      .from(workspaces)
+      .innerJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
+      .where(eq(workspaceMembers.userId, userId))
+      .orderBy(desc(workspaces.createdAt))
+      .limit(1);
+
+    return anyWorkspace[0] as WorkspaceWithRole || null;
   } catch (error) {
     console.error('Error getting default workspace:', error);
     return null;
@@ -125,7 +151,7 @@ export async function getCurrentWorkspace(workspaceSlug?: string): Promise<Works
     if (!workspaceSlug) {
       const defaultWorkspace = await getUserDefaultWorkspace();
       if (!defaultWorkspace) {
-        redirect('/app/login');
+        redirect('/app/onboarding');
       }
       return defaultWorkspace;
     }
@@ -134,6 +160,7 @@ export async function getCurrentWorkspace(workspaceSlug?: string): Promise<Works
     const workspace = await getWorkspaceBySlug(workspaceSlug);
     if (!workspace) {
       // User doesn't have access to this workspace or it doesn't exist
+      console.error(`Workspace not found for slug: ${workspaceSlug}`);
       redirect('/app/onboarding');
     }
 
@@ -141,7 +168,7 @@ export async function getCurrentWorkspace(workspaceSlug?: string): Promise<Works
   } catch (error) {
     console.error('Error getting current workspace:', error);
     // If there's an auth error, redirect to login
-    redirect('/app/login');
+    redirect('/app/onboarding');
   }
 }
 

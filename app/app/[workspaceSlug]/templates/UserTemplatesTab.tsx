@@ -9,9 +9,11 @@ import { Building, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/shared/ui/alert';
 import { Button } from '@/components/shared/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shared/ui/dialog';
+import { getFormEditorUrl, getFormsUrl } from '@/lib/urls/workspace-urls';
 
 interface UserTemplatesTabProps {
   workspaceId: string;
+  workspaceSlug: string;
   userRole: string;
   canCreateTemplates: boolean;
   onCreateTemplate: () => void;
@@ -24,7 +26,8 @@ interface UserTemplatesTabProps {
  * with appropriate permissions.
  */
 export function UserTemplatesTab({ 
-  workspaceId, 
+  workspaceId,
+  workspaceSlug, 
   userRole, 
   canCreateTemplates,
   onCreateTemplate 
@@ -188,7 +191,8 @@ export function UserTemplatesTab({
       const data = await response.json();
       
       // Navigate to the form editor
-      router.push(`/${workspaceId}/forms/${data.form.id}`);
+      const formEditorUrl = getFormEditorUrl(workspaceSlug, data.form.id);
+      router.push(formEditorUrl);
       
     } catch (error) {
       console.error('Error creating form from template:', error);
@@ -199,7 +203,8 @@ export function UserTemplatesTab({
   const handleEditTemplate = async (templateId: string) => {
     // For now, redirect to form builder with template mode
     // In a future implementation, this could open a template editor
-    router.push(`/${workspaceId}/forms/new?templateId=${templateId}&mode=template`);
+    const newFormUrl = getFormsUrl(workspaceSlug) + `/new?templateId=${templateId}&mode=template`;
+    router.push(newFormUrl);
   };
 
   const handleDeleteTemplate = async (templateId: string) => {
