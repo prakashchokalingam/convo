@@ -48,6 +48,7 @@ export async function sendEmail({ to, subject, html, text, from = DEFAULT_FROM }
       text,
     });
 
+    // eslint-disable-next-line no-console
     console.log('✅ Email sent successfully:', { to, subject, id: result.data?.id });
     return { success: true, id: result.data?.id };
   } catch (error) {

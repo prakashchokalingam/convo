@@ -36,6 +36,7 @@ export default function AppStoreInitializer({ children }: AppStoreInitializerPro
       if (isSignedIn) {
         // Only load if not already initialized and not currently loading
         if (!isInitialized && !isLoading) {
+          // eslint-disable-next-line no-console
           console.log('AppStoreInitializer: User signed in, loading bootstrap data.');
           loadBootstrapData();
         }
@@ -43,6 +44,7 @@ export default function AppStoreInitializer({ children }: AppStoreInitializerPro
         // User is not signed in
         if (isInitialized) {
           // Clear store only if it was previously initialized
+          // eslint-disable-next-line no-console
           console.log(
             'AppStoreInitializer: User signed out or auth context issue, clearing store.'
           );
