@@ -7,23 +7,18 @@ import React, { useState, useEffect } from 'react';
 
 import { Badge } from '@/components/shared/ui/badge';
 import { Button } from '@/components/shared/ui/button';
+import { Form as DbForm } from '@/lib/db/schema';
 import { getFormsUrl, getFormEditorUrl } from '@/lib/urls/workspace-urls';
-
 
 // Enhanced components for forms functionality
 
-// Define a type for the form object
-interface Form {
-  id: string;
-  title: string;
-  description?: string | null;
-  isPublished: boolean;
-  createdAt: string; // ISO string
-  updatedAt: string; // ISO string
+// Define a type for the form object with API-specific fields
+interface Form extends Omit<DbForm, 'createdAt' | 'updatedAt'> {
+  createdAt: string; // ISO string from API
+  updatedAt: string; // ISO string from API
   workspaceSlug: string; // Added client-side during fetch processing
   creatorName: string; // From API
   responseCount: number; // From API
-  isConversational: boolean; // From API
 }
 
 interface PaginationData {
@@ -70,10 +65,18 @@ export function FormsList({
         setError(null);
 
         let apiUrl = `/api/forms?workspaceId=${workspaceId}&page=${currentPage}&limit=${ITEMS_PER_PAGE}`;
-        if (searchTerm) {apiUrl += `&searchTerm=${encodeURIComponent(searchTerm)}`;}
-        if (statusFilter && statusFilter !== 'all') {apiUrl += `&status=${statusFilter}`;}
-        if (createdByFilter) {apiUrl += `&createdBy=${encodeURIComponent(createdByFilter)}`;}
-        if (createdAtFilter) {apiUrl += `&createdAt=${createdAtFilter}`;}
+        if (searchTerm) {
+          apiUrl += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+        }
+        if (statusFilter && statusFilter !== 'all') {
+          apiUrl += `&status=${statusFilter}`;
+        }
+        if (createdByFilter) {
+          apiUrl += `&createdBy=${encodeURIComponent(createdByFilter)}`;
+        }
+        if (createdAtFilter) {
+          apiUrl += `&createdAt=${createdAtFilter}`;
+        }
 
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -82,7 +85,7 @@ export function FormsList({
         }
         const data = await response.json();
         const apiForms = data.forms || [];
-        const processedForms = apiForms.map((formItem: any) => ({
+        const processedForms = apiForms.map((formItem: Form) => ({
           ...formItem,
           workspaceSlug: workspaceSlug, // Add workspaceSlug for client-side navigation
         }));
@@ -309,7 +312,7 @@ export function FormsList({
     </>
   );
 }
-export function CreateFormButton({ workspace }: { workspace: any }) {
+export function CreateFormButton({ workspace }: { workspace: { slug: string } }) {
   return (
     <Link href={`${getFormsUrl(workspace.slug)}/new`}>
       <Button className='bg-blue-600 text-white hover:bg-blue-700'>
@@ -321,7 +324,7 @@ export function CreateFormButton({ workspace }: { workspace: any }) {
 }
 
 export interface FormsHeaderProps {
-  workspace: any; // Keeping workspace for now, can be refined if not needed
+  workspace: { slug: string };
   searchTerm: string;
   onSearchTermChange: (term: string) => void;
   statusFilter: string;
@@ -381,7 +384,13 @@ export function FormsHeader({
   );
 }
 
-export function FormEditor({ form: _form, workspace: _workspace }: { form: any; workspace: any }) {
+export function FormEditor({
+  form: _form,
+  workspace: _workspace,
+}: {
+  form: DbForm;
+  workspace: { slug: string };
+}) {
   return (
     <div className='h-full bg-gray-50 flex items-center justify-center'>
       <div className='text-center'>
@@ -392,7 +401,13 @@ export function FormEditor({ form: _form, workspace: _workspace }: { form: any; 
   );
 }
 
-export function FormHeader({ form, workspace: _workspace }: { form: any; workspace: any }) {
+export function FormHeader({
+  form,
+  workspace: _workspace,
+}: {
+  form: DbForm;
+  workspace: { slug: string };
+}) {
   return (
     <div className='bg-white border-b border-gray-200 px-6 py-4'>
       <div className='flex items-center justify-between'>
@@ -413,7 +428,7 @@ export function FormHeader({ form, workspace: _workspace }: { form: any; workspa
   );
 }
 
-export function PublicFormRenderer({ form, isPreview }: { form: any; isPreview: boolean }) {
+export function PublicFormRenderer({ form, isPreview }: { form: DbForm; isPreview: boolean }) {
   return (
     <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
       <div className='bg-white rounded-lg shadow-md p-8 max-w-md w-full'>
@@ -437,7 +452,7 @@ export function FormSubmissionWrapper({
   isPreview: _isPreview,
   children,
 }: {
-  form: any;
+  form: DbForm;
   isPreview: boolean;
   children: React.ReactNode;
 }) {

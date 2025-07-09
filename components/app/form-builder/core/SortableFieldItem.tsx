@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion } from 'framer-motion';
 import { GripVertical, Trash2, Copy, Settings, AlertCircle } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { Button } from '@/components/shared/ui/button';
 import { Input } from '@/components/shared/ui/input';
@@ -12,7 +12,7 @@ import { Textarea } from '@/components/shared/ui/textarea';
 import { getFieldDefinition } from '@/lib/form-builder/field-registry';
 import { FieldConfig, DragItem } from '@/lib/form-builder/types';
 
-import DependencyIndicator from '../conditional/DependencyIndicator';
+import { DependencyIndicator } from '../conditional/DependencyIndicator';
 
 interface SortableFieldItemProps {
   field: FieldConfig;

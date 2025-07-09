@@ -23,7 +23,9 @@ interface FieldDependency {
 export function DependencyIndicator({ field, allFields, className }: DependencyIndicatorProps) {
   // Get fields this field depends on
   const dependencies: FieldDependency[] = useMemo(() => {
-    if (!field.conditional?.conditions) {return [];}
+    if (!field.conditional?.conditions) {
+      return [];
+    }
 
     return field.conditional.conditions
       .map(condition => {
@@ -60,7 +62,9 @@ export function DependencyIndicator({ field, allFields, className }: DependencyI
   }
 
   const getConditionalSummary = () => {
-    if (!field.conditional) {return '';}
+    if (!field.conditional) {
+      return '';
+    }
 
     const { show, logic, conditions } = field.conditional;
     const action = show ? 'shown' : 'hidden';
@@ -135,5 +139,3 @@ export function DependencyIndicator({ field, allFields, className }: DependencyI
     </TooltipProvider>
   );
 }
-
-export default DependencyIndicator;

@@ -130,7 +130,9 @@ function ConditionRow({
   };
 
   const getAvailableOperators = () => {
-    if (!selectedField) {return Object.values(CONDITIONAL_OPERATORS);}
+    if (!selectedField) {
+      return Object.values(CONDITIONAL_OPERATORS);
+    }
 
     switch (selectedField.type) {
       case 'number':
@@ -201,7 +203,12 @@ function ConditionRow({
 
       <Select
         value={condition.operator}
-        onValueChange={operator => onUpdate({ ...condition, operator: operator as ConditionalLogic['conditions'][0]['operator'] })}
+        onValueChange={operator =>
+          onUpdate({
+            ...condition,
+            operator: operator as ConditionalLogic['conditions'][0]['operator'],
+          })
+        }
       >
         <SelectTrigger className='w-40'>
           <SelectValue placeholder='Operator...' />
@@ -242,17 +249,25 @@ export function ConditionalLogicBuilder({
   // Get fields that can be referenced (excluding self and to prevent circular deps)
   const availableFields = useMemo(() => {
     return allFields.filter(f => {
-      if (f.id === field.id) {return false;}
-      if (f.order >= field.order) {return false;} // Only allow references to fields above
+      if (f.id === field.id) {
+        return false;
+      }
+      if (f.order >= field.order) {
+        return false;
+      } // Only allow references to fields above
       return true;
     });
   }, [allFields, field.id, field.order]);
 
-  const conditional = useMemo(() => field.conditional || {
-    show: true,
-    conditions: [],
-    logic: 'and' as const,
-  }, [field.conditional]);
+  const conditional = useMemo(
+    () =>
+      field.conditional || {
+        show: true,
+        conditions: [],
+        logic: 'and' as const,
+      },
+    [field.conditional]
+  );
 
   const handleToggleEnabled = useCallback(
     (enabled: boolean) => {
@@ -278,7 +293,9 @@ export function ConditionalLogicBuilder({
   );
 
   const handleAddCondition = useCallback(() => {
-    if (availableFields.length === 0) {return;}
+    if (availableFields.length === 0) {
+      return;
+    }
 
     const newCondition = {
       fieldId: '',
@@ -463,5 +480,3 @@ export function ConditionalLogicBuilder({
     </Card>
   );
 }
-
-export default ConditionalLogicBuilder;

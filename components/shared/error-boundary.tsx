@@ -1,7 +1,16 @@
 'use client';
 
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import React from 'react';
+import React, {
+  Component,
+  ErrorInfo,
+  ReactNode,
+  ComponentType,
+  FC,
+  useCallback,
+  useState,
+  useEffect,
+} from 'react';
 
 import { Button } from '@/components/shared/ui/button';
 import {
@@ -15,13 +24,13 @@ import {
 interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
-  errorInfo?: React.ErrorInfo;
+  errorInfo?: ErrorInfo;
 }
 
 interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType<ErrorFallbackProps>;
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  children: ReactNode;
+  fallback?: ComponentType<ErrorFallbackProps>;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 interface ErrorFallbackProps {
@@ -32,7 +41,7 @@ interface ErrorFallbackProps {
 /**
  * Default error fallback component
  */
-const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
+const DefaultErrorFallback: FC<ErrorFallbackProps> = ({ error, resetError }) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   return (
@@ -75,7 +84,7 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError 
 /**
  * Error boundary component for catching React errors
  */
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -88,7 +97,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
 
     // Call the onError callback if provided
@@ -124,19 +133,19 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
  * Hook for error boundary functionality in functional components
  */
 export const useErrorHandler = () => {
-  const [error, setError] = React.useState<Error | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
-  const resetError = React.useCallback(() => {
+  const resetError = useCallback(() => {
     setError(null);
   }, []);
 
-  const captureError = React.useCallback((error: Error) => {
+  const captureError = useCallback((error: Error) => {
     console.error('Error captured:', error);
     setError(error);
   }, []);
 
   // Throw the error to be caught by error boundary
-  React.useEffect(() => {
+  useEffect(() => {
     if (error) {
       throw error;
     }
@@ -148,9 +157,9 @@ export const useErrorHandler = () => {
 /**
  * Wrapper component for easier use
  */
-export const WithErrorBoundary: React.FC<{
-  children: React.ReactNode;
-  fallback?: React.ComponentType<ErrorFallbackProps>;
+export const WithErrorBoundary: FC<{
+  children: ReactNode;
+  fallback?: ComponentType<ErrorFallbackProps>;
 }> = ({ children, fallback }) => {
   return <ErrorBoundary fallback={fallback}>{children}</ErrorBoundary>;
 };
@@ -158,7 +167,7 @@ export const WithErrorBoundary: React.FC<{
 /**
  * Page-level error boundary for route errors
  */
-export const PageErrorBoundary: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
+export const PageErrorBoundary: FC<ErrorFallbackProps> = ({ error, resetError }) => {
   return (
     <div className='min-h-screen flex items-center justify-center bg-gray-50 p-4'>
       <Card className='w-full max-w-lg'>

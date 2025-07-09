@@ -1,14 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Settings,
-  Plus,
-  Trash2,
-  Info,
-  Zap,
-} from 'lucide-react';
-import React, { useState, useCallback } from 'react';
+import { Settings, Plus, Trash2, Info, Zap } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,9 +21,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { getFieldDefinition } from '@/lib/form-builder/field-registry';
 import { FormConfig, FieldConfig, ValidationRule } from '@/lib/form-builder/types';
 
-import ConditionalLogicBuilder from '../conditional/ConditionalLogicBuilder';
-import DependencyIndicator from '../conditional/DependencyIndicator';
-
+import { ConditionalLogicBuilder } from '../conditional/ConditionalLogicBuilder';
+import { DependencyIndicator } from '../conditional/DependencyIndicator';
 
 interface PropertiesPanelProps {
   config: FormConfig;
@@ -214,7 +207,6 @@ export function PropertiesPanel({
     },
     [selectedField, onUpdateField]
   );
-
 
   const renderFieldProperties = () => {
     if (!selectedField) {
@@ -404,12 +396,24 @@ export function PropertiesPanel({
                 <div className='space-y-2'>
                   <Label>Options</Label>
                   <div className='space-y-2'>
-                    {((selectedField as FieldConfig & { options?: { label: string; value: string }[] }).options || []).map((option, index: number) => (
+                    {(
+                      (
+                        selectedField as FieldConfig & {
+                          options?: { label: string; value: string }[];
+                        }
+                      ).options || []
+                    ).map((option, index: number) => (
                       <div key={index} className='flex items-center space-x-2'>
                         <Input
                           value={option.label}
                           onChange={e => {
-                            const newOptions = [...((selectedField as FieldConfig & { options?: { label: string; value: string }[] }).options || [])];
+                            const newOptions = [
+                              ...((
+                                selectedField as FieldConfig & {
+                                  options?: { label: string; value: string }[];
+                                }
+                              ).options || []),
+                            ];
                             newOptions[index] = {
                               ...option,
                               label: e.target.value,
@@ -424,9 +428,13 @@ export function PropertiesPanel({
                           variant='ghost'
                           size='sm'
                           onClick={() => {
-                            const newOptions = ((selectedField as FieldConfig & { options?: { label: string; value: string }[] }).options || []).filter(
-                              (_, i: number) => i !== index
-                            );
+                            const newOptions = (
+                              (
+                                selectedField as FieldConfig & {
+                                  options?: { label: string; value: string }[];
+                                }
+                              ).options || []
+                            ).filter((_, i: number) => i !== index);
                             handleFieldUpdate({ options: newOptions });
                           }}
                           className='px-2'

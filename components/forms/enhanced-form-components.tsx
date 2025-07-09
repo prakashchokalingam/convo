@@ -23,11 +23,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/shared/ui/dropdown-menu';
-
+import { Form } from '@/lib/db/schema';
+import { FieldConfig } from '@/lib/form-builder/types';
 
 interface FormHeaderProps {
-  form: any;
-  workspace: any;
+  form: Form;
+  workspace: { id: string; slug: string };
   mode?: string;
 }
 
@@ -111,8 +112,8 @@ export function FormHeader({ form, workspace: _workspace, mode }: FormHeaderProp
 }
 
 interface EnhancedFormEditorProps {
-  form: any;
-  workspace: any;
+  form: Form;
+  workspace: { id: string; slug: string };
   mode?: string;
   templateId?: string;
 }
@@ -122,7 +123,7 @@ export function EnhancedFormEditor({ form, workspace, mode, templateId }: Enhanc
   const [isLoading, setIsLoading] = useState(false);
   const isTemplateMode = mode === 'template';
 
-  const handleTemplateSelect = async (_template: any) => {
+  const handleTemplateSelect = async (_template: Record<string, unknown>) => {
     setIsLoading(true);
     // Here you would apply the template to the current form
     // For now, we'll just close the selector
@@ -187,7 +188,7 @@ export function EnhancedFormEditor({ form, workspace, mode, templateId }: Enhanc
   );
 
   const renderFormStructure = () => {
-    let config;
+    let config: { fields: FieldConfig[] };
     try {
       config = typeof form.config === 'string' ? JSON.parse(form.config) : form.config;
     } catch {
@@ -211,7 +212,7 @@ export function EnhancedFormEditor({ form, workspace, mode, templateId }: Enhanc
           </div>
 
           <div className='space-y-3'>
-            {config.fields.map((field: any, index: number) => (
+            {config.fields.map((field: FieldConfig, index: number) => (
               <div
                 key={field.id || index}
                 className='border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors'
