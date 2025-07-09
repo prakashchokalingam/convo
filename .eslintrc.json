@@ -15,11 +15,25 @@
       "jsx": true
     }
   },
-  "plugins": ["@typescript-eslint", "jsx-a11y", "import"],
+  "plugins": ["@typescript-eslint", "jsx-a11y", "import", "unused-imports"],
   "rules": {
+    // AGGRESSIVE: Unused imports and variables (NO MERCY)
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_",
+        "caughtErrors": "all",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+
     // TypeScript specific rules
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": "off", // Replaced by unused-imports
+    "@typescript-eslint/no-explicit-any": "error", // AGGRESSIVE: No any allowed
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-non-null-assertion": "warn",
@@ -44,7 +58,7 @@
     "jsx-a11y/role-has-required-aria-props": "error",
     "jsx-a11y/role-supports-aria-props": "error",
 
-    // Import rules
+    // AGGRESSIVE: Import rules (NO MERCY)
     "import/order": [
       "error",
       {
@@ -58,7 +72,9 @@
     ],
     "import/no-unresolved": "off", // Handled by TypeScript
     "import/no-duplicates": "error",
-    "import/no-unused-modules": "warn",
+    "import/no-unused-modules": "error", // AGGRESSIVE: Block unused modules
+    "import/no-anonymous-default-export": "error",
+    "import/no-default-export": "error", // AGGRESSIVE: Prefer named exports
 
     // General code quality rules
     "no-console": ["warn", { "allow": ["warn", "error"] }],
@@ -97,6 +113,30 @@
       },
       "rules": {
         "@typescript-eslint/no-explicit-any": "off"
+      }
+    },
+    {
+      "files": [
+        "app/**/page.tsx",
+        "app/**/layout.tsx", 
+        "app/**/loading.tsx",
+        "app/**/error.tsx",
+        "app/**/not-found.tsx",
+        "app/manifest.ts",
+        "app/robots.ts",
+        "app/sitemap.ts",
+        "pages/**/*.tsx",
+        "pages/**/*.ts",
+        "next.config.js",
+        "tailwind.config.*",
+        "playwright.config.*",
+        "vitest.config.*",
+        "drizzle.config.ts",
+        "middleware.ts"
+      ],
+      "rules": {
+        "import/no-default-export": "off", // Next.js requires default exports for pages
+        "import/no-anonymous-default-export": "off"
       }
     }
   ]

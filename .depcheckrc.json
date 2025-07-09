@@ -1,0 +1,65 @@
+{
+  "ignoreMatches": [
+    "@types/*",
+    "typescript",
+    "next",
+    "react",
+    "react-dom",
+    "tailwindcss",
+    "postcss",
+    "autoprefixer",
+    "eslint*",
+    "prettier",
+    "husky",
+    "lint-staged",
+    "@testing-library/*",
+    "@playwright/test",
+    "vitest",
+    "jsdom",
+    "@vitejs/*",
+    "@vitest/*",
+    "drizzle-kit",
+    "tsx",
+    "dotenv-cli",
+    "concurrently",
+    "glob"
+  ],
+  "ignorePatterns": [
+    "dist",
+    "build", 
+    ".next",
+    "node_modules",
+    "coverage",
+    "*.test.*",
+    "*.spec.*",
+    "__tests__"
+  ],
+  "ignoreDirs": [
+    ".next",
+    "dist",
+    "build",
+    "coverage",
+    "node_modules"
+  ],
+  "skipMissing": false,
+  "parsers": {
+    "*.js": "es6",
+    "*.jsx": "jsx",
+    "*.ts": "typescript",
+    "*.tsx": "jsx"
+  },
+  "detectors": [
+    "requireCallExpression",
+    "importDeclaration",
+    "importCallExpression",
+    "exportDeclaration"
+  ],
+  "specials": [
+    "eslint",
+    "prettier",
+    "husky",
+    "lint-staged",
+    "playwright",
+    "vitest"
+  ]
+}

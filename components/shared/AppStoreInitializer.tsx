@@ -9,7 +9,7 @@ interface AppStoreInitializerProps {
   children: ReactNode;
 }
 
-export default function AppStoreInitializer({ children }: AppStoreInitializerProps) {
+export function AppStoreInitializer({ children }: AppStoreInitializerProps) {
   const { loadBootstrapData, isInitialized, isLoading, clearStore } = useAppStore();
 
   let isSignedIn = false;

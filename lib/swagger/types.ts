@@ -1,5 +1,13 @@
 import type { OpenAPIV3 } from 'openapi-types';
 
+type JSONValue =
+    | string
+    | number
+    | boolean
+    | null
+    | JSONValue[]
+    | { [key: string]: JSONValue };
+
 /**
  * Common TypeScript types for the Swagger documentation system
  */
@@ -53,7 +61,7 @@ export interface Workspace {
   ownerId: string;
   description?: string;
   avatarUrl?: string;
-  settings: Record<string, any>;
+  settings: Record<string, JSONValue>;
   createdAt: string;
   updatedAt: string;
 }
@@ -136,7 +144,7 @@ export interface FormResponse {
   id: string;
   formId: string;
   userId?: string;
-  responses: Record<string, any>;
+  responses: Record<string, JSONValue>;
   metadata: ResponseMetadata;
   createdAt: string;
   updatedAt: string;
@@ -191,14 +199,14 @@ export interface UsageMetrics {
 /**
  * API Response wrappers
  */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = JSONValue> {
   success: boolean;
   data?: T;
   message?: string;
   errors?: ApiError[];
 }
 
-export interface PaginatedResponse<T = any> extends ApiResponse<T[]> {
+export interface PaginatedResponse<T = JSONValue> extends ApiResponse<T[]> {
   pagination: PaginationMeta;
 }
 
@@ -215,7 +223,7 @@ export interface ApiError {
   code: string;
   message: string;
   field?: string;
-  details?: Record<string, any>;
+  details?: Record<string, JSONValue>;
 }
 
 /**
@@ -231,7 +239,7 @@ export interface CreateWorkspaceRequest {
 export interface UpdateWorkspaceRequest {
   name?: string;
   description?: string;
-  settings?: Record<string, any>;
+  settings?: Record<string, JSONValue>;
 }
 
 export interface CreateFormRequest {

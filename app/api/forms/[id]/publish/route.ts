@@ -27,7 +27,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
           { status: 400 }
         );
       }
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
@@ -74,8 +74,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       { success: true, message: 'Form publish status updated successfully.' },
       { status: 200 }
     );
-  } catch (error) {
-    console.error('Error updating form publish status:', error);
+  } catch (_error) {
+    console.error('Error updating form publish status:', _error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

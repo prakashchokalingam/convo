@@ -62,7 +62,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null, // Will be populated with Zod schemas
-    component: null as any, // Will be populated with React components
+    component: null, // Will be populated with React components
   },
 
   email: {
@@ -77,7 +77,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   number: {
@@ -92,7 +92,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   textarea: {
@@ -107,7 +107,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   select: {
@@ -122,7 +122,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   multiselect: {
@@ -137,7 +137,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   radio: {
@@ -152,7 +152,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   checkbox: {
@@ -167,7 +167,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   switch: {
@@ -182,7 +182,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   date: {
@@ -197,7 +197,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   datetime: {
@@ -212,7 +212,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   country: {
@@ -227,7 +227,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   phone: {
@@ -242,7 +242,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   file: {
@@ -257,7 +257,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   signature: {
@@ -272,7 +272,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   rating: {
@@ -287,7 +287,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   section: {
@@ -302,7 +302,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   divider: {
@@ -317,7 +317,7 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
       order: 0,
     },
     propertiesSchema: null,
-    component: null as any,
+    component: null,
   },
 
   // Temporarily disabled - will be added back with table experience

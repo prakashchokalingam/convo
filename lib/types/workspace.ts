@@ -9,7 +9,7 @@ export interface WorkspaceWithRole {
   ownerId: string;
   description: string | null;
   avatarUrl: string | null;
-  settings: any;
+  settings: Record<string, unknown>;
   role: 'owner' | 'admin' | 'member' | 'viewer';
   memberCount?: number;
   createdAt: Date;

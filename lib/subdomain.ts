@@ -103,7 +103,7 @@ export async function getSubdomainContext(): Promise<SubdomainContext> {
       }
       return 'marketing'; // Default for localhost:3002/ or if path undetermined
     }
-  } catch (error) {
+  } catch (_error) {
     // Fallback if headers are not available
     return 'marketing';
   }

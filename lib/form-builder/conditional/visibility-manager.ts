@@ -3,7 +3,7 @@
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
 
-import { FieldConfig } from '../types';
+import { FieldConfig, FieldValue } from '../types';
 
 import { DependencyManager } from './dependency-manager';
 import { ConditionalEvaluator, EvaluationResult } from './evaluator';
@@ -19,7 +19,7 @@ export interface VisibilityManagerState {
 }
 
 export interface VisibilityManagerActions {
-  updateFieldValue: (fieldId: string, value: any) => void;
+  updateFieldValue: (fieldId: string, value: FieldValue) => void;
   updateFieldVisibility: (fieldId: string, visible: boolean) => void;
   refreshVisibility: () => void;
   resetVisibility: () => void;
@@ -31,7 +31,7 @@ export interface VisibilityManagerActions {
 
 export interface UseVisibilityManagerOptions {
   fields: FieldConfig[];
-  initialValues?: Record<string, any>;
+  initialValues?: Record<string, FieldValue>;
   onVisibilityChange?: (visibility: VisibilityState) => void;
   enableDebugMode?: boolean;
 }
@@ -43,7 +43,9 @@ export function useVisibilityManager({
   enableDebugMode = false,
 }: UseVisibilityManagerOptions): [VisibilityManagerState, VisibilityManagerActions] {
   // Field values state
-  const [fieldValues, setFieldValues] = useState<Record<string, any>>(initialValues);
+  const [fieldValues, setFieldValues] = useState<Record<string, FieldValue>>(
+    initialValues
+  );
 
   // Visibility state
   const [state, setState] = useState<VisibilityManagerState>(() => {
@@ -79,6 +81,7 @@ export function useVisibilityManager({
   // Evaluate visibility for all fields
   const evaluateVisibility = useCallback(() => {
     if (enableDebugMode) {
+      // eslint-disable-next-line no-console
       console.log('Evaluating visibility with values:', fieldValues);
     }
 
@@ -96,6 +99,7 @@ export function useVisibilityManager({
       newVisibility[fieldId] = result.visible;
 
       if (enableDebugMode) {
+        // eslint-disable-next-line no-console
         console.log(`Field ${fieldId} visibility:`, result);
       }
     }
@@ -132,11 +136,12 @@ export function useVisibilityManager({
 
   // Update field value and trigger visibility re-evaluation
   const updateFieldValue = useCallback(
-    (fieldId: string, value: any) => {
+    (fieldId: string, value: FieldValue) => {
       setFieldValues(prev => {
         const newValues = { ...prev, [fieldId]: value };
 
         if (enableDebugMode) {
+          // eslint-disable-next-line no-console
           console.log(`Field ${fieldId} value updated:`, value);
         }
 
@@ -213,7 +218,7 @@ export function useVisibilityManager({
   // Re-evaluate visibility when field values change
   useEffect(() => {
     evaluateVisibility();
-  }, [fieldValues, fields]);
+  }, [evaluateVisibility]);
 
   // Actions object
   const actions: VisibilityManagerActions = useMemo(
@@ -245,9 +250,9 @@ export function useVisibilityManager({
 // Utility hook for managing form values with conditional fields
 export function useConditionalFormValues(
   fields: FieldConfig[],
-  initialValues: Record<string, any> = {}
+  initialValues: Record<string, FieldValue> = {}
 ) {
-  const [values, setValues] = useState<Record<string, any>>(initialValues);
+  const [values, setValues] = useState<Record<string, FieldValue>>(initialValues);
   const [visibilityState, visibilityActions] = useVisibilityManager({
     fields,
     initialValues,
@@ -266,7 +271,7 @@ export function useConditionalFormValues(
   });
 
   const updateValue = useCallback(
-    (fieldId: string, value: any) => {
+    (fieldId: string, value: FieldValue) => {
       setValues(prev => ({ ...prev, [fieldId]: value }));
       visibilityActions.updateFieldValue(fieldId, value);
     },
@@ -282,7 +287,7 @@ export function useConditionalFormValues(
 
   const getVisibleValues = useCallback(() => {
     const visibleFields = visibilityActions.getVisibleFields();
-    const visibleValues: Record<string, any> = {};
+    const visibleValues: Record<string, FieldValue> = {};
 
     visibleFields.forEach(field => {
       if (values.hasOwnProperty(field.id)) {
@@ -304,4 +309,4 @@ export function useConditionalFormValues(
   };
 }
 
-export default useVisibilityManager;
+

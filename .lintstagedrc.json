@@ -1,5 +1,19 @@
 {
-  "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
-  "*.{css,scss,sass}": ["stylelint --fix", "prettier --write"],
-  "*.{json,md,yaml,yml}": ["prettier --write"]
+  "*.{js,jsx,ts,tsx}": [
+    "eslint --fix --max-warnings=0",
+    "prettier --write"
+  ],
+  "*.{css,scss,sass}": [
+    "stylelint --fix --max-warnings=0",
+    "prettier --write"
+  ],
+  "*.{json,md,yaml,yml}": [
+    "prettier --write"
+  ],
+  "package.json": [
+    "depcheck --config=.depcheckrc.json"
+  ],
+  "tsconfig.json": [
+    "ts-prune --error --ignore 'app/manifest.ts|app/robots.ts|app/sitemap.ts|middleware.ts|*.config.ts|*.config.js'"
+  ]
 }

@@ -11,6 +11,14 @@ export interface Permission {
   action: string;
 }
 
+type JSONValue =
+    | string
+    | number
+    | boolean
+    | null
+    | JSONValue[]
+    | { [key: string]: JSONValue };
+
 // Define role permissions (hardcoded for MVP)
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   owner: [
@@ -119,7 +127,7 @@ export async function logWorkspaceActivity(
   action: string,
   resource: string,
   resourceId?: string,
-  metadata?: Record<string, any>,
+  metadata?: Record<string, JSONValue>,
   request?: Request
 ) {
   const now = new Date();
@@ -168,7 +176,7 @@ export const ActivityLogger = {
     workspaceId: string,
     userId: string,
     formId: string,
-    changes: Record<string, any>,
+    changes: Record<string, JSONValue>,
     request?: Request
   ) => {
     await logWorkspaceActivity(
@@ -274,7 +282,7 @@ export const ActivityLogger = {
   workspaceUpdated: async (
     workspaceId: string,
     userId: string,
-    changes: Record<string, any>,
+    changes: Record<string, JSONValue>,
     request?: Request
   ) => {
     await logWorkspaceActivity(

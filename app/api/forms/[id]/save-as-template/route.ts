@@ -154,7 +154,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     let formSchema;
     try {
       formSchema = JSON.parse(formData.config);
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.json(
         {
           error: 'Invalid form configuration format',
@@ -192,8 +192,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       },
       { status: 201 }
     );
-  } catch (error) {
-    console.error('Error saving form as template:', error);
+  } catch (_error) {
+    console.error('Error saving form as template:', _error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

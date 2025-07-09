@@ -1,9 +1,35 @@
 // Slack notification utilities
 
+export interface SlackBlock {
+  type: string;
+  text?: {
+    type: string;
+    text: string;
+    emoji?: boolean;
+  };
+  accessory?: {
+    type: string;
+    image_url: string;
+    alt_text: string;
+  };
+  fields?: {
+    type: string;
+    text: string;
+  }[];
+}
+
+type JSONValue =
+    | string
+    | number
+    | boolean
+    | null
+    | JSONValue[]
+    | { [key: string]: JSONValue };
+
 // Define the structure of the Slack message payload
 interface SlackPayload {
   text: string;
-  blocks?: any[]; // Slack supports rich formatting with blocks
+  blocks?: SlackBlock[]; // Slack supports rich formatting with blocks
 }
 
 /**
@@ -15,11 +41,12 @@ interface SlackPayload {
  */
 export async function sendSlackNotification(
   message: string,
-  _details?: Record<string, any> // For potential future structured messages
+  _details?: Record<string, JSONValue> // For potential future structured messages
 ): Promise<boolean> {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
 
   if (!webhookUrl) {
+    // eslint-disable-next-line no-console
     console.warn('SLACK_WEBHOOK_URL is not configured. Skipping Slack notification.');
     return false;
   }
@@ -56,15 +83,18 @@ export async function sendSlackNotification(
 
     if (!response.ok) {
       const responseBody = await response.text();
+      // eslint-disable-next-line no-console
       console.error(`Error sending Slack notification: ${response.status} ${response.statusText}`, {
         responseBody,
       });
       return false;
     }
 
+    // eslint-disable-next-line no-console
     console.log('✅ Slack notification sent successfully.');
     return true;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('❌ Failed to send Slack notification:', error);
     return false;
   }

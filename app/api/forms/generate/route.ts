@@ -81,7 +81,7 @@ Examples:
     let metadata;
     try {
       metadata = JSON.parse(metadataText);
-    } catch (error) {
+    } catch (_error) {
       // Fallback if JSON parsing fails
       metadata = {
         name: 'AI Generated Form',
@@ -138,8 +138,8 @@ Create a form configuration for: ${prompt}`;
       // Clean the response to extract JSON if it's wrapped in code blocks
       const cleanedText = configText.replace(/```json\n?|\n?```/g, '').trim();
       config = JSON.parse(cleanedText);
-    } catch (error) {
-      console.error('Error parsing form configuration:', error);
+    } catch (_error) {
+      console.error('Error parsing form configuration:', _error);
       return NextResponse.json({ error: 'Invalid form configuration generated' }, { status: 500 });
     }
 
@@ -164,8 +164,8 @@ Create a form configuration for: ${prompt}`;
       .returning();
 
     return NextResponse.json({ formId: newForm.id, title: newForm.title }, { status: 201 });
-  } catch (error) {
-    console.error('Error generating form:', error);
+  } catch (_error) {
+    console.error('Error generating form:', _error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

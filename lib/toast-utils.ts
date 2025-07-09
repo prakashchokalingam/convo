@@ -41,7 +41,7 @@ export const showInfo = (message: string, title?: string) => {
 /**
  * Handle API response errors with appropriate toast messages
  */
-export const handleApiError = (error: any, defaultMessage?: string) => {
+export const handleApiError = (error: unknown, defaultMessage?: string) => {
   let message = defaultMessage || 'Something went wrong. Please try again.';
 
   if (typeof error === 'string') {
@@ -117,7 +117,7 @@ export const formToasts = {
 /**
  * Network error handler
  */
-export const handleNetworkError = (error: any) => {
+export const handleNetworkError = (error: unknown) => {
   if (!navigator.onLine) {
     return showError('You appear to be offline. Please check your connection.');
   }

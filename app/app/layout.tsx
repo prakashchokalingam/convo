@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 
-import AppStoreInitializer from '@/components/shared/AppStoreInitializer';
+import { AppStoreInitializer } from '@/components/shared/AppStoreInitializer';
 
 /**
  * App Layout

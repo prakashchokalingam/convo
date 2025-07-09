@@ -476,4 +476,4 @@ export class DependencyManager {
   }
 }
 
-export default DependencyManager;
+

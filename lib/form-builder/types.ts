@@ -351,7 +351,7 @@ export interface FieldDefinition {
   category: 'basic' | 'advanced' | 'layout';
   defaultConfig: Partial<FieldConfig>;
   propertiesSchema: unknown; // Zod schema for properties validation
-  component: React.ComponentType<unknown>;
+  component: React.ComponentType<unknown> | null;
 }
 
 export interface FieldRegistry {
