@@ -251,7 +251,9 @@ export class DependencyManager {
 
       visited.add(nodeId);
       const node = this.graph.nodes.get(nodeId);
-      if (!node) {return 0;}
+      if (!node) {
+        return 0;
+      }
 
       let maxDepLevel = 0;
       node.dependencies.forEach(depId => {
@@ -350,10 +352,16 @@ export class DependencyManager {
     const availableFields: FieldConfig[] = [];
 
     this.fields.forEach((field, id) => {
-      if (id === fieldId) {return;} // Can't reference self
+      if (id === fieldId) {
+        return;
+      } // Can't reference self
 
       // Check if adding this reference would create a circular dependency
-      const tempField = { ...this.fields.get(fieldId)! };
+      const currentField = this.fields.get(fieldId);
+      if (!currentField) {
+        return;
+      }
+      const tempField = { ...currentField };
       if (!tempField.conditional) {
         tempField.conditional = {
           show: true,
@@ -391,7 +399,9 @@ export class DependencyManager {
    */
   getDependentFields(fieldId: string): FieldConfig[] {
     const node = this.graph.nodes.get(fieldId);
-    if (!node) {return [];}
+    if (!node) {
+      return [];
+    }
 
     return node.dependents
       .map(id => this.fields.get(id))
@@ -403,7 +413,9 @@ export class DependencyManager {
    */
   getDependencyFields(fieldId: string): FieldConfig[] {
     const node = this.graph.nodes.get(fieldId);
-    if (!node) {return [];}
+    if (!node) {
+      return [];
+    }
 
     return node.dependencies
       .map(id => this.fields.get(id))

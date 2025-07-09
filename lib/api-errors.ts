@@ -8,21 +8,26 @@ export interface ApiErrorResponse {
   success: false;
   error: string;
   code?: string;
-  details?: any;
+  details?:
+    | Record<string, unknown>
+    | Array<{ field: string; message: string }>
+    | string[]
+    | string
+    | null;
   timestamp: string;
 }
 
 /**
  * Standard API success response format
  */
-export interface ApiSuccessResponse<T = any> {
+export interface ApiSuccessResponse<T = unknown> {
   success: true;
   data?: T;
   message?: string;
   timestamp: string;
 }
 
-export type ApiResponse<T = any> = ApiSuccessResponse<T> | ApiErrorResponse;
+export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
 
 /**
  * Error codes for consistent error handling
@@ -67,7 +72,12 @@ export function createErrorResponse(
   message: string,
   status: number = 500,
   code?: ErrorCode,
-  details?: any
+  details?:
+    | Record<string, unknown>
+    | Array<{ field: string; message: string }>
+    | string[]
+    | string
+    | null
 ): NextResponse<ApiErrorResponse> {
   const errorResponse: ApiErrorResponse = {
     success: false,
@@ -117,7 +127,12 @@ export class ApiError extends Error {
     message: string,
     public status: number = 500,
     public code?: ErrorCode,
-    public details?: any
+    public details?:
+      | Record<string, unknown>
+      | Array<{ field: string; message: string }>
+      | string[]
+      | string
+      | null
   ) {
     super(message);
     this.name = 'ApiError';
@@ -145,7 +160,7 @@ export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
 
   // Handle database errors
   if (error && typeof error === 'object' && 'code' in error) {
-    const dbError = error as any;
+    const dbError = error as { code: string; message: string; [key: string]: unknown };
 
     // PostgreSQL error codes
     switch (dbError.code) {
@@ -186,7 +201,7 @@ export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
 /**
  * Async wrapper for API route handlers with error handling
  */
-export function withErrorHandling<T extends any[], R>(
+export function withErrorHandling<T extends unknown[], R>(
   handler: (...args: T) => Promise<NextResponse<ApiResponse<R>>>
 ) {
   return async (...args: T): Promise<NextResponse<ApiResponse<R>>> => {
@@ -237,7 +252,10 @@ export const CommonErrors = {
 /**
  * Validation helper
  */
-export function validateRequiredFields(data: Record<string, any>, requiredFields: string[]): void {
+export function validateRequiredFields(
+  data: Record<string, unknown>,
+  requiredFields: string[]
+): void {
   const missingFields = requiredFields.filter(
     field => data[field] === undefined || data[field] === null || data[field] === ''
   );

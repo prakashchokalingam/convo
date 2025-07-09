@@ -32,7 +32,7 @@ export function getContext(): Context {
   } else {
     // SERVER-SIDE: Try to get pathname from headers
     try {
-      const { headers } = require('next/headers');
+      const { headers } = await import('next/headers');
       const headersList = headers();
       pathname = headersList.get('x-pathname') || '/';
     } catch {
@@ -42,8 +42,12 @@ export function getContext(): Context {
   }
 
   // Simple path-based detection
-  if (pathname.startsWith('/app')) {return 'app';}
-  if (pathname.startsWith('/forms')) {return 'forms';}
+  if (pathname.startsWith('/app')) {
+    return 'app';
+  }
+  if (pathname.startsWith('/forms')) {
+    return 'forms';
+  }
   return 'marketing'; // Default for /marketing/* and other paths
 }
 
@@ -52,8 +56,12 @@ export function getContext(): Context {
  * Useful for middleware and server components that have access to the request
  */
 export function getContextFromPath(pathname: string): Context {
-  if (pathname.startsWith('/app')) {return 'app';}
-  if (pathname.startsWith('/forms')) {return 'forms';}
+  if (pathname.startsWith('/app')) {
+    return 'app';
+  }
+  if (pathname.startsWith('/forms')) {
+    return 'forms';
+  }
   return 'marketing';
 }
 

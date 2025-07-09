@@ -1,10 +1,13 @@
 // Conditional Logic Evaluation Engine
 // Handles evaluation of conditional logic rules and field visibility
 
-import { ConditionalLogic, FieldConfig } from '../types';
+import { ConditionalLogic, FieldConfig, FieldValue, FieldValueMap } from '../types';
+
+// Type for normalized comparison values
+export type NormalizedValue = string | number | boolean | string[] | number[];
 
 export interface EvaluationContext {
-  fieldValues: Record<string, any>;
+  fieldValues: FieldValueMap;
   fields: FieldConfig[];
 }
 
@@ -134,8 +137,8 @@ export class ConditionalEvaluator {
    * Compares two values based on the operator
    */
   private static compareValues(
-    actualValue: any,
-    expectedValue: any,
+    actualValue: FieldValue,
+    expectedValue: FieldValue,
     operator: ConditionalLogic['conditions'][0]['operator']
   ): boolean {
     // Convert values to strings for comparison if they're not numbers
@@ -151,7 +154,7 @@ export class ConditionalEvaluator {
 
       case 'contains':
         if (Array.isArray(actual)) {
-          return actual.some(item => this.normalizeValue(item) === expected);
+          return actual.some(item => this.normalizeValue(item as FieldValue) === expected);
         }
         return String(actual).toLowerCase().includes(String(expected).toLowerCase());
 
@@ -175,7 +178,7 @@ export class ConditionalEvaluator {
   /**
    * Normalizes values for comparison
    */
-  private static normalizeValue(value: any): any {
+  private static normalizeValue(value: FieldValue): NormalizedValue {
     if (value === null || value === undefined) {
       return '';
     }
@@ -188,8 +191,20 @@ export class ConditionalEvaluator {
       return value;
     }
 
+    if (value instanceof File) {
+      return value.name;
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
     if (Array.isArray(value)) {
-      return value;
+      // Convert arrays to string representations, except for File arrays
+      if (value.length > 0 && value[0] instanceof File) {
+        return value.map(f => f.name);
+      }
+      return value as string[] | number[];
     }
 
     return String(value).trim();
@@ -198,7 +213,7 @@ export class ConditionalEvaluator {
   /**
    * Checks if values can be compared numerically
    */
-  private static isNumericComparison(actual: any, expected: any): boolean {
+  private static isNumericComparison(actual: NormalizedValue, expected: NormalizedValue): boolean {
     return !isNaN(Number(actual)) && !isNaN(Number(expected));
   }
 
@@ -334,7 +349,7 @@ export class ConditionalEvaluator {
    */
   static evaluateAllFields(
     fields: FieldConfig[],
-    fieldValues: Record<string, any>
+    fieldValues: FieldValueMap
   ): Record<string, EvaluationResult> {
     const context: EvaluationContext = { fieldValues, fields };
     const results: Record<string, EvaluationResult> = {};

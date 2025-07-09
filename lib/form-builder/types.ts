@@ -1,5 +1,20 @@
 // Core Form Builder Types and Interfaces
 
+// Type for field values that can be stored and submitted
+export type FieldValue =
+  | string
+  | number
+  | boolean
+  | string[]
+  | number[]
+  | Date
+  | File
+  | File[]
+  | null
+  | undefined;
+
+export type FieldValueMap = Record<string, FieldValue>;
+
 export type FieldType =
   // Basic Fields
   | 'text'
@@ -39,7 +54,7 @@ export interface BaseFieldConfig {
 
 export interface ValidationRule {
   type: 'required' | 'min' | 'max' | 'pattern' | 'custom';
-  value?: any;
+  value?: string | number | boolean | RegExp;
   message: string;
 }
 
@@ -48,7 +63,7 @@ export interface ConditionalLogic {
   conditions: Array<{
     fieldId: string;
     operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
-    value: any;
+    value: FieldValue;
   }>;
   logic: 'and' | 'or';
 }
@@ -275,7 +290,7 @@ export interface FormConfig {
 export interface FormSubmission {
   id: string;
   formId: string;
-  data: Record<string, any>;
+  data: FieldValueMap;
   submittedAt: Date;
   submittedBy?: string;
   ipAddress?: string;
@@ -335,8 +350,8 @@ export interface FieldDefinition {
   icon: React.ComponentType<{ className?: string }>;
   category: 'basic' | 'advanced' | 'layout';
   defaultConfig: Partial<FieldConfig>;
-  propertiesSchema: any; // Zod schema for properties validation
-  component: React.ComponentType<any>;
+  propertiesSchema: unknown; // Zod schema for properties validation
+  component: React.ComponentType<unknown>;
 }
 
 export interface FieldRegistry {
@@ -359,9 +374,9 @@ export interface FormValidationOptions {
 // Renderer Types
 export interface FormRendererProps {
   config: FormConfig;
-  onSubmit: (data: Record<string, any>) => Promise<void>;
-  onDraftSave?: (data: Record<string, any>) => Promise<void>;
-  initialData?: Record<string, any>;
+  onSubmit: (data: FieldValueMap) => Promise<void>;
+  onDraftSave?: (data: FieldValueMap) => Promise<void>;
+  initialData?: FieldValueMap;
   validationOptions?: FormValidationOptions;
   className?: string;
   style?: React.CSSProperties;
@@ -369,8 +384,8 @@ export interface FormRendererProps {
 
 export interface FieldRendererProps {
   field: FieldConfig;
-  value?: any;
-  onChange: (value: any) => void;
+  value?: FieldValue;
+  onChange: (value: FieldValue) => void;
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;

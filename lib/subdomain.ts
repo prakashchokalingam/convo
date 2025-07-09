@@ -24,7 +24,7 @@ export type SubdomainContext = 'marketing' | 'app' | 'forms';
  * @returns The current context: 'marketing', 'app', or 'forms'
  */
 
-export function getSubdomainContext(): SubdomainContext {
+export async function getSubdomainContext(): Promise<SubdomainContext> {
   if (typeof window !== 'undefined') {
     // CLIENT-SIDE DETECTION (in browser)
     const hostname = window.location.hostname;
@@ -33,22 +33,30 @@ export function getSubdomainContext(): SubdomainContext {
     if (process.env.NODE_ENV === 'development') {
       // Development: Check path prefix
       // Examples: /app/..., /forms/..., /marketing/... or /
-      if (pathname.startsWith('/app')) {return 'app';}
-      if (pathname.startsWith('/forms')) {return 'forms';}
+      if (pathname.startsWith('/app')) {
+        return 'app';
+      }
+      if (pathname.startsWith('/forms')) {
+        return 'forms';
+      }
       // All other paths, including / and /marketing, map to marketing
       return 'marketing';
     } else {
       // Production: Check actual subdomain in hostname
       // Examples: app.convo.ai, forms.convo.ai
-      if (hostname.startsWith('app.')) {return 'app';}
-      if (hostname.startsWith('forms.')) {return 'forms';}
+      if (hostname.startsWith('app.')) {
+        return 'app';
+      }
+      if (hostname.startsWith('forms.')) {
+        return 'forms';
+      }
       return 'marketing'; // Default for convo.ai
     }
   }
 
   // SERVER-SIDE DETECTION (in API routes and server components)
   try {
-    const { headers } = require('next/headers'); // Keep this for middleware header
+    const { headers } = await import('next/headers'); // Keep this for middleware header
     const requestHeaders = headers(); // Get all headers
 
     // First, try to get context from middleware header (BEST WAY)
@@ -69,8 +77,12 @@ export function getSubdomainContext(): SubdomainContext {
     // For now, the primary mechanism on the server should be the 'x-subdomain-context' header set by middleware.
 
     if (process.env.NODE_ENV === 'production') {
-      if (host.startsWith('app.')) {return 'app';}
-      if (host.startsWith('forms.')) {return 'forms';}
+      if (host.startsWith('app.')) {
+        return 'app';
+      }
+      if (host.startsWith('forms.')) {
+        return 'forms';
+      }
       return 'marketing'; // Default for convo.ai
     } else {
       // Development server-side:
@@ -82,8 +94,12 @@ export function getSubdomainContext(): SubdomainContext {
       const urlHeader = requestHeaders.get('x-url'); // Next.js specific header for request URL
       if (urlHeader) {
         const pathFromServer = new URL(urlHeader).pathname;
-        if (pathFromServer.startsWith('/app')) {return 'app';}
-        if (pathFromServer.startsWith('/forms')) {return 'forms';}
+        if (pathFromServer.startsWith('/app')) {
+          return 'app';
+        }
+        if (pathFromServer.startsWith('/forms')) {
+          return 'forms';
+        }
       }
       return 'marketing'; // Default for localhost:3002/ or if path undetermined
     }
@@ -124,7 +140,9 @@ export function buildContextUrl(context: SubdomainContext, path: string): string
       // Or, if we decide marketing pages are always directly under root (e.g. /pricing, /about)
       // then it would be `${base}${normalizedPath}`.
       // Given current structure, /marketing is a path segment.
-      if (normalizedPath === '') {return `${base}/marketing`;} // Marketing root page
+      if (normalizedPath === '') {
+        return `${base}/marketing`;
+      } // Marketing root page
       return `${base}/marketing${normalizedPath}`; // Other marketing pages like /marketing/pricing
     } else if (context === 'app') {
       return `${base}/app${normalizedPath}`;
