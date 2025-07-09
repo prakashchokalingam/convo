@@ -42,6 +42,12 @@ npm run e2e:clean          # Clean E2E environment
 npm run docs:generate      # Generate API documentation
 npm run docs:watch         # Watch and regenerate docs
 npm run docs:dev           # Start dev server with docs generation
+
+# 🔥 AGGRESSIVE CODE QUALITY (NO MERCY MODE)
+npm run lint:full          # FULL lint + unused code detection
+npm run lint:unused-deps   # Check unused dependencies
+npm run lint:dead-code     # Check dead code exports
+npm run bundle-analyze     # Analyze bundle size
 ```
 
 ## Code Architecture Overview
@@ -147,7 +153,7 @@ Core tables include:
 2. Start development server: `npm run dev`
 3. For schema changes: edit `lib/db/schema.ts` → `npm run db:generate` → `npm run db:push`
 4. Use `npm run db:studio` for visual database inspection
-5. Run `npm run lint` before committing
+5. Run `npm run lint:full` before committing (AGGRESSIVE mode)
 6. Run tests with `npm test` and `npm run test:e2e`
 
 ### Important Implementation Notes
@@ -160,9 +166,35 @@ Core tables include:
 
 # IMPORTANT INSTRUCTIONS
 
-code:
+## 🔥 AGGRESSIVE CODE QUALITY (NO MERCY MODE)
+This project enforces RUTHLESS code quality standards. Every commit is checked for:
+- ❌ NO unused imports or variables
+- ❌ NO TypeScript `any` types
+- ❌ NO unused dependencies
+- ❌ NO dead code exports
+- ❌ NO lint warnings
+- ❌ Prefer named exports over default exports
 
+**COMMITS WILL BE REJECTED** if they don't meet these standards.
+
+**Before committing, ALWAYS run:**
+```bash
+npm run lint:full  # Check everything
+```
+
+**Quick fixes:**
+- Unused variables: Prefix with `_` (e.g., `_unusedVar`)
+- Any types: Use `unknown` or proper interfaces
+- Default exports: Use named exports (except in Next.js pages)
+
+See [docs/CODE_GUIDELINES.md](./docs/CODE_GUIDELINES.md) for complete details.
+
+## Code Standards
 - write very performant and human readable code, strictly typed
 - Follow DRY Principle
-  tests:
+- NO `any` types - use proper TypeScript interfaces
+- NO unused imports/variables - clean up after yourself
+- Use named exports (except in Next.js pages)
+
+## Tests
 - cover essential test cases, only required

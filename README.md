@@ -110,7 +110,16 @@ The application includes an admin dashboard accessible to authorized users.
 | `npm run test:e2e`    | Run E2E tests (Playwright)           |
 | `npm run build`       | Build for production                 |
 | `npm run lint`        | Run ESLint                           |
-| `npm run type-check`  | Run TypeScript checks                |
+
+### 🔥 Aggressive Code Quality (NO MERCY MODE)
+| Command                  | Description                          |
+| ------------------------ | ------------------------------------ |
+| `npm run lint:full`      | **FULL** lint + unused code detection |
+| `npm run lint:unused-deps` | Check unused dependencies            |
+| `npm run lint:dead-code` | Check dead code exports              |
+| `npm run bundle-analyze` | Analyze bundle size                  |
+
+> **⚠️ WARNING**: This project enforces **AGGRESSIVE** code quality standards. Every commit is checked for unused imports, TypeScript `any` types, and dead code. See [CODE_GUIDELINES.md](./docs/CODE_GUIDELINES.md) for details.
 
 For detailed explanations of the development workflow, database management, and more, refer to the **[Development Guide](./docs/DEVELOPMENT.md)**.
 
