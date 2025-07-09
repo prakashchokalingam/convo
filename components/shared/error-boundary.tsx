@@ -44,7 +44,7 @@ const DefaultErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError 
           </div>
           <CardTitle className='text-red-900'>Something went wrong</CardTitle>
           <CardDescription>
-            An unexpected error occurred. Don't worry, this has been reported to our team.
+            An unexpected error occurred. Don&apos;t worry, this has been reported to our team.
           </CardDescription>
         </CardHeader>
 
@@ -168,7 +168,7 @@ export const PageErrorBoundary: React.FC<ErrorFallbackProps> = ({ error, resetEr
           </div>
           <CardTitle className='text-xl text-red-900'>Page Error</CardTitle>
           <CardDescription>
-            This page encountered an error and couldn't load properly.
+            This page encountered an error and couldn&apos;t load properly.
           </CardDescription>
         </CardHeader>
 

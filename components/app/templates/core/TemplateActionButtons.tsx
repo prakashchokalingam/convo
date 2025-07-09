@@ -159,11 +159,11 @@ export function TemplateActionButtons({
                 Delete Template
               </DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete "{template.name}"? This action cannot be undone.
+                Are you sure you want to delete &quot;{template.name}&quot;? This action cannot be undone.
                 {template.usageCount > 0 && (
                   <div className='mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm'>
                     ⚠️ This template has been used to create {template.usageCount} form(s). Deleting
-                    it won't affect existing forms.
+                    it won&apos;t affect existing forms.
                   </div>
                 )}
               </DialogDescription>
@@ -254,7 +254,7 @@ export function TemplateActionButtons({
                 Delete Template
               </DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete "{template.name}"? This action cannot be undone.
+                Are you sure you want to delete &quot;{template.name}&quot;? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
 
@@ -324,11 +324,11 @@ export function TemplateActionButtons({
                 Delete Template
               </DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete "{template.name}"? This action cannot be undone.
+                Are you sure you want to delete &quot;{template.name}&quot;? This action cannot be undone.
                 {template.usageCount > 0 && (
                   <div className='mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm'>
                     ⚠️ This template has been used to create {template.usageCount} form(s). Deleting
-                    it won't affect existing forms.
+                    it won&apos;t affect existing forms.
                   </div>
                 )}
               </DialogDescription>

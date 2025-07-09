@@ -1,7 +1,7 @@
 'use client';
 
 import { Search, Filter, Globe, Building, FileText, Users, Eye, Loader2 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { Badge } from '@/components/shared/ui/badge';
 import { Button } from '@/components/shared/ui/button';
@@ -72,9 +72,9 @@ export function TemplateSelector({
     if (isOpen && workspaceId) {
       fetchTemplates();
     }
-  }, [isOpen, workspaceId]);
+  }, [isOpen, workspaceId, fetchTemplates]);
 
-  const fetchTemplates = async () => {
+  const fetchTemplates = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -106,7 +106,7 @@ export function TemplateSelector({
     } finally {
       setLoading(false);
     }
-  };
+  }, [workspaceId]);
 
   const filterTemplates = (templates: Template[]) => {
     return templates.filter(template => {

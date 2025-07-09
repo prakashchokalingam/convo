@@ -301,7 +301,7 @@ export function UseCasesSection() {
                 {/* Testimonial */}
                 <div className='bg-primary/5 border border-primary/20 rounded-xl p-6 mb-6'>
                   <blockquote className='text-foreground mb-4 italic'>
-                    "{currentCase.testimonial.quote}"
+                    &quot;{currentCase.testimonial.quote}&quot;
                   </blockquote>
                   <div className='text-sm text-muted-foreground'>
                     — {currentCase.testimonial.author}

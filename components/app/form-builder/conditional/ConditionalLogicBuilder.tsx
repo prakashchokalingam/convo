@@ -248,11 +248,11 @@ export function ConditionalLogicBuilder({
     });
   }, [allFields, field.id, field.order]);
 
-  const conditional = field.conditional || {
+  const conditional = useMemo(() => field.conditional || {
     show: true,
     conditions: [],
     logic: 'and' as const,
-  };
+  }, [field.conditional]);
 
   const handleToggleEnabled = useCallback(
     (enabled: boolean) => {

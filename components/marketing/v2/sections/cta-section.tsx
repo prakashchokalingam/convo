@@ -189,8 +189,8 @@ export function CTASection() {
           </div>
 
           <p className='text-muted-foreground italic max-w-2xl mx-auto'>
-            "Convo has transformed how we collect customer feedback. The conversational approach
-            feels so natural, and our response rates have never been higher."
+            &quot;Convo has transformed how we collect customer feedback. The conversational approach
+            feels so natural, and our response rates have never been higher.&quot;
           </p>
           <div className='text-sm text-muted-foreground mt-2'>
             — Sarah Chen, VP Marketing at TechCorp
@@ -207,7 +207,7 @@ export function CTASection() {
         >
           <h3 className='text-2xl font-bold mb-4'>What are you waiting for?</h3>
           <p className='text-muted-foreground mb-8'>
-            Your competitors are already creating better form experiences. Don't get left behind.
+            Your competitors are already creating better form experiences. Don&apos;t get left behind.
           </p>
 
           <div className='flex flex-col sm:flex-row gap-4 justify-center'>

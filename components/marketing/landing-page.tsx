@@ -59,7 +59,7 @@ export function LandingPage() {
               Why Choose Conversational Forms?
             </h2>
             <p className='text-xl text-gray-600'>
-              Traditional forms are broken. Here's how we fix them.
+              Traditional forms are broken. Here&apos;s how we fix them.
             </p>
           </div>
 

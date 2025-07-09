@@ -201,7 +201,7 @@ export function TestimonialsSection() {
 
                 {/* Quote */}
                 <blockquote className='text-lg text-foreground mb-6 leading-relaxed'>
-                  "{current.quote}"
+                  &quot;{current.quote}&quot;
                 </blockquote>
 
                 {/* Results */}

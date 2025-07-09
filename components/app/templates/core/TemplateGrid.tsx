@@ -251,7 +251,7 @@ export function TemplateGrid({
 
               {effectiveSearchQuery && (
                 <Badge variant='outline' className='gap-1'>
-                  Search: "{effectiveSearchQuery}"
+                  Search: &quot;{effectiveSearchQuery}&quot;
                   <button
                     onClick={() => handleSearchChange('')}
                     className='ml-1 hover:bg-gray-200 rounded-full p-0.5'

@@ -157,7 +157,7 @@ export function TrustIndicatorsSection() {
             viewport={{ once: true }}
             className='text-lg text-muted-foreground max-w-3xl mx-auto'
           >
-            Your data security is our top priority. We're committed to maintaining the highest
+            Your data security is our top priority. We&apos;re committed to maintaining the highest
             standards of security, compliance, and reliability for your peace of mind.
           </motion.p>
         </div>

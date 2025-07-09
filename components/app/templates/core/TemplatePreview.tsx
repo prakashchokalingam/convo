@@ -252,7 +252,7 @@ export function TemplatePreview({
                             </span>
 
                             {field.placeholder && (
-                              <span className='truncate'>Placeholder: "{field.placeholder}"</span>
+                              <span className='truncate'>Placeholder: &quot;{field.placeholder}&quot;</span>
                             )}
                           </div>
 

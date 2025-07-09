@@ -104,7 +104,7 @@ export function CreateWorkspaceDialog({ trigger, usage, onSuccess }: CreateWorks
             <DialogTitle className='text-xl'>Create New Workspace</DialogTitle>
           </div>
           <DialogDescription className='text-base leading-relaxed'>
-            Create a new workspace to organize your forms and collaborate with your team. You'll be
+            Create a new workspace to organize your forms and collaborate with your team. You&apos;ll be
             able to invite members and manage permissions.
           </DialogDescription>
         </DialogHeader>
@@ -158,7 +158,7 @@ export function CreateWorkspaceDialog({ trigger, usage, onSuccess }: CreateWorks
             <Alert>
               <AlertCircle className='h-4 w-4' />
               <AlertDescription>
-                You've reached your plan's workspace limit.
+                You&apos;ve reached your plan&apos;s workspace limit.
                 <Button variant='link' className='h-auto p-0 ml-1' asChild>
                   <a href='/billing'>Upgrade your plan</a>
                 </Button>{' '}

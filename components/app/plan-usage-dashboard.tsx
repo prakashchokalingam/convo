@@ -157,7 +157,7 @@ export function PlanUsageDashboard({
               <Alert>
                 <Info className='h-4 w-4' />
                 <AlertDescription>
-                  You're on the Starter plan. Upgrade to Pro to invite team members and create more
+                  You&apos;re on the Starter plan. Upgrade to Pro to invite team members and create more
                   workspaces.
                 </AlertDescription>
               </Alert>
@@ -263,7 +263,7 @@ export function PlanUsageDashboard({
               <Alert>
                 <Info className='h-4 w-4' />
                 <AlertDescription>
-                  Your current plan doesn't support team collaboration. Upgrade to Pro to invite
+                  Your current plan doesn&apos;t support team collaboration. Upgrade to Pro to invite
                   team members.
                 </AlertDescription>
               </Alert>

@@ -441,7 +441,7 @@ export function MembersList({
               </Badge>
             </div>
             <p className='text-sm text-muted-foreground'>
-              Invitations sent to potential team members who haven't joined yet.
+              Invitations sent to potential team members who haven&apos;t joined yet.
             </p>
           </CardHeader>
           <Separator />
@@ -583,7 +583,7 @@ export function InviteMemberButton({ workspace }: { workspace: any }) {
             <DialogTitle className='text-xl'>Invite Team Member</DialogTitle>
           </div>
           <DialogDescription className='text-base leading-relaxed'>
-            Send an invitation to join your workspace. They'll receive an email with instructions to
+            Send an invitation to join your workspace. They&apos;ll receive an email with instructions to
             join.
           </DialogDescription>
         </DialogHeader>
@@ -605,7 +605,7 @@ export function InviteMemberButton({ workspace }: { workspace: any }) {
               // autoFocus
             />
             <p className='text-xs text-muted-foreground'>
-              We'll send them an invitation email with a link to join your workspace.
+              We&apos;ll send them an invitation email with a link to join your workspace.
             </p>
           </div>
 

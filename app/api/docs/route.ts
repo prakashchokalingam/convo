@@ -67,7 +67,6 @@ export async function GET(request: NextRequest) {
       await fs.access(specPath);
     } catch {
       // If file doesn't exist, try to generate it
-      console.log('📝 OpenAPI spec not found, generating...');
       try {
         const generator = new SwaggerGenerator();
         await generator.generate();
@@ -169,8 +168,6 @@ export async function GET(request: NextRequest) {
  */
 export async function POST() {
   try {
-    console.log('🔄 Regenerating API documentation...');
-
     const generator = new SwaggerGenerator();
     const result = await generator.generate();
 
