@@ -1,5 +1,6 @@
+// Toast utility functions
+
 import { toast } from '@/hooks/use-toast';
-import { CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
 
 /**
  * Utility functions for showing different types of toasts
@@ -42,7 +43,7 @@ export const showInfo = (message: string, title?: string) => {
  */
 export const handleApiError = (error: any, defaultMessage?: string) => {
   let message = defaultMessage || 'Something went wrong. Please try again.';
-  
+
   if (typeof error === 'string') {
     message = error;
   } else if (error?.message) {
@@ -50,7 +51,7 @@ export const handleApiError = (error: any, defaultMessage?: string) => {
   } else if (error?.error) {
     message = error.error;
   }
-  
+
   return showError(message);
 };
 
@@ -97,7 +98,8 @@ export const workspaceToasts = {
   memberAdded: (name: string) => showSuccess(`${name} has joined the workspace`),
   memberRemoved: (name: string) => showSuccess(`${name} has been removed from the workspace`),
   roleUpdated: (name: string, role: string) => showSuccess(`${name} is now a ${role}`),
-  planLimitReached: (feature: string) => showWarning(`You have reached your plan limit for ${feature}. Upgrade to continue.`),
+  planLimitReached: (feature: string) =>
+    showWarning(`You have reached your plan limit for ${feature}. Upgrade to continue.`),
 };
 
 /**
@@ -119,14 +121,14 @@ export const handleNetworkError = (error: any) => {
   if (!navigator.onLine) {
     return showError('You appear to be offline. Please check your connection.');
   }
-  
+
   if (error?.status === 429) {
     return showError('Too many requests. Please wait a moment and try again.');
   }
-  
+
   if (error?.status >= 500) {
     return showError('Server error. Our team has been notified.');
   }
-  
+
   return handleApiError(error);
 };

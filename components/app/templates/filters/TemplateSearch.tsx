@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Input } from '@/components/shared/ui/input';
-import { Button } from '@/components/shared/ui/button';
 import { Search, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
 
 export interface TemplateSearchProps {
   value?: string;
@@ -17,7 +18,7 @@ export interface TemplateSearchProps {
 
 /**
  * TemplateSearch - Real-time search component with debouncing
- * 
+ *
  * This component provides search functionality for templates with
  * debouncing to prevent excessive API calls.
  */
@@ -28,7 +29,7 @@ export function TemplateSearch({
   onClear,
   debounceMs = 300,
   className = '',
-  showClearButton = true
+  showClearButton = true,
 }: TemplateSearchProps) {
   const [internalValue, setInternalValue] = useState(value);
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -65,24 +66,24 @@ export function TemplateSearch({
 
   return (
     <div className={`relative ${className}`}>
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-      
+      <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
+
       <Input
-        type="text"
+        type='text'
         placeholder={placeholder}
         value={internalValue}
-        onChange={(e) => setInternalValue(e.target.value)}
+        onChange={e => setInternalValue(e.target.value)}
         className={`pl-10 ${showClearButton && internalValue ? 'pr-10' : ''}`}
       />
-      
+
       {showClearButton && internalValue && (
         <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 hover:bg-gray-100"
+          variant='ghost'
+          size='icon'
+          className='absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 hover:bg-gray-100'
           onClick={handleClear}
         >
-          <X className="h-4 w-4" />
+          <X className='h-4 w-4' />
         </Button>
       )}
     </div>

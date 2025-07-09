@@ -17,10 +17,10 @@ These are essential reads for understanding and contributing to ConvoForms:
 
 - **[Environment Variables](./ENVIRONMENT.md)**: Details on configuring necessary environment variables for local development and production.
 - **[API Documentation (General)](./API_DOCUMENTATION.md)**: Information regarding the backend API endpoints.
-    - For auto-generated, detailed API specifications, see **[Swagger API Documentation](./swagger/README.md)** (includes link to generated `openapi.json`).
+  - For auto-generated, detailed API specifications, see **[Swagger API Documentation](./swagger/README.md)** (includes link to generated `openapi.json`).
 - **[Testing Strategy](./DEVELOPMENT.md#testing)**: (Link to testing section within Development Guide)
-    - **[End-to-End Testing Guide](./E2E_TESTING.md)**: Specific guide on how E2E tests are structured and how to run them.
-    - **[E2E Quick Start Guide](./guides/E2E_QUICK_START.md)**: (Moved from root) A guide for getting started quickly with E2E testing.
+  - **[End-to-End Testing Guide](./E2E_TESTING.md)**: Specific guide on how E2E tests are structured and how to run them.
+  - **[E2E Quick Start Guide](./guides/E2E_QUICK_START.md)**: (Moved from root) A guide for getting started quickly with E2E testing.
 
 ## 🎨 Design & UI
 

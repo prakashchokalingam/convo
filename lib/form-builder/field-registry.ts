@@ -1,16 +1,14 @@
 // Form Builder Field Registry System
 
-import { FieldType, FieldDefinition, FieldRegistry, FieldConfig } from './types'
-import { DEFAULT_FIELD_CONFIGS } from './constants'
-import { 
-  Type, 
-  Mail, 
-  Hash, 
-  FileText, 
-  ChevronDown, 
-  List, 
-  Circle, 
-  CheckSquare, 
+import {
+  Type,
+  Mail,
+  Hash,
+  FileText,
+  ChevronDown,
+  List,
+  Circle,
+  CheckSquare,
   ToggleLeft,
   Calendar,
   CalendarClock,
@@ -21,8 +19,11 @@ import {
   Star,
   LayoutPanelTop,
   Minus,
-  Code
-} from 'lucide-react'
+  Code,
+} from 'lucide-react';
+
+import { DEFAULT_FIELD_CONFIGS } from './constants';
+import { FieldType, FieldDefinition, FieldRegistry, FieldConfig } from './types';
 
 // Field Icons
 export const FIELD_ICONS = {
@@ -44,8 +45,8 @@ export const FIELD_ICONS = {
   rating: Star,
   section: LayoutPanelTop,
   divider: Minus,
-  html: Code
-}
+  html: Code,
+};
 
 // Field Definitions
 export const FIELD_DEFINITIONS: FieldRegistry = {
@@ -58,10 +59,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.text,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null, // Will be populated with Zod schemas
-    component: null as any // Will be populated with React components
+    component: null as any, // Will be populated with React components
   },
 
   email: {
@@ -73,10 +74,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.email,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   number: {
@@ -88,10 +89,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.number,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   textarea: {
@@ -103,10 +104,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.textarea,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   select: {
@@ -118,10 +119,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.select,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   multiselect: {
@@ -133,10 +134,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.multiselect,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   radio: {
@@ -148,10 +149,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.radio,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   checkbox: {
@@ -163,10 +164,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.checkbox,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   switch: {
@@ -178,10 +179,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.switch,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   date: {
@@ -193,10 +194,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.date,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   datetime: {
@@ -208,10 +209,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.datetime,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   country: {
@@ -223,10 +224,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.country,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   phone: {
@@ -238,10 +239,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.phone,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   file: {
@@ -253,10 +254,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.file,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   signature: {
@@ -268,10 +269,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.signature,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   rating: {
@@ -283,10 +284,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.rating,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   section: {
@@ -298,10 +299,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.section,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   divider: {
@@ -313,10 +314,10 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
     defaultConfig: {
       ...DEFAULT_FIELD_CONFIGS.divider,
       id: '',
-      order: 0
+      order: 0,
     },
     propertiesSchema: null,
-    component: null as any
+    component: null as any,
   },
 
   // Temporarily disabled - will be added back with table experience
@@ -334,73 +335,74 @@ export const FIELD_DEFINITIONS: FieldRegistry = {
   //   propertiesSchema: null,
   //   component: null as any
   // }
-}
+};
 
 // Registry Management Functions
 export class FormFieldRegistry {
-  private static instance: FormFieldRegistry
-  private registry: FieldRegistry = { ...FIELD_DEFINITIONS }
+  private static instance: FormFieldRegistry;
+  private registry: FieldRegistry = { ...FIELD_DEFINITIONS };
 
   private constructor() {}
 
   static getInstance(): FormFieldRegistry {
     if (!FormFieldRegistry.instance) {
-      FormFieldRegistry.instance = new FormFieldRegistry()
+      FormFieldRegistry.instance = new FormFieldRegistry();
     }
-    return FormFieldRegistry.instance
+    return FormFieldRegistry.instance;
   }
 
   // Get all field definitions
   getAllFields(): FieldRegistry {
-    return { ...this.registry }
+    return { ...this.registry };
   }
 
   // Get field definition by type
   getField(type: FieldType): FieldDefinition | undefined {
-    return this.registry[type]
+    return this.registry[type];
   }
 
   // Get fields by category
   getFieldsByCategory(category: 'basic' | 'advanced' | 'layout'): FieldDefinition[] {
-    return Object.values(this.registry).filter(field => field.category === category)
+    return Object.values(this.registry).filter(field => field.category === category);
   }
 
   // Register a new field type
   registerField(definition: FieldDefinition): void {
-    this.registry[definition.type] = definition
+    this.registry[definition.type] = definition;
   }
 
   // Unregister a field type
   unregisterField(type: FieldType): void {
-    delete this.registry[type]
+    delete this.registry[type];
   }
 
   // Check if field type is registered
   isRegistered(type: FieldType): boolean {
-    return type in this.registry
+    return type in this.registry;
   }
 
   // Get field types by category
   getFieldTypesByCategory(category: 'basic' | 'advanced' | 'layout'): FieldType[] {
     return Object.values(this.registry)
       .filter(field => field.category === category)
-      .map(field => field.type)
+      .map(field => field.type);
   }
 
   // Search fields by label or description
   searchFields(query: string): FieldDefinition[] {
-    const lowercaseQuery = query.toLowerCase()
-    return Object.values(this.registry).filter(field => 
-      field.label.toLowerCase().includes(lowercaseQuery) ||
-      field.description.toLowerCase().includes(lowercaseQuery)
-    )
+    const lowercaseQuery = query.toLowerCase();
+    return Object.values(this.registry).filter(
+      field =>
+        field.label.toLowerCase().includes(lowercaseQuery) ||
+        field.description.toLowerCase().includes(lowercaseQuery)
+    );
   }
 
   // Create default field config for a type
   createDefaultFieldConfig(type: FieldType, overrides: Partial<FieldConfig> = {}): FieldConfig {
-    const definition = this.getField(type)
+    const definition = this.getField(type);
     if (!definition) {
-      throw new Error(`Field type "${type}" is not registered`)
+      throw new Error(`Field type "${type}" is not registered`);
     }
 
     const baseConfig = {
@@ -408,37 +410,42 @@ export class FormFieldRegistry {
       id: overrides.id || `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
       order: overrides.order || 0,
-      validation: []
-    }
+      validation: [],
+    };
 
-    return { ...baseConfig, ...overrides } as FieldConfig
+    return { ...baseConfig, ...overrides } as FieldConfig;
   }
 }
 
 // Singleton instance
-export const fieldRegistry = FormFieldRegistry.getInstance()
+export const fieldRegistry = FormFieldRegistry.getInstance();
 
 // Helper functions
 export const getFieldDefinition = (type: FieldType): FieldDefinition | undefined => {
-  return fieldRegistry.getField(type)
-}
+  return fieldRegistry.getField(type);
+};
 
 export const getAllFieldDefinitions = (): FieldRegistry => {
-  return fieldRegistry.getAllFields()
-}
+  return fieldRegistry.getAllFields();
+};
 
-export const getFieldsByCategory = (category: 'basic' | 'advanced' | 'layout'): FieldDefinition[] => {
-  return fieldRegistry.getFieldsByCategory(category)
-}
+export const getFieldsByCategory = (
+  category: 'basic' | 'advanced' | 'layout'
+): FieldDefinition[] => {
+  return fieldRegistry.getFieldsByCategory(category);
+};
 
-export const createFieldConfig = (type: FieldType, overrides: Partial<FieldConfig> = {}): FieldConfig => {
-  return fieldRegistry.createDefaultFieldConfig(type, overrides)
-}
+export const createFieldConfig = (
+  type: FieldType,
+  overrides: Partial<FieldConfig> = {}
+): FieldConfig => {
+  return fieldRegistry.createDefaultFieldConfig(type, overrides);
+};
 
 export const isFieldTypeRegistered = (type: FieldType): boolean => {
-  return fieldRegistry.isRegistered(type)
-}
+  return fieldRegistry.isRegistered(type);
+};
 
 export const searchFieldDefinitions = (query: string): FieldDefinition[] => {
-  return fieldRegistry.searchFields(query)
-}
+  return fieldRegistry.searchFields(query);
+};

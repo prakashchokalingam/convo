@@ -376,7 +376,7 @@ export const swaggerConfig: SwaggerDefinition = {
     {
       name: 'Admin',
       description: 'Admin-specific operations and management',
-    }
+    },
   ],
 };
 

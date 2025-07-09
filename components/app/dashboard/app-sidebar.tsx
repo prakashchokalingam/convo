@@ -1,27 +1,25 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { 
-  LayoutDashboard, 
-  FileText, 
-  BarChart3, 
-  Settings, 
+import {
+  LayoutDashboard,
+  FileText,
+  BarChart3,
+  Settings,
   Users,
   Plus,
   Layout,
   ChevronDown,
   Building,
   User as UserIcon,
-  Crown,
-  Shield,
-  Eye
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
+import { usePathname , useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
+import { CreateWorkspaceDialog } from '@/components/app/workspace/workspace-creation-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,21 +28,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { CreateWorkspaceDialog } from '@/components/app/workspace/workspace-creation-dialog';
-
-// Import client-safe types and URL helpers
-import type { WorkspaceWithRole } from '@/lib/types/workspace';
-import { hasPermission } from '@/lib/types/workspace';
-import { 
-  getWorkspaceUrl, 
-  getFormsUrl, 
-  getMembersUrl, 
+import { Separator } from '@/components/ui/separator';
+import { hasPermission, type WorkspaceWithRole } from '@/lib/types/workspace';
+import {
+  getWorkspaceUrl,
+  getFormsUrl,
+  getMembersUrl,
   getWorkspaceSettingsUrl,
-  getTemplatesUrl
+  getTemplatesUrl,
 } from '@/lib/urls/workspace-urls';
+import { cn } from '@/lib/utils';
 
 interface AppSidebarProps {
   workspace: WorkspaceWithRole;
@@ -57,34 +50,30 @@ interface NavItem {
   requiresRole?: 'owner' | 'admin' | 'member' | 'viewer';
 }
 
-const roleIcons = {
-  owner: Crown,
-  admin: Shield,
-  member: UserIcon,
-  viewer: Eye,
-};
 
 export function AppSidebar({ workspace }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [availableWorkspaces, setAvailableWorkspaces] = useState<WorkspaceWithRole[]>([]);
-  const [usage, setUsage] = useState<any>(null);
+  const [usage, setUsage] = useState<{
+    workspaces: { used: number; limit: number; unlimited: boolean };
+  } | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Always start with current workspace to prevent loading states
         setAvailableWorkspaces([workspace]);
-        
+
         // Fetch all workspaces and usage data
         const [workspacesRes, usageRes] = await Promise.all([
           fetch('/api/workspaces'),
-          fetch('/api/usage/workspaces')
+          fetch('/api/usage/workspaces'),
         ]);
 
         const [workspacesData, usageData] = await Promise.all([
           workspacesRes.json(),
-          usageRes.json()
+          usageRes.json(),
         ]);
 
         if (workspacesData.success && Array.isArray(workspacesData.workspaces)) {
@@ -127,7 +116,7 @@ export function AppSidebar({ workspace }: AppSidebarProps) {
     // Refresh workspaces and usage data
     window.location.reload();
   };
-  
+
   const navItems: NavItem[] = [
     {
       href: getWorkspaceUrl(workspace.slug),
@@ -164,7 +153,7 @@ export function AppSidebar({ workspace }: AppSidebarProps) {
   ];
 
   const canAccessItem = (item: NavItem) => {
-    if (!item.requiresRole) return true;
+    if (!item.requiresRole) {return true;}
     return hasPermission(workspace.role, item.requiresRole);
   };
 
@@ -178,37 +167,37 @@ export function AppSidebar({ workspace }: AppSidebarProps) {
       // Exact match for the dashboard path
       return cleanCurrentPath === dashboardBasePath;
     }
-    
+
     // For other pages, check if the current path starts with the link's href.
     return cleanCurrentPath.startsWith(cleanHref);
   };
 
   return (
-    <aside className="w-64 border-r bg-muted/10 h-[calc(100vh-64px)]">
-      <div className="flex h-full flex-col gap-2 p-4">
+    <aside className='hidden lg:block w-64 border-r bg-background h-[calc(100vh-64px)]'>
+      <div className='flex h-full flex-col gap-2 p-4'>
         {/* Navigation */}
-        <nav className="flex flex-col space-y-1">
-          {navItems.map((item) => {
-            if (!canAccessItem(item)) return null;
-            
+        <nav className='flex flex-col space-y-1'>
+          {navItems.map(item => {
+            if (!canAccessItem(item)) {return null;}
+
             const Icon = item.icon;
             const isActive = isActiveLink(item.href);
-            
+
             return (
               <Button
                 key={item.href}
-                variant={isActive ? "default" : "ghost"}
+                variant={isActive ? 'default' : 'ghost'}
                 className={cn(
-                  "w-full justify-start",
-                  isActive && "bg-primary text-primary-foreground shadow-sm"
+                  'w-full justify-start',
+                  isActive && 'bg-primary text-primary-foreground shadow-sm'
                 )}
                 asChild
               >
                 <Link href={item.href}>
-                  <Icon className="mr-2 h-4 w-4" />
+                  <Icon className='mr-2 h-4 w-4' />
                   {item.label}
                   {item.label === 'Forms' && (
-                    <Badge variant="secondary" className="ml-auto">
+                    <Badge variant='secondary' className='ml-auto'>
                       12
                     </Badge>
                   )}
@@ -219,55 +208,49 @@ export function AppSidebar({ workspace }: AppSidebarProps) {
         </nav>
 
         {/* Workspace Switcher */}
-        <div className="mt-auto">
-          <Separator className="mb-4" />
+        <div className='mt-auto'>
+          <Separator className='mb-4' />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="w-full justify-between h-auto p-3"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage 
-                      src={workspace.avatarUrl || undefined} 
-                      alt={workspace.name} 
-                    />
-                    <AvatarFallback className="text-xs">
+              <Button variant='outline' className='w-full justify-between h-auto p-3'>
+                <div className='flex items-center gap-3'>
+                  <Avatar className='h-8 w-8'>
+                    <AvatarImage src={workspace.avatarUrl || undefined} alt={workspace.name} />
+                    <AvatarFallback className='text-xs'>
                       {getWorkspaceInitials(workspace.name)}
                     </AvatarFallback>
                   </Avatar>
-                  
-                  <div className="flex flex-col items-start">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm truncate max-w-[120px]">
+
+                  <div className='flex flex-col items-start'>
+                    <div className='flex items-center gap-2'>
+                      <span className='font-medium text-sm truncate max-w-[120px]'>
                         {workspace.name}
                       </span>
                       {workspace.type === 'default' && (
-                        <UserIcon className="h-3 w-3 text-muted-foreground" />
+                        <UserIcon className='h-3 w-3 text-muted-foreground' />
                       )}
                       {workspace.type === 'team' && (
-                        <Building className="h-3 w-3 text-muted-foreground" />
+                        <Building className='h-3 w-3 text-muted-foreground' />
                       )}
                     </div>
-                    
-                    <Badge variant="outline" className="text-xs h-5">
+
+                    <Badge variant='outline' className='text-xs h-5'>
                       Pro Plan
                     </Badge>
                   </div>
                 </div>
-                
-                <ChevronDown className="h-4 w-4 shrink-0" />
+
+                <ChevronDown className='h-4 w-4 shrink-0' />
               </Button>
             </DropdownMenuTrigger>
-            
-            <DropdownMenuContent className="w-64" align="start" side="top">
+
+            <DropdownMenuContent className='w-64' align='start' side='top'>
               <DropdownMenuLabel>Switch Workspace</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              
-              {availableWorkspaces.map((ws) => {
+
+              {availableWorkspaces.map(ws => {
                 const isCurrentWorkspace = ws.id === workspace.id;
-                
+
                 return (
                   <DropdownMenuItem
                     key={ws.id}
@@ -276,80 +259,73 @@ export function AppSidebar({ workspace }: AppSidebarProps) {
                       isCurrentWorkspace ? 'bg-accent' : ''
                     }`}
                   >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage 
-                        src={ws.avatarUrl || undefined} 
-                        alt={ws.name} 
-                      />
-                      <AvatarFallback className="text-xs">
+                    <Avatar className='h-8 w-8'>
+                      <AvatarImage src={ws.avatarUrl || undefined} alt={ws.name} />
+                      <AvatarFallback className='text-xs'>
                         {getWorkspaceInitials(ws.name)}
                       </AvatarFallback>
                     </Avatar>
-                    
-                    <div className="flex flex-col flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">
-                          {ws.name}
-                        </span>
+
+                    <div className='flex flex-col flex-1'>
+                      <div className='flex items-center gap-2'>
+                        <span className='font-medium text-sm'>{ws.name}</span>
                         {ws.type === 'default' && (
-                          <UserIcon className="h-3 w-3 text-muted-foreground" />
+                          <UserIcon className='h-3 w-3 text-muted-foreground' />
                         )}
                         {ws.type === 'team' && (
-                          <Building className="h-3 w-3 text-muted-foreground" />
+                          <Building className='h-3 w-3 text-muted-foreground' />
                         )}
                       </div>
-                      
-                      <Badge variant="outline" className="text-xs h-5 w-fit">
+
+                      <Badge variant='outline' className='text-xs h-5 w-fit'>
                         Pro Plan
                       </Badge>
                     </div>
-                    
-                    {isCurrentWorkspace && (
-                      <div className="h-2 w-2 bg-primary rounded-full" />
-                    )}
+
+                    {isCurrentWorkspace && <div className='h-2 w-2 bg-primary rounded-full' />}
                   </DropdownMenuItem>
                 );
               })}
-              
+
               <DropdownMenuSeparator />
-              
-              <CreateWorkspaceDialog 
+
+              <CreateWorkspaceDialog
                 usage={usage}
                 trigger={
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <Plus className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem onSelect={e => e.preventDefault()}>
+                    <Plus className='h-4 w-4 mr-2' />
                     Create Workspace
                     {usage && !usage.workspaces.unlimited && (
-                      <Badge variant="outline" className="ml-auto text-xs">
+                      <Badge variant='outline' className='ml-auto text-xs'>
                         {usage.workspaces.used}/{usage.workspaces.limit}
                       </Badge>
                     )}
                   </DropdownMenuItem>
                 }
-                onSuccess={(workspace) => {
+                onSuccess={_workspace => {
                   handleWorkspaceCreated();
                   // Workspace will auto-redirect via the dialog
                 }}
               />
-              
-              <DropdownMenuItem 
+
+              <DropdownMenuItem
                 onClick={() => {
                   const url = getWorkspaceSettingsUrl(workspace.slug);
                   router.push(url);
                 }}
               >
-                <Settings className="h-4 w-4 mr-2" />
+                <Settings className='h-4 w-4 mr-2' />
                 Workspace Settings
               </DropdownMenuItem>
-              
+
               {(workspace.role === 'owner' || workspace.role === 'admin') && (
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => {
                     const url = getMembersUrl(workspace.slug);
                     router.push(url);
                   }}
                 >
-                  <Users className="h-4 w-4 mr-2" />
+                  <Users className='h-4 w-4 mr-2' />
                   Manage Members
                 </DropdownMenuItem>
               )}

@@ -1,12 +1,13 @@
-import { redirect } from 'next/navigation';
 import { auth } from '@clerk/nextjs';
-import { getCurrentUserWorkspaces } from '@/lib/workspace-server';
+import { redirect } from 'next/navigation';
+
 import { AnimatedWorkspaceCreation } from '@/components/app/onboarding/animated-workspace-creation';
 import { getWorkspaceUrl } from '@/lib/urls/workspace-urls';
+import { getCurrentUserWorkspaces } from '@/lib/workspace-server';
 
 export default async function OnboardingPage() {
   const { userId } = auth();
-  
+
   if (!userId) {
     redirect('/login');
   }
@@ -18,7 +19,7 @@ export default async function OnboardingPage() {
       // User has existing workspace - redirect WITHOUT welcome parameter
       const primaryWorkspace = workspaces.find(w => w.type === 'default') || workspaces[0];
       const workspaceUrl = getWorkspaceUrl(primaryWorkspace.slug);
-      console.log('🏠 User has existing workspace, redirecting to:', workspaceUrl);
+      // console.log('🏠 User has existing workspace, redirecting to:', workspaceUrl);
       redirect(workspaceUrl);
     }
   } catch (error) {
@@ -27,7 +28,7 @@ export default async function OnboardingPage() {
   }
 
   // No workspaces found - show animated automatic creation
-  console.log('📝 No workspaces found, starting automatic workspace creation');
+  // console.log('📝 No workspaces found, starting automatic workspace creation');
 
   return <AnimatedWorkspaceCreation />;
 }

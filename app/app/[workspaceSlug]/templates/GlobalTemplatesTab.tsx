@@ -1,14 +1,13 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { TemplateGrid, TemplateAction, TemplatePermissions } from '@/components/app/templates/core';
-import { TemplatePreview } from '@/components/app/templates/core';
-import { TemplateSelector } from '@/components/app/templates/specialized';
-import { Template } from '@/lib/db/schema';
 import { Globe, Loader2, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback } from 'react';
+
+import { TemplateGrid, TemplateAction, TemplatePermissions , TemplatePreview } from '@/components/app/templates/core';
 import { Alert, AlertDescription } from '@/components/shared/ui/alert';
 import { Button } from '@/components/shared/ui/button';
+import { Template } from '@/lib/db/schema';
 import { getFormEditorUrl } from '@/lib/urls/workspace-urls';
 
 interface GlobalTemplatesTabProps {
@@ -20,22 +19,22 @@ interface GlobalTemplatesTabProps {
 
 /**
  * GlobalTemplatesTab - Displays and manages global templates
- * 
+ *
  * Shows global templates with clone and create form functionality.
  * Templates are fetched from the API and filtered to show only global ones.
  */
-export function GlobalTemplatesTab({ 
+export function GlobalTemplatesTab({
   workspaceId,
-  workspaceSlug, 
-  userRole, 
-  canCreateTemplates 
+  workspaceSlug,
+  userRole: _userRole,
+  canCreateTemplates,
 }: GlobalTemplatesTabProps) {
   const router = useRouter();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
-  const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
+  const [, setActionLoading] = useState<Record<string, boolean>>({});
 
   // Define permissions for global templates
   const permissions: TemplatePermissions = {
@@ -48,7 +47,7 @@ export function GlobalTemplatesTab({
   const fetchGlobalTemplates = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const params = new URLSearchParams({
         workspaceId,
@@ -57,11 +56,11 @@ export function GlobalTemplatesTab({
       });
 
       const response = await fetch(`/api/templates?${params}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch templates');
       }
-      
+
       const data = await response.json();
       setTemplates(data.templates || []);
     } catch (error) {
@@ -78,10 +77,10 @@ export function GlobalTemplatesTab({
 
   const handleTemplateAction = async (action: TemplateAction) => {
     const { type, templateId } = action;
-    
+
     // Set loading state for this specific action
     setActionLoading(prev => ({ ...prev, [`${templateId}-${type}`]: true }));
-    
+
     try {
       switch (type) {
         case 'preview':
@@ -90,15 +89,15 @@ export function GlobalTemplatesTab({
             setPreviewTemplate(template);
           }
           break;
-          
+
         case 'clone':
           await handleCloneTemplate(templateId);
           break;
-          
+
         case 'createForm':
           await handleCreateForm(templateId);
           break;
-          
+
         default:
           console.warn('Unhandled template action:', type);
       }
@@ -127,14 +126,13 @@ export function GlobalTemplatesTab({
         throw new Error('Failed to clone template');
       }
 
-      const data = await response.json();
-      
+      await response.json();
+
       // Success feedback (you could add a toast notification here)
-      console.log('Template cloned successfully:', data.template.name);
-      
+      // console.log('Template cloned successfully:', _data.template.name);
+
       // Optionally refresh the templates list to update clone counts
       fetchGlobalTemplates();
-      
     } catch (error) {
       console.error('Error cloning template:', error);
       throw error;
@@ -167,11 +165,10 @@ export function GlobalTemplatesTab({
       }
 
       const data = await response.json();
-      
+
       // Navigate to the form editor
       const formEditorUrl = getFormEditorUrl(workspaceSlug, data.form.id);
       router.push(formEditorUrl);
-      
     } catch (error) {
       console.error('Error creating form from template:', error);
       throw error;
@@ -184,10 +181,10 @@ export function GlobalTemplatesTab({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-400 mx-auto mb-4" />
-          <div className="text-gray-600">Loading global templates...</div>
+      <div className='flex items-center justify-center py-12'>
+        <div className='text-center'>
+          <Loader2 className='w-8 h-8 animate-spin text-gray-400 mx-auto mb-4' />
+          <div className='text-gray-600'>Loading global templates...</div>
         </div>
       </div>
     );
@@ -195,11 +192,11 @@ export function GlobalTemplatesTab({
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription className="flex items-center justify-between">
+      <Alert variant='destructive'>
+        <AlertCircle className='h-4 w-4' />
+        <AlertDescription className='flex items-center justify-between'>
           <span>{error}</span>
-          <Button variant="outline" size="sm" onClick={retryFetch}>
+          <Button variant='outline' size='sm' onClick={retryFetch}>
             Try Again
           </Button>
         </AlertDescription>
@@ -213,19 +210,19 @@ export function GlobalTemplatesTab({
         templates={templates}
         permissions={permissions}
         onTemplateAction={handleTemplateAction}
-        title="Global Templates"
-        description="Pre-built templates for common business needs. Clone any template to customize it for your workspace."
+        title='Global Templates'
+        description='Pre-built templates for common business needs. Clone any template to customize it for your workspace.'
         showFilters={true}
         showCreateButton={false} // Don't show create button for global templates
         emptyState={
-          <div className="text-center py-12">
-            <div className="mx-auto w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-              <Globe className="w-8 h-8 text-blue-500" />
+          <div className='text-center py-12'>
+            <div className='mx-auto w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4'>
+              <Globe className='w-8 h-8 text-blue-500' />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className='text-lg font-medium text-gray-900 mb-2'>
               No global templates available
             </h3>
-            <p className="text-sm text-gray-600 mb-4 max-w-sm mx-auto">
+            <p className='text-sm text-gray-600 mb-4 max-w-sm mx-auto'>
               Global templates are created by the Convo team to help you get started quickly.
             </p>
           </div>

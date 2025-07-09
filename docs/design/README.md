@@ -1,4 +1,5 @@
 # ConvoForms Design System Documentation
+
 ## shadcn/ui Implementation for Professional UI/UX
 
 ---
@@ -8,12 +9,14 @@
 ConvoForms uses **shadcn/ui** as the foundation for our design system, providing battle-tested components with zero maintenance overhead and guaranteed accessibility.
 
 ### **📋 Documentation Structure**
-| Document | Purpose | Status |
-|----------|---------|--------|
-| [shadcn/ui Design System](./shadcn-ui-design-system.md) | 🎨 Complete design system specification | ✅ **Active** |
-| [Component Architecture](./shadcn-component-architecture.md) | 🏗️ Component structure and patterns | ✅ **Active** |
+
+| Document                                                     | Purpose                                 | Status        |
+| ------------------------------------------------------------ | --------------------------------------- | ------------- |
+| [shadcn/ui Design System](./shadcn-ui-design-system.md)      | 🎨 Complete design system specification | ✅ **Active** |
+| [Component Architecture](./shadcn-component-architecture.md) | 🏗️ Component structure and patterns     | ✅ **Active** |
 
 ### **🚀 Key Benefits**
+
 - **Zero Maintenance**: Community-maintained components
 - **Guaranteed Accessibility**: WCAG 2.1 AA compliance out of the box
 - **Proven Quality**: Battle-tested by thousands of projects
@@ -25,6 +28,7 @@ ConvoForms uses **shadcn/ui** as the foundation for our design system, providing
 ## 🏗️ **shadcn/ui Architecture**
 
 ### **Component Structure**
+
 ```
 components/
 ├── ui/                     # shadcn/ui foundation components
@@ -43,6 +47,7 @@ components/
 ```
 
 ### **Usage Examples**
+
 ```typescript
 // shadcn/ui foundation components
 import { Button, Card, Input, Form } from '@/components/ui'
@@ -64,6 +69,7 @@ import { AppLayout, AppHeader } from '@/components/app/layout'
 ## 🎨 **ConvoForms Theme on shadcn/ui**
 
 ### **Brand Identity**
+
 - **Foundation**: shadcn/ui components (New York style, Slate base)
 - **Brand Colors**: ConvoForms purple (#a855f7) primary, blue (#3b82f6) secondary
 - **Philosophy**: "Professional Elegance with Proven Foundation"
@@ -71,15 +77,16 @@ import { AppLayout, AppHeader } from '@/components/app/layout'
 - **Dark Mode**: Complete theme switching built-in
 
 ### **Custom CSS Variables**
+
 ```css
 :root {
   /* ConvoForms primary colors */
-  --primary: 270 85% 60%;        /* Purple #a855f7 */
+  --primary: 270 85% 60%; /* Purple #a855f7 */
   --primary-foreground: 210 40% 98%;
-  
+
   /* Secondary colors */
-  --secondary: 220 85% 60%;      /* Blue #3b82f6 */
-  
+  --secondary: 220 85% 60%; /* Blue #3b82f6 */
+
   /* shadcn/ui semantic colors */
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
@@ -94,6 +101,7 @@ import { AppLayout, AppHeader } from '@/components/app/layout'
 ## 🚀 **Getting Started**
 
 ### **For New Team Members**
+
 1. **Learn shadcn/ui**: Visit [ui.shadcn.com](https://ui.shadcn.com) for component docs
 2. **Review Architecture**: Read shadcn/ui component architecture doc
 3. **Understand Theming**: Learn CSS variables and dark mode
@@ -101,6 +109,7 @@ import { AppLayout, AppHeader } from '@/components/app/layout'
 5. **Follow Patterns**: Use established development patterns
 
 ### **For Development**
+
 1. **Start with Foundation**: Use shadcn/ui components as base
 2. **Build Incrementally**: Add ConvoForms customization on top
 3. **Test Thoroughly**: Validate each step before proceeding
@@ -112,12 +121,14 @@ import { AppLayout, AppHeader } from '@/components/app/layout'
 ## 📞 **Resources & Support**
 
 ### **Official Documentation**
+
 - [shadcn/ui Official Docs](https://ui.shadcn.com/docs)
 - [shadcn/ui Components](https://ui.shadcn.com/docs/components)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [Radix UI Primitives](https://www.radix-ui.com/primitives)
 
 ### **ConvoForms Documentation**
+
 - [Design System Specification](./shadcn-ui-design-system.md)
 - [Component Architecture](./shadcn-component-architecture.md)
 
@@ -137,6 +148,7 @@ import { AppLayout, AppHeader } from '@/components/app/layout'
 ## 🔧 **Development Workflow**
 
 ### **Component Development**
+
 ```typescript
 // Build custom components on shadcn/ui foundation
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -159,16 +171,17 @@ export function StatsCard({ title, value }: StatsCardProps) {
 ```
 
 ### **Import Patterns**
+
 ```typescript
 // shadcn/ui components
-import { Button, Card, Input } from '@/components/ui'
+import { Button, Card, Input } from '@/components/ui';
 
-// Custom app components  
-import { StatsCard } from '@/components/app/dashboard'
-import { AppLayout } from '@/components/app/layout'
+// Custom app components
+import { StatsCard } from '@/components/app/dashboard';
+import { AppLayout } from '@/components/app/layout';
 
 // Utilities
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 ```
 
 ---

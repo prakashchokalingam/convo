@@ -1,22 +1,29 @@
-"use client";
+'use client';
 
-import React, { useState } from 'react';
+import { FileText, Plus, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shared/ui/dialog';
-import { Button } from '@/components/shared/ui/button';
-import { Input } from '@/components/shared/ui/input';
-import { Textarea } from '@/components/shared/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared/ui/select';
-import { Label } from '@/components/shared/ui/label';
-import { Separator } from '@/components/shared/ui/separator';
-import { 
-  FileText, 
-  Plus, 
-  Loader2, 
-  AlertCircle,
-  Sparkles
-} from 'lucide-react';
+import React, { useState } from 'react';
+
 import { Alert, AlertDescription } from '@/components/shared/ui/alert';
+import { Button } from '@/components/shared/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/shared/ui/dialog';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/shared/ui/select';
+import { Separator } from '@/components/shared/ui/separator';
+import { Textarea } from '@/components/shared/ui/textarea';
 import { getFormsUrl } from '@/lib/urls/workspace-urls';
 
 interface TemplateCreateDialogProps {
@@ -39,7 +46,7 @@ const BUSINESS_CATEGORIES = [
 
 /**
  * TemplateCreateDialog - Template creation modal
- * 
+ *
  * Provides options for creating templates:
  * 1. From scratch (opens form builder in template mode)
  * 2. From existing form (converts form to template)
@@ -49,13 +56,13 @@ export function TemplateCreateDialog({
   onClose,
   workspaceId,
   workspaceSlug,
-  onSuccess
+  onSuccess,
 }: TemplateCreateDialogProps) {
   const router = useRouter();
   const [createMode, setCreateMode] = useState<'scratch' | 'form' | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Form state for template metadata
   const [templateData, setTemplateData] = useState({
     name: '',
@@ -84,7 +91,7 @@ export function TemplateCreateDialog({
       description: templateData.description || '',
       category: templateData.category || '',
     });
-    
+
     const newFormUrl = getFormsUrl(workspaceSlug) + `/new?${params}`;
     router.push(newFormUrl);
     handleClose();
@@ -109,7 +116,7 @@ export function TemplateCreateDialog({
             label: 'Sample Field',
             placeholder: 'Replace this with your form fields',
             required: false,
-          }
+          },
         ],
         settings: {
           submitButtonText: 'Submit',
@@ -137,17 +144,17 @@ export function TemplateCreateDialog({
       }
 
       const data = await response.json();
-      
+
       // Success - redirect to edit the template
-      const editTemplateUrl = getFormsUrl(workspaceSlug) + `/new?templateId=${data.template.id}&mode=template`;
+      const editTemplateUrl =
+        getFormsUrl(workspaceSlug) + `/new?templateId=${data.template.id}&mode=template`;
       router.push(editTemplateUrl);
-      
+
       if (onSuccess) {
         onSuccess();
       }
-      
+
       handleClose();
-      
     } catch (error) {
       console.error('Error creating template:', error);
       setError(error instanceof Error ? error.message : 'Failed to create template');
@@ -164,31 +171,27 @@ export function TemplateCreateDialog({
   };
 
   const renderModeSelection = () => (
-    <div className="space-y-4">
-      <div className="text-center">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+    <div className='space-y-4'>
+      <div className='text-center'>
+        <h3 className='text-lg font-medium text-gray-900 mb-2'>
           How would you like to create your template?
         </h3>
-        <p className="text-sm text-gray-600">
-          Choose how you want to start building your template
-        </p>
+        <p className='text-sm text-gray-600'>Choose how you want to start building your template</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-3">
+      <div className='grid grid-cols-1 gap-3'>
         {/* Create from Scratch */}
         <button
           onClick={() => setCreateMode('scratch')}
-          className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors text-left group"
+          className='p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors text-left group'
         >
-          <div className="flex items-start gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors">
-              <Sparkles className="w-5 h-5 text-blue-600" />
+          <div className='flex items-start gap-3'>
+            <div className='flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors'>
+              <Sparkles className='w-5 h-5 text-blue-600' />
             </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900 mb-1">
-                Start from Scratch
-              </h4>
-              <p className="text-sm text-gray-600">
+            <div className='flex-1'>
+              <h4 className='font-medium text-gray-900 mb-1'>Start from Scratch</h4>
+              <p className='text-sm text-gray-600'>
                 Use the form builder to create a new template with custom fields and settings
               </p>
             </div>
@@ -198,17 +201,15 @@ export function TemplateCreateDialog({
         {/* Create Basic Template */}
         <button
           onClick={() => setCreateMode('form')}
-          className="p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors text-left group"
+          className='p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors text-left group'
         >
-          <div className="flex items-start gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
-              <FileText className="w-5 h-5 text-green-600" />
+          <div className='flex items-start gap-3'>
+            <div className='flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors'>
+              <FileText className='w-5 h-5 text-green-600' />
             </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900 mb-1">
-                Create Basic Template
-              </h4>
-              <p className="text-sm text-gray-600">
+            <div className='flex-1'>
+              <h4 className='font-medium text-gray-900 mb-1'>Create Basic Template</h4>
+              <p className='text-sm text-gray-600'>
                 Create a template with basic metadata, then customize it in the form builder
               </p>
             </div>
@@ -219,58 +220,54 @@ export function TemplateCreateDialog({
   );
 
   const renderTemplateForm = () => (
-    <div className="space-y-4">
-      <div className="text-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Template Information
-        </h3>
-        <p className="text-sm text-gray-600">
-          Provide basic information for your template
-        </p>
+    <div className='space-y-4'>
+      <div className='text-center mb-4'>
+        <h3 className='text-lg font-medium text-gray-900 mb-2'>Template Information</h3>
+        <p className='text-sm text-gray-600'>Provide basic information for your template</p>
       </div>
 
       {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
+        <Alert variant='destructive'>
+          <AlertCircle className='h-4 w-4' />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <div className="space-y-4">
+      <div className='space-y-4'>
         <div>
-          <Label htmlFor="template-name">Template Name *</Label>
+          <Label htmlFor='template-name'>Template Name *</Label>
           <Input
-            id="template-name"
-            placeholder="e.g., Customer Feedback Survey"
+            id='template-name'
+            placeholder='e.g., Customer Feedback Survey'
             value={templateData.name}
-            onChange={(e) => setTemplateData(prev => ({ ...prev, name: e.target.value }))}
-            className="mt-1"
+            onChange={e => setTemplateData(prev => ({ ...prev, name: e.target.value }))}
+            className='mt-1'
           />
         </div>
 
         <div>
-          <Label htmlFor="template-description">Description</Label>
+          <Label htmlFor='template-description'>Description</Label>
           <Textarea
-            id="template-description"
-            placeholder="Describe what this template is for and how it should be used..."
+            id='template-description'
+            placeholder='Describe what this template is for and how it should be used...'
             value={templateData.description}
-            onChange={(e) => setTemplateData(prev => ({ ...prev, description: e.target.value }))}
-            className="mt-1"
+            onChange={e => setTemplateData(prev => ({ ...prev, description: e.target.value }))}
+            className='mt-1'
             rows={3}
           />
         </div>
 
         <div>
-          <Label htmlFor="template-category">Category</Label>
+          <Label htmlFor='template-category'>Category</Label>
           <Select
             value={templateData.category}
-            onValueChange={(value) => setTemplateData(prev => ({ ...prev, category: value }))}
+            onValueChange={value => setTemplateData(prev => ({ ...prev, category: value }))}
           >
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select a business category" />
+            <SelectTrigger className='mt-1'>
+              <SelectValue placeholder='Select a business category' />
             </SelectTrigger>
             <SelectContent>
-              {BUSINESS_CATEGORIES.map((category) => (
+              {BUSINESS_CATEGORIES.map(category => (
                 <SelectItem key={category.value} value={category.value}>
                   {category.label}
                 </SelectItem>
@@ -283,54 +280,52 @@ export function TemplateCreateDialog({
   );
 
   const renderScratchForm = () => (
-    <div className="space-y-4">
-      <div className="text-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Template Setup
-        </h3>
-        <p className="text-sm text-gray-600">
+    <div className='space-y-4'>
+      <div className='text-center mb-4'>
+        <h3 className='text-lg font-medium text-gray-900 mb-2'>Template Setup</h3>
+        <p className='text-sm text-gray-600'>
           Provide basic information, then use the form builder to create your template
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className='space-y-4'>
         <div>
-          <Label htmlFor="scratch-name">Template Name (Optional)</Label>
+          <Label htmlFor='scratch-name'>Template Name (Optional)</Label>
           <Input
-            id="scratch-name"
-            placeholder="e.g., Customer Feedback Survey"
+            id='scratch-name'
+            placeholder='e.g., Customer Feedback Survey'
             value={templateData.name}
-            onChange={(e) => setTemplateData(prev => ({ ...prev, name: e.target.value }))}
-            className="mt-1"
+            onChange={e => setTemplateData(prev => ({ ...prev, name: e.target.value }))}
+            className='mt-1'
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className='text-xs text-gray-500 mt-1'>
             You can change this later in the form builder
           </p>
         </div>
 
         <div>
-          <Label htmlFor="scratch-description">Description (Optional)</Label>
+          <Label htmlFor='scratch-description'>Description (Optional)</Label>
           <Textarea
-            id="scratch-description"
-            placeholder="Describe what this template is for..."
+            id='scratch-description'
+            placeholder='Describe what this template is for...'
             value={templateData.description}
-            onChange={(e) => setTemplateData(prev => ({ ...prev, description: e.target.value }))}
-            className="mt-1"
+            onChange={e => setTemplateData(prev => ({ ...prev, description: e.target.value }))}
+            className='mt-1'
             rows={2}
           />
         </div>
 
         <div>
-          <Label htmlFor="scratch-category">Category (Optional)</Label>
+          <Label htmlFor='scratch-category'>Category (Optional)</Label>
           <Select
             value={templateData.category}
-            onValueChange={(value) => setTemplateData(prev => ({ ...prev, category: value }))}
+            onValueChange={value => setTemplateData(prev => ({ ...prev, category: value }))}
           >
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select a business category" />
+            <SelectTrigger className='mt-1'>
+              <SelectValue placeholder='Select a business category' />
             </SelectTrigger>
             <SelectContent>
-              {BUSINESS_CATEGORIES.map((category) => (
+              {BUSINESS_CATEGORIES.map(category => (
                 <SelectItem key={category.value} value={category.value}>
                   {category.label}
                 </SelectItem>
@@ -344,10 +339,10 @@ export function TemplateCreateDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className='max-w-md'>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Plus className="w-5 h-5" />
+          <DialogTitle className='flex items-center gap-2'>
+            <Plus className='w-5 h-5' />
             Create Template
           </DialogTitle>
           <DialogDescription>
@@ -355,7 +350,7 @@ export function TemplateCreateDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className='py-4'>
           {!createMode && renderModeSelection()}
           {createMode === 'form' && renderTemplateForm()}
           {createMode === 'scratch' && renderScratchForm()}
@@ -364,28 +359,30 @@ export function TemplateCreateDialog({
         {createMode && (
           <>
             <Separator />
-            <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setCreateMode(null)}>
+            <div className='flex justify-between'>
+              <Button variant='outline' onClick={() => setCreateMode(null)}>
                 Back
               </Button>
-              
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleClose}>
+
+              <div className='flex gap-2'>
+                <Button variant='outline' onClick={handleClose}>
                   Cancel
                 </Button>
-                
+
                 <Button
-                  onClick={createMode === 'scratch' ? handleCreateFromScratch : handleCreateFromForm}
+                  onClick={
+                    createMode === 'scratch' ? handleCreateFromScratch : handleCreateFromForm
+                  }
                   disabled={!validateForm() || loading}
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      <Loader2 className='w-4 h-4 animate-spin mr-2' />
                       Creating...
                     </>
                   ) : (
                     <>
-                      <Plus className="w-4 h-4 mr-2" />
+                      <Plus className='w-4 h-4 mr-2' />
                       {createMode === 'scratch' ? 'Open Form Builder' : 'Create Template'}
                     </>
                   )}

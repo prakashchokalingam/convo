@@ -1,9 +1,10 @@
-"use client"; // This page will fetch data client-side
+'use client'; // This page will fetch data client-side
 
+import { Terminal } from 'lucide-react'; // For Alert icon
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Terminal } from "lucide-react"; // For Alert icon
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface AdminStats {
   totalUsers: number;
@@ -27,8 +28,8 @@ export default function AdminOverviewPage() {
         }
         const data: AdminStats = await response.json();
         setStats(data);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch statistics.');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch statistics.');
       } finally {
         setIsLoading(false);
       }
@@ -39,17 +40,19 @@ export default function AdminOverviewPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Admin Overview</h1>
+      <h1 className='text-3xl font-bold mb-6'>Admin Overview</h1>
 
       {isLoading && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
           {[...Array(3)].map((_, i) => (
             <Card key={i}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Loading...</CardTitle>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardTitle className='text-sm font-medium text-muted-foreground'>
+                  Loading...
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-8 bg-muted rounded animate-pulse"></div>
+                <div className='h-8 bg-muted rounded animate-pulse'></div>
               </CardContent>
             </Card>
           ))}
@@ -57,45 +60,45 @@ export default function AdminOverviewPage() {
       )}
 
       {error && (
-        <Alert variant="destructive" className="mb-6">
-          <Terminal className="h-4 w-4" />
+        <Alert variant='destructive' className='mb-6'>
+          <Terminal className='h-4 w-4' />
           <AlertTitle>Error Fetching Stats</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {!isLoading && !error && stats && (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium text-muted-foreground'>
                 Total Users
               </CardTitle>
               {/* You can add an icon here if you like, e.g., Users icon from lucide-react */}
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
+              <div className='text-2xl font-bold'>{stats.totalUsers}</div>
               {/* <p className="text-xs text-muted-foreground">+20.1% from last month</p> */}
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium text-muted-foreground'>
                 Total Workspaces
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalWorkspaces}</div>
+              <div className='text-2xl font-bold'>{stats.totalWorkspaces}</div>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium text-muted-foreground'>
                 Active Subscriptions
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.activeSubscriptions}</div>
+              <div className='text-2xl font-bold'>{stats.activeSubscriptions}</div>
             </CardContent>
           </Card>
         </div>

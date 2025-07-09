@@ -80,7 +80,7 @@ const basicOpenApiSpec = {
         tags: ['Forms'],
         security: [{ ClerkAuth: [] }],
         responses: {
-          '200': {
+          200: {
             description: 'Successfully retrieved forms',
             content: {
               'application/json': {
@@ -96,15 +96,13 @@ const basicOpenApiSpec = {
               },
             },
           },
-          '401': { $ref: '#/components/responses/UnauthorizedError' },
-          '500': { $ref: '#/components/responses/InternalServerError' },
+          401: { $ref: '#/components/responses/UnauthorizedError' },
+          500: { $ref: '#/components/responses/InternalServerError' },
         },
       },
     },
   },
-  tags: [
-    { name: 'Forms', description: 'Form management operations' },
-  ],
+  tags: [{ name: 'Forms', description: 'Form management operations' }],
 };
 
 // Ensure directory exists

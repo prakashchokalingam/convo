@@ -28,12 +28,14 @@ Convo is a **Next.js 14 application** with these main parts:
 We use **route groups** and **subdomain simulation** for clean separation:
 
 ### Production URLs
+
 - **Marketing**: `convo.ai` (e.g., `https://convo.ai/pricing`)
 - **App**: `app.convo.ai` (e.g., `https://app.convo.ai/workspace-slug/settings`)
 - **Forms**: `forms.convo.ai` (e.g., `https://forms.convo.ai/workspace-slug/form-id`)
 - **Admin**: `admin.convo.ai` (e.g., `https://admin.convo.ai/overview`)
 
 ### Development URLs (Path-based)
+
 - **Marketing**: `localhost:3002/marketing` (e.g., `http://localhost:3002/marketing/pricing`)
 - **App**: `localhost:3002/app` (e.g., `http://localhost:3002/app/workspace-slug/settings`)
 - **Forms**: `localhost:3002/forms` (e.g., `http://localhost:3002/forms/workspace-slug/form-id`)
@@ -67,20 +69,25 @@ app/
 └── layout.tsx                # Root layout (applies to all, including marketing if not overridden)
 └── page.tsx                  # Root page (often the main marketing homepage)
 ```
-*Note: `app/page.tsx` is often the marketing homepage. If marketing has its own layout and more pages, it might be in `app/marketing/`.*
+
+_Note: `app/page.tsx` is often the marketing homepage. If marketing has its own layout and more pages, it might be in `app/marketing/`._
 
 ## Key Components
 
 ### Directory-based Routing
+
 Next.js uses directory structure within `app/` for routing:
+
 - `app/app/...` maps to `/app/...` URLs (main application, `app.convo.ai`).
 - `app/admin/...` maps to `/admin/...` URLs (admin dashboard, `admin.convo.ai`).
 - `app/forms/...` maps to `/forms/...` URLs (public forms, `forms.convo.ai`).
 - `app/marketing/...` or root `app/page.tsx` for marketing site (`convo.ai`).
-Route groups like `(groupName)` can still be used for organization without affecting URL paths, if needed.
+  Route groups like `(groupName)` can still be used for organization without affecting URL paths, if needed.
 
 ### Context Detection
+
 The app detects which "context" (or part of the site) you're in, often via middleware:
+
 ```typescript
 // Example logic in middleware.ts
 // let context: 'marketing' | 'app' | 'forms' | 'admin' = 'marketing';
@@ -88,11 +95,13 @@ The app detects which "context" (or part of the site) you're in, often via middl
 ```
 
 This determines:
+
 - What layout to show
 - Whether authentication is required
 - How URLs are generated
 
 ### Authentication Flow
+
 1. **Marketing Context**: No auth required
 2. **App Context**: Requires login → redirects to workspace
 3. **Forms Context**: Public access for form submissions
@@ -100,16 +109,19 @@ This determines:
 ## Data Flow
 
 ### 1. Form Creation
+
 ```
 User types prompt → AI generates schema → Save to database → Show in builder
 ```
 
 ### 2. Form Submission
+
 ```
 User fills form → Validate data → Save response → Show thank you
 ```
 
 ### 3. Conversational Mode
+
 ```
 Form schema → Generate chat flow → Progressive disclosure → Same data collection
 ```
@@ -117,6 +129,7 @@ Form schema → Generate chat flow → Progressive disclosure → Same data coll
 ## Database Schema
 
 ### Core Tables
+
 - **users** - User profiles from Clerk
 - **workspaces** - Team/personal workspaces
 - **workspace_members** - Who has access to what
@@ -125,6 +138,7 @@ Form schema → Generate chat flow → Progressive disclosure → Same data coll
 - **form_responses** - Submitted form data
 
 ### Key Relationships
+
 ```
 User → Workspace (via workspace_members)
 Workspace → Forms (one-to-many)
@@ -135,6 +149,7 @@ Form → Responses (one-to-many)
 ## AI Integration
 
 ### Prompt to Schema
+
 ```typescript
 // User input: "Create a contact form"
 // AI output: JSON schema with fields, validation, etc.
@@ -148,7 +163,9 @@ Form → Responses (one-to-many)
 ```
 
 ### Conversational Flow
+
 The same form schema gets transformed into a chat-like experience:
+
 - One question at a time
 - Natural transitions
 - Progress tracking
@@ -157,11 +174,13 @@ The same form schema gets transformed into a chat-like experience:
 ## State Management
 
 ### Client State
+
 - **React Hook Form** for form handling
 - **URL state** for navigation and filters
 - **Local storage** for user preferences
 
 ### Server State
+
 - **Database** as source of truth
 - **Clerk** for authentication state
 - **API routes** for data fetching
@@ -169,12 +188,14 @@ The same form schema gets transformed into a chat-like experience:
 ## Styling & UI
 
 ### Design System
+
 - **Tailwind CSS** for utility-first styling
 - **shadcn/ui** for consistent components
 - **CSS variables** for theming
 - **Mobile-first** responsive design
 
 ### Component Structure
+
 ```
 components/
 ├── ui/              # Basic UI components (buttons, inputs)
@@ -187,12 +208,14 @@ components/
 ## Development Workflow
 
 ### Local Development
+
 1. **Start database**: `npm run db:up`
 2. **Start app**: `npm run dev`
 3. **Make changes**: Hot reload automatically
 4. **Test different contexts**: Navigate to paths like `/app` or `/forms` (e.g., `http://localhost:3002/app/dashboard`)
 
 ### Database Changes
+
 1. **Edit schema**: `lib/db/schema.ts`
 2. **Generate migration**: `npm run db:generate`
 3. **Apply changes**: `npm run db:push`
@@ -200,15 +223,18 @@ components/
 ## Performance Considerations
 
 ### Server Components
+
 - Most pages are server components (faster initial load)
 - Client components only when needed (forms, interactive elements)
 
 ### Database Optimization
+
 - Proper indexing on frequently queried fields
 - Pagination for large datasets
 - Connection pooling for database efficiency
 
 ### Caching Strategy
+
 - Static pages cached at CDN level
 - API responses cached where appropriate
 - Database queries optimized with proper relations
@@ -216,16 +242,19 @@ components/
 ## Security
 
 ### Authentication
+
 - **Clerk** handles all auth complexity
 - **Route protection** at layout level
 - **API protection** using Clerk middleware
 
 ### Data Validation
+
 - **Zod schemas** for all inputs
 - **Server-side validation** for all API routes
 - **SQL injection protection** via Drizzle ORM
 
 ### Access Control
+
 - **Workspace-level permissions** (owner, admin, member, viewer)
 - **Route-level access checks**
 - **API-level authorization**
@@ -233,11 +262,13 @@ components/
 ## Deployment Architecture
 
 ### Production Setup
+
 ```
 Vercel (Frontend + API) → Supabase (Database) → Clerk (Auth)
 ```
 
 ### Environment Variables
+
 ```bash
 # Database
 DATABASE_URL=postgresql://...
@@ -254,6 +285,7 @@ NEXT_PUBLIC_APP_URL=https://convo.ai
 ```
 
 This architecture provides:
+
 - **Scalable** - Can handle growth
 - **Maintainable** - Clear separation of concerns
 - **Secure** - Proper authentication and validation

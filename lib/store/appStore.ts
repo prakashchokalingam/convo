@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import type {
   AppStoreState,
   AppStoreActions,
@@ -23,7 +24,7 @@ const initialState: AppStoreState = {
 };
 
 // Create the Zustand store
-export const useAppStore = create<StoreType>((set, get) => ({
+export const useAppStore = create<StoreType>((set, _get) => ({
   ...initialState,
 
   loadBootstrapData: async (workspaceSlug?: string) => {

@@ -1,8 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/shared/ui/button';
 import {
   Check,
   ArrowRight,
@@ -13,8 +11,12 @@ import {
   Building,
   Users,
   BarChart3,
-  Shield
+  Shield,
 } from 'lucide-react';
+import { useState } from 'react';
+
+import { Button } from '@/components/shared/ui/button';
+
 
 const plans = [
   {
@@ -28,11 +30,11 @@ const plans = [
       '100 responses/month',
       'Basic conversational mode',
       'Email support',
-      'Standard templates'
+      'Standard templates',
     ],
     limitations: ['Limited to 100 responses', 'Basic integrations only', 'Convo branding'],
     cta: 'Start Free',
-    popular: false
+    popular: false,
   },
   {
     name: 'Starter',
@@ -48,11 +50,11 @@ const plans = [
       'Priority email support',
       'Custom branding',
       'Basic analytics',
-      '20+ integrations'
+      '20+ integrations',
     ],
     limitations: [],
     cta: 'Start Free Trial',
-    popular: false
+    popular: false,
   },
   {
     name: 'Pro',
@@ -70,11 +72,11 @@ const plans = [
       'Advanced analytics',
       'All integrations',
       'Team collaboration',
-      'Custom CSS'
+      'Custom CSS',
     ],
     limitations: [],
     cta: 'Start Free Trial',
-    popular: true
+    popular: true,
   },
   {
     name: 'Enterprise',
@@ -91,67 +93,67 @@ const plans = [
       'SLA guarantees',
       'Advanced compliance',
       'Custom training',
-      'Priority feature requests'
+      'Priority feature requests',
     ],
     limitations: [],
     cta: 'Contact Sales',
-    popular: false
-  }
+    popular: false,
+  },
 ];
 
 export function PricingPreviewSection() {
   const [isAnnual, setIsAnnual] = useState(true);
 
   const getPrice = (price: number | null) => {
-    if (price === null) return 'Custom';
-    if (price === 0) return 'Free';
-    
+    if (price === null) {return 'Custom';}
+    if (price === 0) {return 'Free';}
+
     const finalPrice = isAnnual ? Math.round(price * 0.8) : price;
     return `$${finalPrice}`;
   };
 
   const getSavings = (price: number) => {
-    if (price === 0) return null;
+    if (price === 0) {return null;}
     const savings = Math.round(price * 0.2);
     return `Save $${savings}/mo`;
   };
 
   return (
-    <section id="pricing" className="py-20 lg:py-32 bg-muted/30">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        
+    <section id='pricing' className='py-20 lg:py-32 bg-muted/30'>
+      <div className='max-w-7xl mx-auto px-6 lg:px-8'>
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className='text-center mb-16'>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm font-medium mb-6"
+            className='inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm font-medium mb-6'
           >
-            <CreditCard className="w-4 h-4 mr-2" />
+            <CreditCard className='w-4 h-4 mr-2' />
             Simple Pricing
           </motion.div>
-          
+
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
+            className='text-3xl md:text-4xl lg:text-5xl font-bold mb-6'
           >
             Plans that grow
-            <span className="block text-primary">with your business</span>
+            <span className='block text-primary'>with your business</span>
           </motion.h2>
-          
+
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8"
+            className='text-lg text-muted-foreground max-w-3xl mx-auto mb-8'
           >
-            Start free and scale as you grow. All plans include our core AI features and conversational forms.
+            Start free and scale as you grow. All plans include our core AI features and
+            conversational forms.
           </motion.p>
 
           {/* Billing Toggle */}
@@ -160,7 +162,7 @@ export function PricingPreviewSection() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             viewport={{ once: true }}
-            className="inline-flex items-center bg-muted rounded-lg p-1"
+            className='inline-flex items-center bg-muted rounded-lg p-1'
           >
             <button
               onClick={() => setIsAnnual(false)}
@@ -181,7 +183,7 @@ export function PricingPreviewSection() {
               }`}
             >
               Annual
-              <span className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 text-xs px-2 py-1 rounded-full">
+              <span className='bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 text-xs px-2 py-1 rounded-full'>
                 Save 20%
               </span>
             </button>
@@ -189,7 +191,7 @@ export function PricingPreviewSection() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid lg:grid-cols-4 gap-8">
+        <div className='grid lg:grid-cols-4 gap-8'>
           {plans.map((plan, index) => {
             const Icon = plan.icon;
             const price = getPrice(plan.price);
@@ -210,48 +212,50 @@ export function PricingPreviewSection() {
               >
                 {/* Popular Badge */}
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-primary text-white text-sm font-medium px-4 py-2 rounded-full flex items-center gap-2">
-                      <Crown className="w-4 h-4" />
+                  <div className='absolute -top-4 left-1/2 transform -translate-x-1/2'>
+                    <div className='bg-primary text-white text-sm font-medium px-4 py-2 rounded-full flex items-center gap-2'>
+                      <Crown className='w-4 h-4' />
                       Most Popular
                     </div>
                   </div>
                 )}
 
                 {/* Plan Header */}
-                <div className="text-center mb-8">
-                  <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${plan.color} text-white mb-4`}>
-                    <Icon className="w-6 h-6" />
+                <div className='text-center mb-8'>
+                  <div
+                    className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${plan.color} text-white mb-4`}
+                  >
+                    <Icon className='w-6 h-6' />
                   </div>
-                  
-                  <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                  <p className="text-muted-foreground text-sm mb-4">{plan.description}</p>
-                  
-                  <div className="mb-2">
-                    <span className="text-4xl font-bold">{price}</span>
+
+                  <h3 className='text-xl font-bold mb-2'>{plan.name}</h3>
+                  <p className='text-muted-foreground text-sm mb-4'>{plan.description}</p>
+
+                  <div className='mb-2'>
+                    <span className='text-4xl font-bold'>{price}</span>
                     {plan.price !== null && plan.price > 0 && (
-                      <span className="text-muted-foreground">/{isAnnual ? 'mo' : 'mo'}</span>
+                      <span className='text-muted-foreground'>/{isAnnual ? 'mo' : 'mo'}</span>
                     )}
                   </div>
-                  
+
                   {savings && isAnnual && (
-                    <div className="text-sm text-green-600 font-medium">{savings}</div>
+                    <div className='text-sm text-green-600 font-medium'>{savings}</div>
                   )}
                 </div>
 
                 {/* Features */}
-                <div className="space-y-3 mb-8">
+                <div className='space-y-3 mb-8'>
                   {plan.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
+                    <div key={featureIndex} className='flex items-center gap-3'>
+                      <Check className='w-4 h-4 text-green-500 flex-shrink-0' />
+                      <span className='text-sm'>{feature}</span>
                     </div>
                   ))}
-                  
+
                   {plan.limitations.map((limitation, limitIndex) => (
-                    <div key={limitIndex} className="flex items-center gap-3 opacity-60">
-                      <div className="w-4 h-4 border border-muted-foreground rounded-full flex-shrink-0"></div>
-                      <span className="text-sm text-muted-foreground">{limitation}</span>
+                    <div key={limitIndex} className='flex items-center gap-3 opacity-60'>
+                      <div className='w-4 h-4 border border-muted-foreground rounded-full flex-shrink-0'></div>
+                      <span className='text-sm text-muted-foreground'>{limitation}</span>
                     </div>
                   ))}
                 </div>
@@ -262,13 +266,15 @@ export function PricingPreviewSection() {
                     plan.popular
                       ? 'bg-primary hover:bg-primary/90'
                       : plan.name === 'Enterprise'
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700'
-                      : ''
+                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700'
+                        : ''
                   }`}
-                  variant={plan.popular ? 'default' : plan.name === 'Enterprise' ? 'default' : 'outline'}
+                  variant={
+                    plan.popular ? 'default' : plan.name === 'Enterprise' ? 'default' : 'outline'
+                  }
                 >
                   {plan.cta}
-                  {plan.name !== 'Enterprise' && <ArrowRight className="w-4 h-4 ml-2" />}
+                  {plan.name !== 'Enterprise' && <ArrowRight className='w-4 h-4 ml-2' />}
                 </Button>
               </motion.div>
             );
@@ -281,11 +287,11 @@ export function PricingPreviewSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mt-16 text-center"
+          className='mt-16 text-center'
         >
-          <Button variant="outline" size="lg" className="mb-8">
+          <Button variant='outline' size='lg' className='mb-8'>
             View Detailed Feature Comparison
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <ArrowRight className='w-4 h-4 ml-2' />
           </Button>
         </motion.div>
 
@@ -295,35 +301,35 @@ export function PricingPreviewSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-16 pt-12 border-t border-border"
+          className='grid grid-cols-1 md:grid-cols-4 gap-8 mt-16 pt-12 border-t border-border'
         >
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Shield className="w-5 h-5 text-green-500" />
-              <span className="text-sm font-medium">30-day free trial</span>
+          <div className='text-center'>
+            <div className='flex items-center justify-center gap-2 mb-2'>
+              <Shield className='w-5 h-5 text-green-500' />
+              <span className='text-sm font-medium'>30-day free trial</span>
             </div>
-            <p className="text-xs text-muted-foreground">No credit card required</p>
+            <p className='text-xs text-muted-foreground'>No credit card required</p>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <CreditCard className="w-5 h-5 text-blue-500" />
-              <span className="text-sm font-medium">Cancel anytime</span>
+          <div className='text-center'>
+            <div className='flex items-center justify-center gap-2 mb-2'>
+              <CreditCard className='w-5 h-5 text-blue-500' />
+              <span className='text-sm font-medium'>Cancel anytime</span>
             </div>
-            <p className="text-xs text-muted-foreground">No long-term contracts</p>
+            <p className='text-xs text-muted-foreground'>No long-term contracts</p>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <BarChart3 className="w-5 h-5 text-purple-500" />
-              <span className="text-sm font-medium">Usage-based scaling</span>
+          <div className='text-center'>
+            <div className='flex items-center justify-center gap-2 mb-2'>
+              <BarChart3 className='w-5 h-5 text-purple-500' />
+              <span className='text-sm font-medium'>Usage-based scaling</span>
             </div>
-            <p className="text-xs text-muted-foreground">Pay only for what you use</p>
+            <p className='text-xs text-muted-foreground'>Pay only for what you use</p>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Users className="w-5 h-5 text-orange-500" />
-              <span className="text-sm font-medium">24/7 support</span>
+          <div className='text-center'>
+            <div className='flex items-center justify-center gap-2 mb-2'>
+              <Users className='w-5 h-5 text-orange-500' />
+              <span className='text-sm font-medium'>24/7 support</span>
             </div>
-            <p className="text-xs text-muted-foreground">For all paid plans</p>
+            <p className='text-xs text-muted-foreground'>For all paid plans</p>
           </div>
         </motion.div>
       </div>

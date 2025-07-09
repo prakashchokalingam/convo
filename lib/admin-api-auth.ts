@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getAuth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface AdminAuthResult {
   authorized: boolean;
@@ -12,7 +12,12 @@ export async function checkAdminApiAuth(req: NextRequest): Promise<AdminAuthResu
   const { userId } = getAuth(req);
 
   if (!userId) {
-    return { authorized: false, userId: null, error: 'Unauthorized: No user ID found.', status: 401 };
+    return {
+      authorized: false,
+      userId: null,
+      error: 'Unauthorized: No user ID found.',
+      status: 401,
+    };
   }
 
   try {
@@ -23,8 +28,13 @@ export async function checkAdminApiAuth(req: NextRequest): Promise<AdminAuthResu
 
     const adminEmailsEnv = process.env.ADMIN_EMAILS;
     if (!adminEmailsEnv) {
-      console.warn("ADMIN_EMAILS environment variable is not set. Denying API access.");
-      return { authorized: false, userId, error: 'Forbidden: Admin access not configured.', status: 403 };
+      console.warn('ADMIN_EMAILS environment variable is not set. Denying API access.');
+      return {
+        authorized: false,
+        userId,
+        error: 'Forbidden: Admin access not configured.',
+        status: 403,
+      };
     }
 
     const allowedAdminEmails = adminEmailsEnv.split(',').map(email => email.trim().toLowerCase());
@@ -33,13 +43,23 @@ export async function checkAdminApiAuth(req: NextRequest): Promise<AdminAuthResu
     const isAuthorized = userEmails.some(email => allowedAdminEmails.includes(email));
 
     if (!isAuthorized) {
-      return { authorized: false, userId, error: 'Forbidden: User is not an authorized admin.', status: 403 };
+      return {
+        authorized: false,
+        userId,
+        error: 'Forbidden: User is not an authorized admin.',
+        status: 403,
+      };
     }
 
     return { authorized: true, userId };
   } catch (error) {
     console.error('Error during admin API authorization:', error);
-    return { authorized: false, userId, error: 'Internal Server Error during authorization.', status: 500 };
+    return {
+      authorized: false,
+      userId,
+      error: 'Internal Server Error during authorization.',
+      status: 500,
+    };
   }
 }
 
@@ -48,7 +68,10 @@ export async function checkAdminApiAuth(req: NextRequest): Promise<AdminAuthResu
  * Usage: export const GET = withAdminApiAuth(async (req, { params }) => { ... });
  */
 export function withAdminApiAuth<T extends Record<string, unknown>>(
-  handler: (req: NextRequest, context: { params: T, authResult: AdminAuthResult }) => Promise<NextResponse>
+  handler: (
+    req: NextRequest,
+    context: { params: T; authResult: AdminAuthResult }
+  ) => Promise<NextResponse>
 ) {
   return async (req: NextRequest, context: { params: T }): Promise<NextResponse> => {
     const authResult = await checkAdminApiAuth(req);

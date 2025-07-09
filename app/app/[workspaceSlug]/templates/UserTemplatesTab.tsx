@@ -1,14 +1,20 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { TemplateGrid, TemplateAction, TemplatePermissions } from '@/components/app/templates/core';
-import { TemplatePreview } from '@/components/app/templates/core';
-import { Template } from '@/lib/db/schema';
 import { Building, Loader2, AlertCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useCallback } from 'react';
+
+import { TemplateGrid, TemplateAction, TemplatePermissions , TemplatePreview } from '@/components/app/templates/core';
 import { Alert, AlertDescription } from '@/components/shared/ui/alert';
 import { Button } from '@/components/shared/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shared/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/shared/ui/dialog';
+import { Template } from '@/lib/db/schema';
 import { getFormEditorUrl, getFormsUrl } from '@/lib/urls/workspace-urls';
 
 interface UserTemplatesTabProps {
@@ -21,16 +27,16 @@ interface UserTemplatesTabProps {
 
 /**
  * UserTemplatesTab - Displays and manages workspace templates
- * 
+ *
  * Shows workspace-specific templates with full CRUD operations for users
  * with appropriate permissions.
  */
-export function UserTemplatesTab({ 
+export function UserTemplatesTab({
   workspaceId,
-  workspaceSlug, 
-  userRole, 
+  workspaceSlug,
+  userRole: _userRole,
   canCreateTemplates,
-  onCreateTemplate 
+  onCreateTemplate,
 }: UserTemplatesTabProps) {
   const router = useRouter();
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -54,7 +60,7 @@ export function UserTemplatesTab({
   const fetchWorkspaceTemplates = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const params = new URLSearchParams({
         workspaceId,
@@ -63,11 +69,11 @@ export function UserTemplatesTab({
       });
 
       const response = await fetch(`/api/templates?${params}`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch templates');
       }
-      
+
       const data = await response.json();
       // Filter to only workspace templates (extra safety)
       const workspaceTemplates = data.templates?.filter((t: Template) => !t.isGlobal) || [];
@@ -86,10 +92,10 @@ export function UserTemplatesTab({
 
   const handleTemplateAction = async (action: TemplateAction) => {
     const { type, templateId } = action;
-    
+
     // Set loading state for this specific action
     setActionLoading(prev => ({ ...prev, [`${templateId}-${type}`]: true }));
-    
+
     try {
       switch (type) {
         case 'preview':
@@ -98,29 +104,29 @@ export function UserTemplatesTab({
             setPreviewTemplate(template);
           }
           break;
-          
+
         case 'clone':
           await handleCloneTemplate(templateId);
           break;
-          
+
         case 'createForm':
           await handleCreateForm(templateId);
           break;
-          
+
         case 'edit':
           await handleEditTemplate(templateId);
           break;
-          
+
         case 'delete':
           const templateToDelete = templates.find(t => t.id === templateId);
           if (templateToDelete) {
             setDeleteConfirmDialog({
               isOpen: true,
-              template: templateToDelete
+              template: templateToDelete,
             });
           }
           break;
-          
+
         default:
           console.warn('Unhandled template action:', type);
       }
@@ -149,14 +155,13 @@ export function UserTemplatesTab({
         throw new Error('Failed to clone template');
       }
 
-      const data = await response.json();
-      
+      await response.json();
+
       // Success feedback
-      console.log('Template cloned successfully:', data.template.name);
-      
+      // console.log('Template cloned successfully:', _data.template.name);
+
       // Refresh the templates list
       fetchWorkspaceTemplates();
-      
     } catch (error) {
       console.error('Error cloning template:', error);
       throw error;
@@ -189,11 +194,10 @@ export function UserTemplatesTab({
       }
 
       const data = await response.json();
-      
+
       // Navigate to the form editor
       const formEditorUrl = getFormEditorUrl(workspaceSlug, data.form.id);
       router.push(formEditorUrl);
-      
     } catch (error) {
       console.error('Error creating form from template:', error);
       throw error;
@@ -218,14 +222,13 @@ export function UserTemplatesTab({
       }
 
       // Success feedback
-      console.log('Template deleted successfully');
-      
+      // console.log('Template deleted successfully');
+
       // Remove template from local state
       setTemplates(prev => prev.filter(t => t.id !== templateId));
-      
+
       // Close dialog
       setDeleteConfirmDialog({ isOpen: false, template: null });
-      
     } catch (error) {
       console.error('Error deleting template:', error);
       throw error;
@@ -238,10 +241,10 @@ export function UserTemplatesTab({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-400 mx-auto mb-4" />
-          <div className="text-gray-600">Loading workspace templates...</div>
+      <div className='flex items-center justify-center py-12'>
+        <div className='text-center'>
+          <Loader2 className='w-8 h-8 animate-spin text-gray-400 mx-auto mb-4' />
+          <div className='text-gray-600'>Loading workspace templates...</div>
         </div>
       </div>
     );
@@ -249,11 +252,11 @@ export function UserTemplatesTab({
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription className="flex items-center justify-between">
+      <Alert variant='destructive'>
+        <AlertCircle className='h-4 w-4' />
+        <AlertDescription className='flex items-center justify-between'>
           <span>{error}</span>
-          <Button variant="outline" size="sm" onClick={retryFetch}>
+          <Button variant='outline' size='sm' onClick={retryFetch}>
             Try Again
           </Button>
         </AlertDescription>
@@ -267,26 +270,22 @@ export function UserTemplatesTab({
         templates={templates}
         permissions={permissions}
         onTemplateAction={handleTemplateAction}
-        title="My Templates"
-        description="Templates created by your team. Create, edit, and manage custom templates for your workspace."
+        title='My Templates'
+        description='Templates created by your team. Create, edit, and manage custom templates for your workspace.'
         showFilters={true}
         showCreateButton={canCreateTemplates}
         onCreateTemplate={onCreateTemplate}
         emptyState={
-          <div className="text-center py-12">
-            <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <Building className="w-8 h-8 text-gray-400" />
+          <div className='text-center py-12'>
+            <div className='mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4'>
+              <Building className='w-8 h-8 text-gray-400' />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No workspace templates yet
-            </h3>
-            <p className="text-sm text-gray-600 mb-4 max-w-sm mx-auto">
+            <h3 className='text-lg font-medium text-gray-900 mb-2'>No workspace templates yet</h3>
+            <p className='text-sm text-gray-600 mb-4 max-w-sm mx-auto'>
               Create your first template or clone a global template to get started.
             </p>
             {canCreateTemplates && (
-              <Button onClick={onCreateTemplate}>
-                Create Your First Template
-              </Button>
+              <Button onClick={onCreateTemplate}>Create Your First Template</Button>
             )}
           </div>
         }
@@ -303,34 +302,34 @@ export function UserTemplatesTab({
       />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog 
-        open={deleteConfirmDialog.isOpen} 
-        onOpenChange={(open) => setDeleteConfirmDialog({ isOpen: open, template: null })}
+      <Dialog
+        open={deleteConfirmDialog.isOpen}
+        onOpenChange={open => setDeleteConfirmDialog({ isOpen: open, template: null })}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Template</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{deleteConfirmDialog.template?.name}"?
-              This action cannot be undone.
+              Are you sure you want to delete &quot;{deleteConfirmDialog.template?.name}&quot;? This action
+              cannot be undone.
               {deleteConfirmDialog.template && deleteConfirmDialog.template.usageCount > 0 && (
-                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm">
-                  ⚠️ This template has been used to create {deleteConfirmDialog.template.usageCount} form(s). 
-                  Deleting it won't affect existing forms.
+                <div className='mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm'>
+                  ⚠️ This template has been used to create {deleteConfirmDialog.template.usageCount}{' '}
+                  form(s). Deleting it won&apos;t affect existing forms.
                 </div>
               )}
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="flex justify-end gap-2">
-            <Button 
-              variant="outline" 
+
+          <div className='flex justify-end gap-2'>
+            <Button
+              variant='outline'
               onClick={() => setDeleteConfirmDialog({ isOpen: false, template: null })}
             >
               Cancel
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant='destructive'
               onClick={() => {
                 if (deleteConfirmDialog.template) {
                   handleDeleteTemplate(deleteConfirmDialog.template.id);
@@ -340,7 +339,7 @@ export function UserTemplatesTab({
             >
               {actionLoading[`${deleteConfirmDialog.template?.id}-delete`] ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  <Loader2 className='w-4 h-4 animate-spin mr-2' />
                   Deleting...
                 </>
               ) : (

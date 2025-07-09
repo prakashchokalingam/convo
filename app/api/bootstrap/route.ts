@@ -1,6 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs';
+import { NextRequest, NextResponse } from 'next/server';
 
+import {
+  getUserSubscription,
+  getUserPlanLimits,
+  canCreateWorkspace,
+  getWorkspaceMemberUsage,
+  getWorkspaceUsage,
+  PLAN_CONFIGS,
+  type Plan,
+} from '@/lib/plans';
 import type {
   BootstrapData,
   BootstrapUserData,
@@ -10,21 +19,9 @@ import type {
   BootstrapFeaturesData,
   BootstrapAbilitiesData,
 } from '@/lib/types/bootstrap';
-import type { WorkspaceWithRole } from '@/lib/types/workspace'; // WorkspaceWithRole is BootstrapCurrentWorkspaceData
-import type { Plan } from '@/lib/plans';
-
-import {
-  getUserSubscription,
-  getUserPlanLimits,
-  canCreateWorkspace,
-  getWorkspaceMemberUsage,
-  getWorkspaceUsage, // Added for currentWorkspacesOwned
-  PLAN_CONFIGS,
-} from '@/lib/plans';
 import {
   getWorkspaceBySlug,
   getUserDefaultWorkspace,
-  // getCurrentUserWorkspaces, // Not directly needed if getWorkspaceUsage provides count
 } from '@/lib/workspace-server';
 
 export async function GET(request: NextRequest) {
@@ -79,7 +76,9 @@ export async function GET(request: NextRequest) {
         seatLimitsData = {
           maxSeats: memberUsage.members.limit,
           currentSeats: memberUsage.members.used,
-          canInviteMoreMembers: memberUsage.members.limit === -1 || memberUsage.members.used < memberUsage.members.limit,
+          canInviteMoreMembers:
+            memberUsage.members.limit === -1 ||
+            memberUsage.members.used < memberUsage.members.limit,
         };
       }
     }
@@ -111,7 +110,6 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json(bootstrapResponseData);
-
   } catch (error) {
     console.error('Error fetching bootstrap data:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

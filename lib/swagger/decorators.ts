@@ -17,7 +17,7 @@ export class SwaggerDecorator {
     auth?: boolean;
   }): string {
     const { summary, description, tags, responseSchema, auth = true } = config;
-    
+
     return `
 /**
  * @swagger
@@ -68,7 +68,7 @@ export class SwaggerDecorator {
     parameters?: Array<{ name: string; type: string; description: string; required?: boolean }>;
   }): string {
     const { summary, description, tags, responseSchema, auth = true, parameters = [] } = config;
-    
+
     return `
 /**
  * @swagger
@@ -79,13 +79,17 @@ export class SwaggerDecorator {
  *     tags: [${tags.map(tag => `"${tag}"`).join(', ')}]
  *     ${auth ? 'security:\n *       - ClerkAuth: []' : ''}
  *     ${parameters.length > 0 ? 'parameters:' : ''}
- *     ${parameters.map(param => `
+ *     ${parameters
+   .map(
+     param => `
  *       - in: ${param.name.includes('Id') ? 'path' : 'query'}
  *         name: ${param.name}
  *         ${param.required !== false ? 'required: true' : ''}
  *         schema:
  *           type: ${param.type}
- *         description: ${param.description}`).join('')}
+ *         description: ${param.description}`
+   )
+   .join('')}
  *     responses:
  *       200:
  *         description: Successfully retrieved resource
@@ -114,7 +118,7 @@ export class SwaggerDecorator {
     auth?: boolean;
   }): string {
     const { summary, description, tags, requestSchema, responseSchema, auth = true } = config;
-    
+
     return `
 /**
  * @swagger
@@ -124,19 +128,23 @@ export class SwaggerDecorator {
  *     ${description ? `description: ${description}` : ''}
  *     tags: [${tags.map(tag => `"${tag}"`).join(', ')}]
  *     ${auth ? 'security:\n *       - ClerkAuth: []' : ''}
- *     ${requestSchema ? `requestBody:
+ *     ${
+   requestSchema
+     ? `requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/${requestSchema}'` : ''}
+ *             $ref: '#/components/schemas/${requestSchema}'`
+     : ''
+ }
  *     responses:
  *       201:
  *         description: Resource created successfully
  *         content:
  *           application/json:
  *             schema:
- *               ${responseSchema ? `$ref: '#/components/schemas/${responseSchema}'` : '$ref: \'#/components/schemas/SuccessResponse\''}
+ *               ${responseSchema ? `$ref: '#/components/schemas/${responseSchema}'` : "$ref: '#/components/schemas/SuccessResponse'"}
  *       400:
  *         $ref: '#/components/responses/ValidationError'
  *       401:
@@ -171,8 +179,16 @@ export class SwaggerDecorator {
     auth?: boolean;
     pathParams?: Array<{ name: string; description: string }>;
   }): string {
-    const { summary, description, tags, requestSchema, responseSchema, auth = true, pathParams = [] } = config;
-    
+    const {
+      summary,
+      description,
+      tags,
+      requestSchema,
+      responseSchema,
+      auth = true,
+      pathParams = [],
+    } = config;
+
     return `
 /**
  * @swagger
@@ -183,26 +199,34 @@ export class SwaggerDecorator {
  *     tags: [${tags.map(tag => `"${tag}"`).join(', ')}]
  *     ${auth ? 'security:\n *       - ClerkAuth: []' : ''}
  *     ${pathParams.length > 0 ? 'parameters:' : ''}
- *     ${pathParams.map(param => `
+ *     ${pathParams
+   .map(
+     param => `
  *       - in: path
  *         name: ${param.name}
  *         required: true
  *         schema:
  *           type: string
- *         description: ${param.description}`).join('')}
- *     ${requestSchema ? `requestBody:
+ *         description: ${param.description}`
+   )
+   .join('')}
+ *     ${
+   requestSchema
+     ? `requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/${requestSchema}'` : ''}
+ *             $ref: '#/components/schemas/${requestSchema}'`
+     : ''
+ }
  *     responses:
  *       200:
  *         description: Resource updated successfully
  *         content:
  *           application/json:
  *             schema:
- *               ${responseSchema ? `$ref: '#/components/schemas/${responseSchema}'` : '$ref: \'#/components/schemas/SuccessResponse\''}
+ *               ${responseSchema ? `$ref: '#/components/schemas/${responseSchema}'` : "$ref: '#/components/schemas/SuccessResponse'"}
  *       400:
  *         $ref: '#/components/responses/ValidationError'
  *       401:
@@ -227,7 +251,7 @@ export class SwaggerDecorator {
     pathParams?: Array<{ name: string; description: string }>;
   }): string {
     const { summary, description, tags, auth = true, pathParams = [] } = config;
-    
+
     return `
 /**
  * @swagger
@@ -238,13 +262,17 @@ export class SwaggerDecorator {
  *     tags: [${tags.map(tag => `"${tag}"`).join(', ')}]
  *     ${auth ? 'security:\n *       - ClerkAuth: []' : ''}
  *     ${pathParams.length > 0 ? 'parameters:' : ''}
- *     ${pathParams.map(param => `
+ *     ${pathParams
+   .map(
+     param => `
  *       - in: path
  *         name: ${param.name}
  *         required: true
  *         schema:
  *           type: string
- *         description: ${param.description}`).join('')}
+ *         description: ${param.description}`
+   )
+   .join('')}
  *     responses:
  *       200:
  *         description: Resource deleted successfully

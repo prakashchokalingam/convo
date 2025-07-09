@@ -1,9 +1,11 @@
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
-import { createId } from "@paralleldrive/cuid2";
-import { db } from "@/drizzle/db";
-import { forms, responses, workspaceMembers, workspaces } from "@/drizzle/schema";
-import { eq, count, desc, and, ilike, or, gte, lt, SQL } from "drizzle-orm";
+import { auth, clerkClient } from '@clerk/nextjs/server';
+import { createId } from '@paralleldrive/cuid2';
+import { eq, count, desc, and, ilike, or, gte, lt, SQL } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/drizzle/db';
+import { forms, responses, workspaceMembers } from '@/drizzle/schema';
+
 
 /**
  * @swagger
@@ -65,9 +67,9 @@ import { eq, count, desc, and, ilike, or, gte, lt, SQL } from "drizzle-orm";
 export async function GET(request: NextRequest) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -82,7 +84,10 @@ export async function GET(request: NextRequest) {
     const createdAtParam = searchParams.get('createdAt'); // ISO date string YYYY-MM-DD
 
     if (!workspaceId) {
-      return NextResponse.json({ error: "workspaceId query parameter is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: 'workspaceId query parameter is required' },
+        { status: 400 }
+      );
     }
 
     const conditions: SQL[] = [eq(forms.workspaceId, workspaceId)];
@@ -92,7 +97,7 @@ export async function GET(request: NextRequest) {
         or(
           ilike(forms.title, `%${searchTerm}%`),
           ilike(forms.description, `%${searchTerm}%`) // Assuming description can be searched
-        )! // Use non-null assertion if `or` can return undefined and conditions array expects SQL
+        ) as SQL
       );
     }
 
@@ -112,7 +117,10 @@ export async function GET(request: NextRequest) {
       try {
         const date = new Date(createdAtParam);
         if (isNaN(date.getTime())) {
-          return NextResponse.json({ error: "Invalid createdAt date format. Use YYYY-MM-DD." }, { status: 400 });
+          return NextResponse.json(
+            { error: 'Invalid createdAt date format. Use YYYY-MM-DD.' },
+            { status: 400 }
+          );
         }
         // Adjust to local timezone if needed, but default JS Date is UTC.
         // For filtering a whole day, use date for start and start of next day for end.
@@ -120,9 +128,9 @@ export async function GET(request: NextRequest) {
         const nextDay = new Date(startDate);
         nextDay.setDate(startDate.getDate() + 1);
 
-        conditions.push(and(gte(forms.createdAt, startDate), lt(forms.createdAt, nextDay))!);
-      } catch (e) {
-        return NextResponse.json({ error: "Invalid createdAt date processing." }, { status: 400 });
+        conditions.push(and(gte(forms.createdAt, startDate), lt(forms.createdAt, nextDay)) as SQL);
+      } catch (_e) {
+        return NextResponse.json({ error: 'Invalid createdAt date processing.' }, { status: 400 });
       }
     }
 
@@ -145,7 +153,7 @@ export async function GET(request: NextRequest) {
     const userFormsData = await db
       .select({
         ...selectedFormFields,
-        responseCount: count(responses.id)
+        responseCount: count(responses.id),
       })
       .from(forms)
       .leftJoin(responses, eq(forms.id, responses.formId))
@@ -161,9 +169,11 @@ export async function GET(request: NextRequest) {
       if (form.createdBy) {
         try {
           const user = await clerkClient.users.getUser(form.createdBy);
-          creatorName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.username || 'Unknown User';
-        } catch (error) {
-          console.error(`Failed to fetch user ${form.createdBy}`, error);
+          creatorName = user.firstName
+            ? `${user.firstName} ${user.lastName || ''}`.trim()
+            : user.username || 'Unknown User';
+        } catch (_error) {
+          console.error(`Failed to fetch user ${form.createdBy}`, _error);
           // creatorName remains 'Unknown User'
         }
       }
@@ -187,12 +197,12 @@ export async function GET(request: NextRequest) {
         totalForms,
         totalPages,
         hasNext: page < totalPages,
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     });
   } catch (error) {
-    console.error("Error fetching forms:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error fetching forms:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -279,52 +289,67 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { workspaceId, title, description, config, isConversational = false, isPublished = false } = body;
+    const {
+      workspaceId,
+      title,
+      description,
+      config,
+      isConversational = false,
+      isPublished = false,
+    } = body;
 
     // Validate required fields
     if (!workspaceId || !title || !config) {
-      return NextResponse.json({ 
-        error: "Missing required fields: workspaceId, title, config" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Missing required fields: workspaceId, title, config',
+        },
+        { status: 400 }
+      );
     }
 
     // Verify user has create_form permission in the workspace
     const workspaceMember = await db
       .select({
-        role: workspaceMembers.role
+        role: workspaceMembers.role,
       })
       .from(workspaceMembers)
-      .where(and(
-        eq(workspaceMembers.workspaceId, workspaceId),
-        eq(workspaceMembers.userId, userId)
-      ))
+      .where(
+        and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.userId, userId))
+      )
       .limit(1);
 
     if (workspaceMember.length === 0) {
-      return NextResponse.json({ error: "Access denied to workspace" }, { status: 403 });
+      return NextResponse.json({ error: 'Access denied to workspace' }, { status: 403 });
     }
 
     // Check if user has create_form permission (owner, admin, or member)
     const userRole = workspaceMember[0].role;
     if (!['owner', 'admin', 'member'].includes(userRole)) {
-      return NextResponse.json({ 
-        error: "Insufficient permissions. Requires create_form permission." 
-      }, { status: 403 });
+      return NextResponse.json(
+        {
+          error: 'Insufficient permissions. Requires create_form permission.',
+        },
+        { status: 403 }
+      );
     }
 
     // Validate config is valid JSON
     try {
       JSON.parse(config);
-    } catch (error) {
-      return NextResponse.json({ 
-        error: "Invalid form configuration JSON" 
-      }, { status: 400 });
+    } catch (_error) {
+      return NextResponse.json(
+        {
+          error: 'Invalid form configuration JSON',
+        },
+        { status: 400 }
+      );
     }
 
     // Generate unique ID for the form
@@ -346,14 +371,16 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    return NextResponse.json({
-      success: true,
-      form: newForm,
-      message: "Form created successfully"
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        form: newForm,
+        message: 'Form created successfully',
+      },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("Error creating form:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error creating form:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

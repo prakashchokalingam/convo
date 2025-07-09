@@ -1,33 +1,39 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs';
+import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { 
-  createWorkspace, 
-  canCreateTeamWorkspace, 
-  canCreateDefaultWorkspace,
-  getWorkspaceLimitsInfo,
-  isSlugAvailable 
-} from '@/lib/workspace-server';
+
 import { db } from '@/drizzle/db';
 import { users, subscriptions } from '@/drizzle/schema';
-import { eq } from 'drizzle-orm';
 import { sendSlackNotification, formatWorkspaceCreationMessage } from '@/lib/slack';
+import {
+  createWorkspace,
+  getWorkspaceLimitsInfo,
+  isSlugAvailable,
+} from '@/lib/workspace-server';
 
 // Validation schema for workspace creation
 const createWorkspaceSchema = z.object({
-  name: z.string().min(1, 'Workspace name is required').max(50, 'Workspace name must be less than 50 characters'),
-  slug: z.string()
+  name: z
+    .string()
+    .min(1, 'Workspace name is required')
+    .max(50, 'Workspace name must be less than 50 characters'),
+  slug: z
+    .string()
     .min(3, 'Workspace slug must be at least 3 characters')
     .max(20, 'Workspace slug must be less than 20 characters')
-    .regex(/^[a-z0-9-]+$/, 'Workspace slug can only contain lowercase letters, numbers, and hyphens'),
+    .regex(
+      /^[a-z0-9-]+$/,
+      'Workspace slug can only contain lowercase letters, numbers, and hyphens'
+    ),
   description: z.string().max(200, 'Description must be less than 200 characters').optional(),
-  type: z.enum(['default', 'team']).optional()
+  type: z.enum(['default', 'team']).optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -58,12 +64,12 @@ export async function POST(req: NextRequest) {
         workspaceType = 'team';
       } else {
         return NextResponse.json(
-          { 
+          {
             error: 'You have reached the maximum number of workspaces allowed.',
             details: {
               currentCount: limitsInfo.currentCount,
-              limits: limitsInfo.limits
-            }
+              limits: limitsInfo.limits,
+            },
           },
           { status: 400 }
         );
@@ -74,12 +80,12 @@ export async function POST(req: NextRequest) {
     if (workspaceType === 'default') {
       if (!limitsInfo.canCreateDefault) {
         return NextResponse.json(
-          { 
+          {
             error: 'You can only have one default workspace.',
             details: {
               currentCount: limitsInfo.currentCount,
-              limits: limitsInfo.limits
-            }
+              limits: limitsInfo.limits,
+            },
           },
           { status: 400 }
         );
@@ -87,12 +93,12 @@ export async function POST(req: NextRequest) {
     } else if (workspaceType === 'team') {
       if (!limitsInfo.canCreateTeam) {
         return NextResponse.json(
-          { 
+          {
             error: 'Maximum 3 team workspaces allowed per account.',
             details: {
               currentCount: limitsInfo.currentCount,
-              limits: limitsInfo.limits
-            }
+              limits: limitsInfo.limits,
+            },
           },
           { status: 400 }
         );
@@ -104,16 +110,16 @@ export async function POST(req: NextRequest) {
       name: validatedData.name,
       slug: validatedData.slug,
       description: validatedData.description,
-      type: workspaceType
+      type: workspaceType,
     });
 
-    console.log('✅ Workspace created successfully:', {
-      userId,
-      workspaceId: workspace.id,
-      workspaceSlug: workspace.slug,
-      workspaceName: workspace.name,
-      workspaceType: workspace.type
-    });
+    // console.log('✅ Workspace created successfully:', {
+    //   userId,
+    //   workspaceId: workspace.id,
+    //   workspaceSlug: workspace.slug,
+    //   workspaceName: workspace.name,
+    //   workspaceType: workspace.type,
+    // });
 
     // Send Slack notification
     try {
@@ -135,8 +141,11 @@ export async function POST(req: NextRequest) {
         }
       );
       await sendSlackNotification(notificationMessage);
-    } catch (slackError) {
-      console.error('Error sending Slack notification during manual workspace creation:', slackError);
+    } catch (_slackError) {
+      console.error(
+        'Error sending Slack notification during manual workspace creation:',
+        _slackError
+      );
       // Do not fail the request if Slack notification fails
     }
 
@@ -147,19 +156,18 @@ export async function POST(req: NextRequest) {
         name: workspace.name,
         slug: workspace.slug,
         type: workspace.type,
-        description: workspace.description
+        description: workspace.description,
       },
-      message: `${workspaceType === 'default' ? 'Default' : 'Team'} workspace created successfully`
+      message: `${workspaceType === 'default' ? 'Default' : 'Team'} workspace created successfully`,
     });
+  } catch (_error) {
+    console.error('Error creating workspace:', _error);
 
-  } catch (error) {
-    console.error('Error creating workspace:', error);
-    
-    if (error instanceof z.ZodError) {
+    if (_error instanceof z.ZodError) {
       return NextResponse.json(
-        { 
+        {
           error: 'Validation failed',
-          details: error.errors
+          details: _error.errors,
         },
         { status: 400 }
       );
@@ -167,12 +175,12 @@ export async function POST(req: NextRequest) {
 
     // Return detailed error for debugging in development
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to create workspace',
-        details: isDevelopment ? error.message : undefined
-      }, 
+        details: isDevelopment ? _error.message : undefined,
+      },
       { status: 500 }
     );
   }
@@ -182,7 +190,7 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -191,16 +199,12 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      data: limitsInfo
+      data: limitsInfo,
     });
+  } catch (_error) {
+    console.error('Error getting workspace limits:', _error);
 
-  } catch (error) {
-    console.error('Error getting workspace limits:', error);
-    
-    return NextResponse.json(
-      { error: 'Failed to get workspace limits' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to get workspace limits' }, { status: 500 });
   }
 }
 

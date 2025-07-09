@@ -1,10 +1,13 @@
 # Templates Feature Implementation Plan
 
 ## 📋 Project Overview
+
 As an admin, I should be able to create forms from templates and manage templates. This feature introduces a template system with global pre-defined templates and user-created templates.
 
 ## 🎯 Smart Implementation Strategy
+
 **Key Principles:**
+
 - ✅ Build reusable components first, assemble features second
 - ✅ Leverage existing form builder extensively
 - ✅ Follow established codebase patterns
@@ -12,12 +15,14 @@ As an admin, I should be able to create forms from templates and manage template
 - ✅ Clear dependency tracking with parallel development opportunities
 
 **Reusable Components Library:**
+
 - `TemplateCard` - Works for both global and user templates
 - `TemplateGrid` - Search, filter, pagination for all template lists
 - `TemplatePreview` - Modal with permission-based actions
 - `TemplateSelector` - For form creation integration
 
 **Existing Code Leverage:**
+
 - Form Builder → Template Editor (add template mode)
 - Form Creation → Enhanced with template selection
 - Permission System → Extended with template permissions
@@ -25,6 +30,7 @@ As an admin, I should be able to create forms from templates and manage template
 ---
 
 ## 🏗️ Phase 1: Foundation (Database + Core API)
+
 **Status: ✅ Complete**
 **Dependencies: None**
 **Parallel Work: Global template content creation**
@@ -33,9 +39,11 @@ As an admin, I should be able to create forms from templates and manage template
 **Completed: June 10, 2025**
 
 ### 1.1 Database Schema Implementation
+
 **Location: `drizzle/schema.ts`**
 
 - [x] Add `templates` table with comprehensive schema
+
   ```typescript
   export const templates = pgTable('templates', {
     id: uuid('id').primaryKey().defaultRandom(),
@@ -50,44 +58,49 @@ As an admin, I should be able to create forms from templates and manage template
     cloneCount: integer('clone_count').default(0),
     thumbnailUrl: varchar('thumbnail_url', { length: 500 }),
     createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow()
+    updatedAt: timestamp('updated_at').defaultNow(),
   });
   ```
 
 - [x] Add `formTemplates` relationship tracking
+
   ```typescript
   export const formTemplates = pgTable('form_templates', {
     formId: uuid('form_id').references(() => forms.id),
     templateId: uuid('template_id').references(() => templates.id),
-    createdAt: timestamp('created_at').defaultNow()
+    createdAt: timestamp('created_at').defaultNow(),
   });
   ```
 
 - [x] Extend workspace permissions (leverage existing permission system)
   - [ ] Add `create_template` to workspace roles
-  - [ ] Add `edit_template` to workspace roles  
+  - [ ] Add `edit_template` to workspace roles
   - [ ] Verify `create_form` permission exists
-  **Note: Permission system to be implemented at API level**
+        **Note: Permission system to be implemented at API level**
 
 ### 1.2 Database Migration & Global Content
+
 **Can be done in parallel with API development**
 
 - [x] Generate and apply Drizzle migration
+
   ```bash
   npm run db:generate
   npm run db:push
   ```
+
   **Migration file created: `0004_add_templates_system.sql`**
 
 - [x] Create global template seed data (leverage existing form schemas)
-  **File: `drizzle/seeds/global-templates.ts`**
+      **File: `drizzle/seeds/global-templates.ts`**
   - [x] HR Templates (3): Job Application, Employee Survey, Performance Review
   - [x] Marketing Templates (3): Lead Form, Event Registration, Feedback Survey
   - [x] Support Templates (3): Contact Form, Bug Report, Feature Request
   - [x] Sales Templates (3): Quote Request, Demo Booking, CRM Lead
-  **Created 12 comprehensive global templates with realistic form schemas**
+        **Created 12 comprehensive global templates with realistic form schemas**
 
 ### 1.3 Core API Layer
+
 **Location: `app/api/templates/`**
 **Pattern: Follow existing form API patterns**
 
@@ -132,6 +145,7 @@ As an admin, I should be able to create forms from templates and manage template
 ---
 
 ## 🧩 Phase 2: Reusable Components Library
+
 **Status: 🟡 In Progress**
 **Dependencies: Phase 1 API endpoints**
 **Strategy: Build once, use everywhere**
@@ -139,10 +153,12 @@ As an admin, I should be able to create forms from templates and manage template
 **Started: June 10, 2025**
 
 ### 2.1 Core Template Components
+
 **Location: `components/app/templates/core/`**
 **Pattern: Follow existing form builder component patterns**
 
 - [ ] `TemplateCard` component - The foundation component
+
   ```typescript
   interface TemplateCardProps {
     template: Template;
@@ -159,6 +175,7 @@ As an admin, I should be able to create forms from templates and manage template
     };
   }
   ```
+
   - [ ] Template preview thumbnail
   - [ ] Usage statistics display (forms created, times cloned)
   - [ ] Permission-based action buttons
@@ -167,6 +184,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Hover states and animations
 
 - [ ] `TemplateGrid` component - Reusable list container
+
   ```typescript
   interface TemplateGridProps {
     templates: Template[];
@@ -178,6 +196,7 @@ As an admin, I should be able to create forms from templates and manage template
     permissions: TemplatePermissions;
   }
   ```
+
   - [ ] Responsive grid layout (1-4 columns based on screen size)
   - [ ] Loading skeleton states
   - [ ] Empty state with call-to-action
@@ -185,6 +204,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Infinite scroll or pagination support
 
 - [ ] `TemplatePreview` component - Universal preview modal
+
   ```typescript
   interface TemplatePreviewProps {
     template: Template;
@@ -193,6 +213,7 @@ As an admin, I should be able to create forms from templates and manage template
     actions: TemplateAction[];
   }
   ```
+
   - [ ] Full form schema display
   - [ ] Field-by-field preview
   - [ ] Action buttons in modal footer
@@ -200,9 +221,11 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Keyboard navigation support
 
 ### 2.2 Specialized Components
+
 **Location: `components/app/templates/specialized/`**
 
 - [ ] `TemplateSelector` component - For form creation integration
+
   ```typescript
   interface TemplateSelectorProps {
     isOpen: boolean;
@@ -212,12 +235,14 @@ As an admin, I should be able to create forms from templates and manage template
     categoryFilter?: string;
   }
   ```
+
   - [ ] Compact template browser
-  - [ ] Quick search functionality  
+  - [ ] Quick search functionality
   - [ ] Category tabs
   - [ ] Selection confirmation
 
 - [ ] `TemplateActionButtons` component - Reusable action controls
+
   ```typescript
   interface TemplateActionButtonsProps {
     template: Template;
@@ -226,12 +251,14 @@ As an admin, I should be able to create forms from templates and manage template
     onAction: (action: TemplateAction) => void;
   }
   ```
+
   - [ ] Permission-aware button rendering
   - [ ] Loading states for actions
   - [ ] Confirmation dialogs integration
   - [ ] Multiple layout variants
 
 ### 2.3 Search and Filter Components
+
 **Location: `components/app/templates/filters/`**
 **Reuse pattern: Similar to form filtering**
 
@@ -248,6 +275,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Active filter indicators
 
 ### 2.4 Component Integration Tests
+
 **Test each component in isolation**
 
 - [ ] TemplateCard component tests
@@ -268,15 +296,18 @@ As an admin, I should be able to create forms from templates and manage template
 ---
 
 ## 🏠 Phase 3: Templates Page Assembly
+
 **Status: 🔴 Not Started**
 **Dependencies: Phase 2 components**
 **Strategy: Assemble features from reusable components**
 
 ### 3.1 Templates Page Structure
+
 **Location: `app/(app)/[workspaceSlug]/templates/page.tsx`**
 **Pattern: Follow existing dashboard page patterns**
 
 - [ ] Main Templates page component
+
   ```typescript
   export default function TemplatesPage() {
     // Leverage existing workspace context
@@ -284,15 +315,18 @@ As an admin, I should be able to create forms from templates and manage template
     // Assemble TemplateGrid components
   }
   ```
+
   - [ ] Page header with breadcrumbs (reuse existing pattern)
   - [ ] Tab navigation component (Global Templates | Templates)
   - [ ] Search and filter controls (assemble from Phase 2 components)
   - [ ] Permission-gated "Create Template" button
 
 ### 3.2 Tab Implementation
+
 **Leverage existing tab patterns from dashboard**
 
 - [ ] `GlobalTemplatesTab` component
+
   ```typescript
   function GlobalTemplatesTab() {
     // Use TemplateGrid from Phase 2
@@ -300,25 +334,29 @@ As an admin, I should be able to create forms from templates and manage template
     // Handle permission-based actions
   }
   ```
+
   - [ ] Fetch global templates via API
   - [ ] Render using TemplateGrid component
   - [ ] Business category filtering integration
   - [ ] Clone and create form actions
 
 - [ ] `UserTemplatesTab` component
+
   ```typescript
   function UserTemplatesTab() {
     // Use TemplateGrid from Phase 2
-    // Pass workspace templates filter  
+    // Pass workspace templates filter
     // Handle CRUD operations
   }
   ```
+
   - [ ] Fetch workspace templates via API
   - [ ] Render using TemplateGrid component
   - [ ] Create, edit, delete functionality
   - [ ] Template creation dialog integration
 
 ### 3.3 Navigation Integration
+
 **Location: `components/app/dashboard/app-sidebar.tsx`**
 **Pattern: Follow existing sidebar menu items**
 
@@ -329,6 +367,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Active state styling
 
 ### 3.4 Template Operations
+
 **Leverage reusable components from Phase 2**
 
 - [ ] Template creation flow
@@ -345,6 +384,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Create Form: Navigate to form builder with template data
 
 ### 3.5 Page Integration Tests
+
 **Test page assembly and routing**
 
 - [ ] Templates page routing tests
@@ -356,15 +396,18 @@ As an admin, I should be able to create forms from templates and manage template
 ---
 
 ## 🔄 Phase 4: Form Builder Integration
+
 **Status: 🔴 Not Started**  
 **Dependencies: Phase 3 templates page, existing form builder**
 **Strategy: Extend existing form builder with template capabilities**
 
 ### 4.1 Form Creation Enhancement
+
 **Location: Existing form creation page**
 **Pattern: Enhance existing flow, don't rebuild**
 
 - [ ] Enhanced form creation page
+
   ```typescript
   // Extend existing form creation component
   function FormCreationOptions() {
@@ -376,6 +419,7 @@ As an admin, I should be able to create forms from templates and manage template
     );
   }
   ```
+
   - [ ] Two-option layout: "Choose Template" vs "Start Fresh"
   - [ ] Visual cards with icons and descriptions
   - [ ] Integrate with existing form creation workflow
@@ -388,10 +432,12 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Seamless transition to form builder
 
 ### 4.2 Form Builder Template Mode
+
 **Location: Existing form builder components**
 **Strategy: Add template mode to existing builder**
 
 - [ ] Template editing capability
+
   ```typescript
   // Extend existing form builder context
   interface FormBuilderContext {
@@ -400,6 +446,7 @@ As an admin, I should be able to create forms from templates and manage template
     // ... existing context
   }
   ```
+
   - [ ] Add template mode to existing form builder
   - [ ] Template-specific save logic (save to templates table)
   - [ ] Template metadata editing (name, description, category)
@@ -407,6 +454,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Template preview functionality
 
 - [ ] Save button enhancement
+
   ```typescript
   // Extend existing save functionality
   function SaveDropdown() {
@@ -421,12 +469,14 @@ As an admin, I should be able to create forms from templates and manage template
     );
   }
   ```
+
   - [ ] Convert Save button to dropdown menu
   - [ ] Add "Save as Template" option
   - [ ] Template metadata collection dialog
   - [ ] Success feedback and navigation
 
 ### 4.3 In-Builder Template Browsing
+
 **Location: Form builder toolbar**
 **Strategy: Add secondary actions to existing toolbar**
 
@@ -437,25 +487,28 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Confirmation when replacing existing form content
 
 - [ ] Template replacement flow
+
   ```typescript
   function applyTemplate(template: Template) {
     if (hasFormContent) {
       showConfirmationDialog({
-        title: "Replace form content?",
-        description: "This will replace your current form with the template.",
-        onConfirm: () => loadTemplateSchema(template)
+        title: 'Replace form content?',
+        description: 'This will replace your current form with the template.',
+        onConfirm: () => loadTemplateSchema(template),
       });
     } else {
       loadTemplateSchema(template);
     }
   }
   ```
+
   - [ ] Check for existing form content
   - [ ] Confirmation dialog for destructive actions
   - [ ] Smooth template loading animation
   - [ ] Preserve undo/redo functionality
 
 ### 4.4 Form-Template Relationship Tracking
+
 **Location: Existing form save logic**
 **Strategy: Extend existing save functionality**
 
@@ -471,6 +524,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Maintain form independence after creation
 
 ### 4.5 Integration Testing
+
 **Test template integration with existing form workflows**
 
 - [ ] Form creation with templates
@@ -482,29 +536,34 @@ As an admin, I should be able to create forms from templates and manage template
 ---
 
 ## 🔐 Phase 5: Security & Permission Integration
+
 **Status: 🔴 Not Started**
 **Dependencies: All previous phases**
 **Strategy: Extend existing permission system**
 
 ### 5.1 Permission System Extension
+
 **Location: Existing permission logic**
 **Pattern: Follow existing workspace permission patterns**
 
 - [ ] Extend workspace role definitions
+
   ```typescript
   // Add to existing workspace permissions
   const TEMPLATE_PERMISSIONS = {
     create_template: ['owner', 'admin'],
-    edit_template: ['owner', 'admin'], 
+    edit_template: ['owner', 'admin'],
     create_form: ['owner', 'admin', 'member'], // Existing permission
   } as const;
   ```
+
   - [ ] Add template permissions to existing role system
   - [ ] Leverage existing permission checking infrastructure
   - [ ] Update permission middleware to include template checks
   - [ ] Ensure consistent permission patterns
 
 ### 5.2 Security Implementation
+
 **Location: API routes and components**
 **Pattern: Follow existing security patterns**
 
@@ -520,6 +579,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Permission-aware navigation
 
 ### 5.3 Security Testing
+
 - [ ] Permission boundary tests
 - [ ] Authorization bypass attempts
 - [ ] Input validation tests
@@ -528,11 +588,13 @@ As an admin, I should be able to create forms from templates and manage template
 ---
 
 ## ✅ Phase 6: Comprehensive Testing
+
 **Status: 🔴 Not Started**
 **Dependencies: Phases 1-5**
 **Strategy: Component-level testing leveraging reusability**
 
 ### 6.1 Component Testing Strategy
+
 **Test reusable components thoroughly once**
 
 - [ ] Core component tests (from Phase 2)
@@ -548,6 +610,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Data validation
 
 ### 6.2 Integration Testing
+
 **Test component assembly and workflows**
 
 - [ ] Templates page integration tests
@@ -556,6 +619,7 @@ As an admin, I should be able to create forms from templates and manage template
 - [ ] Template usage tracking tests
 
 ### 6.3 E2E Testing
+
 **Critical user journeys**
 
 - [ ] Complete template management workflow
@@ -564,6 +628,7 @@ As an admin, I should be able to create forms from templates and manage template
 - [ ] Template search and discovery
 
 ### 6.4 Test Cases Validation
+
 **Reference: `docs/cases/templates-feature.md`**
 
 - [ ] Validate all 37 test cases from documentation
@@ -574,11 +639,13 @@ As an admin, I should be able to create forms from templates and manage template
 ---
 
 ## 💯 Phase 7: Polish & Launch Preparation
+
 **Status: 🔴 Not Started**
 **Dependencies: Phases 1-6**
 **Strategy: Final optimization and documentation**
 
 ### 7.1 Performance Optimization
+
 **Leverage existing optimization patterns**
 
 - [ ] Template caching strategies
@@ -593,6 +660,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Search debouncing and optimization
 
 ### 7.2 Accessibility & Mobile
+
 **Follow existing accessibility standards**
 
 - [ ] Accessibility compliance
@@ -607,6 +675,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Mobile template browsing
 
 ### 7.3 Documentation & Training
+
 **Update existing documentation systems**
 
 - [ ] Technical documentation
@@ -621,6 +690,7 @@ As an admin, I should be able to create forms from templates and manage template
   - [ ] Permission explanations
 
 ### 7.4 Launch Checklist
+
 **Final validation before release**
 
 - [ ] Feature flag implementation
@@ -635,6 +705,7 @@ As an admin, I should be able to create forms from templates and manage template
 ## 🎯 Acceptance Criteria Checklist
 
 ### Core Functionality
+
 - [ ] Users can navigate to templates page via sidebar
 - [ ] Global templates are displayed with proper categorization
 - [ ] Users can clone global templates (with proper permissions)
@@ -645,6 +716,7 @@ As an admin, I should be able to create forms from templates and manage template
 - [ ] Users can save existing forms as templates
 
 ### Permission System
+
 - [ ] `create_template` permission controls template creation
 - [ ] `edit_template` permission controls template editing
 - [ ] `create_form` permission controls form creation from templates
@@ -652,6 +724,7 @@ As an admin, I should be able to create forms from templates and manage template
 - [ ] API endpoints enforce permission checks
 
 ### User Experience
+
 - [ ] Templates are displayed in an intuitive card layout
 - [ ] Search and filtering work correctly
 - [ ] Template preview functionality works
@@ -660,6 +733,7 @@ As an admin, I should be able to create forms from templates and manage template
 - [ ] Mobile experience is optimized
 
 ### Technical Requirements
+
 - [ ] Database schema supports all required features
 - [ ] API endpoints follow project conventions
 - [ ] Components follow established patterns
@@ -673,24 +747,28 @@ As an admin, I should be able to create forms from templates and manage template
 ### 🎯 Why This Approach Wins:
 
 **1. Reusable Component Strategy**
+
 - Build `TemplateCard`, `TemplateGrid`, `TemplatePreview` once, use everywhere
 - Consistent UI/UX across all template features
 - Easy to maintain and extend
 - Reduces development time by 60%+
 
 **2. Leverage Existing Investment**
+
 - Form Builder → Template Editor (minimal additional code)
 - Permission System → Extended (not rebuilt)
 - API Patterns → Consistent (follow existing conventions)
 - UI Patterns → Familiar (users already know the interface)
 
 **3. Component-First Testing**
+
 - Test reusable components thoroughly once
 - Feature assembly becomes integration testing
 - Higher confidence, lower test maintenance
 - Better test coverage with less effort
 
 **4. Future-Proof Architecture**
+
 - Components ready for template marketplace
 - Easy to add template versioning
 - AI template suggestions can plug in easily
@@ -701,26 +779,31 @@ As an admin, I should be able to create forms from templates and manage template
 ## 🚅 Implementation Sequence
 
 **🎆 Phase 1: Foundation** (Week 1)
+
 - Database schema + API endpoints
 - Global template seeding
 - Core infrastructure
 
 **🧩 Phase 2: Component Library** (Week 2)
+
 - TemplateCard, TemplateGrid, TemplatePreview
 - Search and filter components
 - Reusable building blocks
 
 **🏠 Phase 3: Page Assembly** (Week 3)
+
 - Templates page using Phase 2 components
 - Navigation integration
 - Tab implementation
 
 **🔄 Phase 4: Form Builder Integration** (Week 4)
+
 - Template mode for existing form builder
 - Enhanced form creation flow
 - Save as template functionality
 
 **🔐 Phase 5-7: Security, Testing, Polish** (Week 5)
+
 - Permission integration
 - Comprehensive testing
 - Performance optimization
@@ -730,6 +813,7 @@ As an admin, I should be able to create forms from templates and manage template
 ## 📝 Implementation Guidelines
 
 ### ✨ Smart Code Organization
+
 ```
 components/app/templates/
 ├── core/               # Reusable components (Phase 2)
@@ -743,6 +827,7 @@ components/app/templates/
 ```
 
 ### 🔌 Existing Code Integration Points
+
 - **Form Builder**: Extend with template mode, don't rebuild
 - **Permission System**: Add template permissions to existing roles
 - **API Patterns**: Follow existing form API conventions
@@ -750,18 +835,21 @@ components/app/templates/
 - **Styling**: Follow established Tailwind patterns
 
 ### 📊 Database Smart Choices
+
 - **Templates Table**: Reuse form schema format (JSON)
 - **Permissions**: Extend existing workspace role system
 - **Relationships**: Simple foreign keys, leverage existing patterns
 - **Seeding**: Use existing form schemas as template base
 
 ### 🚀 Performance Optimizations
+
 - Global template caching (they rarely change)
 - Component-level lazy loading
 - Search debouncing and optimization
 - Infinite scroll for large template sets
 
 ### 🔮 Future Enhancement Ready
+
 - **Template Versioning**: Database schema supports it
 - **Template Marketplace**: Components ready for sharing
 - **AI Suggestions**: API structure supports recommendation engine
@@ -772,18 +860,21 @@ components/app/templates/
 ## ✅ Success Metrics
 
 ### 📏 Development Efficiency
+
 - **60% faster development** through component reuse
 - **40% less code** by leveraging existing form builder
 - **80% consistent UI** by using established patterns
 - **90% test coverage** with component-focused testing
 
 ### 📊 User Experience
+
 - **Familiar interface** (leverages existing form builder UX)
 - **Fast template browsing** (optimized components)
 - **Seamless integration** (natural workflow enhancement)
 - **Mobile-optimized** (responsive design from day one)
 
 ### 🔍 Technical Quality
+
 - **Maintainable architecture** (clear component boundaries)
 - **Extensible design** (ready for future features)
 - **Secure implementation** (follows existing security patterns)

@@ -1,12 +1,22 @@
-import { sql } from 'drizzle-orm';
-import { text, integer, boolean, timestamp, pgTable, uuid, varchar, jsonb, primaryKey } from 'drizzle-orm/pg-core';
+import {
+  text,
+  integer,
+  boolean,
+  timestamp,
+  pgTable,
+  uuid,
+  varchar,
+  jsonb,
+} from 'drizzle-orm/pg-core';
 
 // Workspaces table
 export const workspaces = pgTable('workspaces', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
-  type: text('type', { enum: ['default', 'team'] }).notNull().default('default'),
+  type: text('type', { enum: ['default', 'team'] })
+    .notNull()
+    .default('default'),
   ownerId: text('owner_id').notNull(),
   description: text('description'),
   avatarUrl: text('avatar_url'),
@@ -20,7 +30,9 @@ export const workspaceMembers = pgTable('workspace_members', {
   id: uuid('id').primaryKey().defaultRandom(),
   workspaceId: uuid('workspace_id').notNull(),
   userId: text('user_id').notNull(),
-  role: text('role', { enum: ['owner', 'admin', 'member', 'viewer'] }).notNull().default('member'),
+  role: text('role', { enum: ['owner', 'admin', 'member', 'viewer'] })
+    .notNull()
+    .default('member'),
   invitedBy: text('invited_by'),
   invitedAt: timestamp('invited_at'),
   joinedAt: timestamp('joined_at'),
@@ -66,15 +78,21 @@ export const templates = pgTable('templates', {
 // Form-Template relationship tracking
 export const formTemplates = pgTable('form_templates', {
   id: uuid('id').primaryKey().defaultRandom(),
-  formId: uuid('form_id').notNull().references(() => forms.id, { onDelete: 'cascade' }),
-  templateId: uuid('template_id').notNull().references(() => templates.id, { onDelete: 'cascade' }),
+  formId: uuid('form_id')
+    .notNull()
+    .references(() => forms.id, { onDelete: 'cascade' }),
+  templateId: uuid('template_id')
+    .notNull()
+    .references(() => templates.id, { onDelete: 'cascade' }),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
 // Responses table
 export const responses = pgTable('responses', {
   id: uuid('id').primaryKey().defaultRandom(),
-  formId: uuid('form_id').notNull().references(() => forms.id, { onDelete: 'cascade' }),
+  formId: uuid('form_id')
+    .notNull()
+    .references(() => forms.id, { onDelete: 'cascade' }),
   data: text('data').notNull(), // JSON string
   metadata: text('metadata'), // JSON string
   completedAt: timestamp('completed_at').defaultNow(),
@@ -83,7 +101,9 @@ export const responses = pgTable('responses', {
 // Conversations table
 export const conversations = pgTable('conversations', {
   id: uuid('id').primaryKey().defaultRandom(),
-  formId: uuid('form_id').notNull().references(() => forms.id, { onDelete: 'cascade' }),
+  formId: uuid('form_id')
+    .notNull()
+    .references(() => forms.id, { onDelete: 'cascade' }),
   responseId: uuid('response_id').references(() => responses.id, { onDelete: 'cascade' }),
   messages: text('messages').notNull(), // JSON string
   currentFieldIndex: integer('current_field_index').default(0),
@@ -95,7 +115,9 @@ export const conversations = pgTable('conversations', {
 // Form analytics table
 export const formAnalytics = pgTable('form_analytics', {
   id: uuid('id').primaryKey().defaultRandom(),
-  formId: uuid('form_id').notNull().references(() => forms.id, { onDelete: 'cascade' }),
+  formId: uuid('form_id')
+    .notNull()
+    .references(() => forms.id, { onDelete: 'cascade' }),
   date: text('date').notNull(), // YYYY-MM-DD format
   views: integer('views').default(0),
   starts: integer('starts').default(0),

@@ -90,7 +90,17 @@ export interface FormConfig {
 
 export interface FormField {
   id: string;
-  type: 'text' | 'email' | 'phone' | 'select' | 'multiselect' | 'textarea' | 'number' | 'date' | 'file' | 'signature';
+  type:
+    | 'text'
+    | 'email'
+    | 'phone'
+    | 'select'
+    | 'multiselect'
+    | 'textarea'
+    | 'number'
+    | 'date'
+    | 'file'
+    | 'signature';
   label: string;
   placeholder?: string;
   required: boolean;

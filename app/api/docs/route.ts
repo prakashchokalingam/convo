@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
+
+import { NextRequest, NextResponse } from 'next/server';
+
 import { SwaggerGenerator } from '../../../docs/swagger/generator';
 
 /**
@@ -56,7 +58,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
-    const version = searchParams.get('version') || 'latest';
 
     // Path to the generated OpenAPI specification
     const specPath = path.join(process.cwd(), 'docs/swagger/generated/openapi.json');
@@ -75,7 +76,8 @@ export async function GET(request: NextRequest) {
         return NextResponse.json(
           {
             error: 'Not Found',
-            message: 'API documentation not found. Please run "npm run docs:generate" to generate documentation.',
+            message:
+              'API documentation not found. Please run "npm run docs:generate" to generate documentation.',
             code: 'DOCS_NOT_FOUND',
           },
           { status: 404 }
@@ -168,7 +170,7 @@ export async function GET(request: NextRequest) {
 export async function POST() {
   try {
     console.log('🔄 Regenerating API documentation...');
-    
+
     const generator = new SwaggerGenerator();
     const result = await generator.generate();
 

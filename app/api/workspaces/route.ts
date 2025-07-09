@@ -1,12 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs';
-import { db } from '@/drizzle/db';
-import { workspaces, workspaceMembers, workspaceActivities } from '@/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
+import { NextRequest } from 'next/server';
+
+import { db } from '@/drizzle/db';
+import { workspaces, workspaceMembers } from '@/drizzle/schema';
+import {
+  withErrorHandling,
+  createSuccessResponse,
+  ApiError,
+  ErrorCodes,
+  requireAuth,
+  validateRequiredFields,
+} from '@/lib/api-errors';
 import { canCreateWorkspace } from '@/lib/plans';
 import { ActivityLogger } from '@/lib/rbac';
-import { withErrorHandling, createSuccessResponse, ApiError, ErrorCodes, requireAuth, validateRequiredFields } from '@/lib/api-errors';
 
 /**
  * @swagger
@@ -16,7 +24,7 @@ import { withErrorHandling, createSuccessResponse, ApiError, ErrorCodes, require
  *     description: |
  *       Creates a new workspace for organizing forms and team collaboration.
  *       The authenticated user becomes the owner of the workspace.
- *       
+ *
  *       **Features:**
  *       - Automatic owner assignment
  *       - Unique slug validation
@@ -141,11 +149,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
   // Check if user can create workspace based on their plan
   const canCreate = await canCreateWorkspace(userId);
   if (!canCreate.allowed) {
-    throw new ApiError(
-      canCreate.reason!,
-      403,
-      ErrorCodes.PLAN_LIMIT_EXCEEDED
-    );
+    throw new ApiError(canCreate.reason || 'Plan limit exceeded', 403, ErrorCodes.PLAN_LIMIT_EXCEEDED);
   }
 
   // Check if slug is unique
@@ -154,35 +158,34 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
   });
 
   if (existingWorkspace) {
-    throw new ApiError(
-      'Workspace URL is already taken',
-      409,
-      ErrorCodes.ALREADY_EXISTS
-    );
+    throw new ApiError('Workspace URL is already taken', 409, ErrorCodes.ALREADY_EXISTS);
   }
 
   const workspaceId = createId();
   const now = new Date();
 
   // Create workspace
-  const newWorkspace = await db.insert(workspaces).values({
-    id: workspaceId,
-    name,
-    slug,
-    type: type as 'default' | 'team',
-    ownerId: userId,
-    description: description || null,
-    settings: JSON.stringify({
-      theme: 'light',
-      timezone: 'UTC',
-      notifications: {
-        email: true,
-        browser: true,
-      }
-    }),
-    createdAt: now,
-    updatedAt: now,
-  }).returning();
+  const newWorkspace = await db
+    .insert(workspaces)
+    .values({
+      id: workspaceId,
+      name,
+      slug,
+      type: type as 'default' | 'team',
+      ownerId: userId,
+      description: description || null,
+      settings: JSON.stringify({
+        theme: 'light',
+        timezone: 'UTC',
+        notifications: {
+          email: true,
+          browser: true,
+        },
+      }),
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning();
 
   // Add creator as owner
   await db.insert(workspaceMembers).values({
@@ -204,17 +207,14 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     req
   );
 
-  console.log('✅ Workspace created:', { 
-    userId, 
-    workspaceId,
-    name,
-    slug
-  });
+  // console.log('✅ Workspace created:', {
+  //   userId,
+  //   workspaceId,
+  //   name,
+  //   slug,
+  // });
 
-  return createSuccessResponse(
-    { workspace: newWorkspace[0] },
-    'Workspace created successfully'
-  );
+  return createSuccessResponse({ workspace: newWorkspace[0] }, 'Workspace created successfully');
 });
 
 /**
@@ -225,7 +225,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
  *     description: |
  *       Retrieves all workspaces where the authenticated user is a member.
  *       Includes the user's role in each workspace.
- *       
+ *
  *       **Returned Data:**
  *       - Workspace basic information
  *       - User's role in each workspace
@@ -291,8 +291,5 @@ export const GET = withErrorHandling(async () => {
     .where(eq(workspaceMembers.userId, userId))
     .orderBy(workspaces.createdAt);
 
-  return createSuccessResponse(
-    { workspaces: userWorkspaces },
-    'Workspaces retrieved successfully'
-  );
+  return createSuccessResponse({ workspaces: userWorkspaces }, 'Workspaces retrieved successfully');
 });

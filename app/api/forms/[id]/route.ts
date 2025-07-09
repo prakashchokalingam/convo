@@ -1,8 +1,9 @@
-import { auth } from "@clerk/nextjs";
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { forms } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { auth } from '@clerk/nextjs';
+import { eq, and } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/lib/db';
+import { forms } from '@/lib/db/schema';
 
 /**
  * @swagger
@@ -44,15 +45,12 @@ import { eq, and } from "drizzle-orm";
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const form = await db
@@ -62,13 +60,13 @@ export async function GET(
       .limit(1);
 
     if (form.length === 0) {
-      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
 
     return NextResponse.json(form[0]);
   } catch (error) {
-    console.error("Error fetching form:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error fetching form:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -80,7 +78,7 @@ export async function GET(
  *     description: |
  *       Updates form properties such as name, description, configuration, and publish status.
  *       Only the form owner can update their forms.
- *       
+ *
  *       **Updatable Fields:**
  *       - name: Form display name
  *       - description: Form description
@@ -148,15 +146,12 @@ export async function GET(
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -170,19 +165,29 @@ export async function PATCH(
       .limit(1);
 
     if (existingForm.length === 0) {
-      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
 
     // Prepare update data
-    const updateData: any = {
+    const updateData: Partial<typeof forms.$inferInsert> = {
       updatedAt: new Date().toISOString(),
     };
 
-    if (name !== undefined) updateData.name = name;
-    if (description !== undefined) updateData.description = description;
-    if (config !== undefined) updateData.config = JSON.stringify(config);
-    if (isConversational !== undefined) updateData.isConversational = isConversational;
-    if (isPublished !== undefined) updateData.isPublished = isPublished;
+    if (name !== undefined) {
+      updateData.name = name;
+    }
+    if (description !== undefined) {
+      updateData.description = description;
+    }
+    if (config !== undefined) {
+      updateData.config = JSON.stringify(config);
+    }
+    if (isConversational !== undefined) {
+      updateData.isConversational = isConversational;
+    }
+    if (isPublished !== undefined) {
+      updateData.isPublished = isPublished;
+    }
 
     // Update the form
     const [updatedForm] = await db
@@ -196,8 +201,8 @@ export async function PATCH(
       form: updatedForm,
     });
   } catch (error) {
-    console.error("Error updating form:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error updating form:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -209,7 +214,7 @@ export async function PATCH(
  *     description: |
  *       Permanently deletes a form and all associated data including responses.
  *       Only the form owner can delete their forms.
- *       
+ *
  *       **⚠️ Warning:** This action cannot be undone. All form responses will be permanently deleted.
  *     tags: [Forms]
  *     security:
@@ -237,15 +242,12 @@ export async function PATCH(
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Verify the form exists and belongs to the user
@@ -256,20 +258,18 @@ export async function DELETE(
       .limit(1);
 
     if (existingForm.length === 0) {
-      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
 
     // Delete the form
-    await db
-      .delete(forms)
-      .where(and(eq(forms.id, params.id), eq(forms.userId, userId)));
+    await db.delete(forms).where(and(eq(forms.id, params.id), eq(forms.userId, userId)));
 
     return NextResponse.json({
       success: true,
-      message: "Form deleted successfully",
+      message: 'Form deleted successfully',
     });
   } catch (error) {
-    console.error("Error deleting form:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error deleting form:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

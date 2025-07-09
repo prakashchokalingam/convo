@@ -49,21 +49,25 @@ npm run docs:dev           # Start dev server with docs generation
 ConvoForms is a Next.js 14 application using the App Router with multi-context architecture:
 
 ### URL Structure & Context Detection
+
 The app uses middleware-based context detection:
 
 **Development (Path-based):**
+
 - Marketing: `localhost:3002/marketing` or `localhost:3002/`
 - App: `localhost:3002/app/[workspaceSlug]`
 - Forms: `localhost:3002/forms/[workspaceSlug]/[formId]`
 - Admin: `localhost:3002/admin`
 
 **Production (Subdomain-based):**
+
 - Marketing: `convo.ai`
 - App: `app.convo.ai/[workspaceSlug]`
 - Forms: `forms.convo.ai/[workspaceSlug]/[formId]`
 - Admin: `admin.convo.ai`
 
 ### Core Technology Stack
+
 - **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui
 - **Database**: PostgreSQL with Drizzle ORM
 - **Authentication**: Clerk
@@ -104,7 +108,9 @@ __tests__/                 # All test files
 ```
 
 ### Database Schema
+
 Core tables include:
+
 - **workspaces** - Team/personal workspaces with workspace type (`default`/`team`)
 - **workspace_members** - Workspace membership with roles (owner/admin/member/viewer)
 - **forms** - Form definitions with AI-generated configurations
@@ -114,12 +120,14 @@ Core tables include:
 - **subscriptions** - User subscription and billing data
 
 ### Authentication & Authorization
+
 - Clerk handles authentication with custom sign-in/sign-up pages at `/app/login` and `/app/signup`
 - Workspace-based permissions with role-based access control (RBAC)
 - Admin dashboard requires emails listed in `ADMIN_EMAILS` environment variable
 - Admin API routes must use `withAdminApiAuth` wrapper from `lib/admin-api-auth.ts`
 
 ### Form Builder System
+
 - Complex type system in `lib/form-builder/types.ts` supporting 20+ field types
 - AI-powered form generation using Google Gemini
 - Drag-and-drop form builder with conditional logic
@@ -127,12 +135,14 @@ Core tables include:
 - Conversational mode transforms traditional forms into chat-like experiences
 
 ### Testing Strategy
+
 - Unit tests with Vitest in `__tests__/` directory
 - E2E tests with Playwright covering authentication flows, form creation, and workspace management
 - Test utilities in `__tests__/utils/` for common testing patterns
 - Custom E2E setup with Clerk authentication testing
 
 ### Development Workflow
+
 1. Always start database: `npm run db:up`
 2. Start development server: `npm run dev`
 3. For schema changes: edit `lib/db/schema.ts` → `npm run db:generate` → `npm run db:push`
@@ -141,6 +151,7 @@ Core tables include:
 6. Run tests with `npm test` and `npm run test:e2e`
 
 ### Important Implementation Notes
+
 - Middleware in `middleware.ts` handles context detection and workspace routing
 - All forms use React Hook Form with Zod validation
 - The app supports both traditional and conversational form modes
@@ -148,8 +159,10 @@ Core tables include:
 - Extensive use of shadcn/ui components with custom theming
 
 # IMPORTANT INSTRUCTIONS
+
 code:
+
 - write very performant and human readable code, strictly typed
 - Follow DRY Principle
-tests:
+  tests:
 - cover essential test cases, only required

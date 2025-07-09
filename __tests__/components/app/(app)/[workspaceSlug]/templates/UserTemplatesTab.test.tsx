@@ -56,7 +56,9 @@ describe('UserTemplatesTab Component', () => {
       json: async () => ({ templates: mockUserTemplates, pagination: {} }),
     });
     // Reset useWorkspace mock to default for each test, then override as needed
-    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation(() => false);
+    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation(
+      () => false
+    );
     (useWorkspace as ReturnType<typeof vi.fn>).mockReturnValue(mockUseWorkspaceValues);
   });
 
@@ -68,15 +70,16 @@ describe('UserTemplatesTab Component', () => {
   };
 
   it('shows all actions (Clone, Create Form, Edit, Delete) if user has all relevant permissions', async () => {
-    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation((resource: string, action: string) => {
-      if (resource === 'templates') {
-        return action === 'create' || action === 'edit' || action === 'delete';
+    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation(
+      (resource: string, action: string) => {
+        if (resource === 'templates') {
+          return action === 'create' || action === 'edit' || action === 'delete';
+        }
+        return false;
       }
-      return false;
-    });
+    );
     // canCreateTemplates prop for this tab also implies clone permission from within this tab
     const props = { ...defaultProps, canCreateTemplates: true };
-
 
     await act(async () => {
       render(<UserTemplatesTab {...props} />);
@@ -96,11 +99,12 @@ describe('UserTemplatesTab Component', () => {
     // Here, canCreateTemplates directly controls clone from this tab.
     const props = { ...defaultProps, canCreateTemplates: false };
     // Other permissions (edit, delete) might still be true from hasPermission directly
-    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation((resource: string, action: string) => {
+    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation(
+      (resource: string, action: string) => {
         if (resource === 'templates') return action === 'edit' || action === 'delete';
         return false;
-    });
-
+      }
+    );
 
     await act(async () => {
       render(<UserTemplatesTab {...props} />);
@@ -111,16 +115,16 @@ describe('UserTemplatesTab Component', () => {
     expect(within(firstCard).queryByRole('button', { name: /Clone/i })).not.toBeInTheDocument();
     // Edit and Delete might still be there based on hasPermission
     expect(within(firstCard).getByRole('button', { name: /Edit/i })).toBeInTheDocument();
-
   });
 
   it('hides "Edit" if user lacks edit_template permission', async () => {
-    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation((resource: string, action: string) => {
-      if (resource === 'templates') return action === 'create' || action === 'delete'; // Has create/delete, not edit
-      return false;
-    });
-     const props = { ...defaultProps, canCreateTemplates: true };
-
+    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation(
+      (resource: string, action: string) => {
+        if (resource === 'templates') return action === 'create' || action === 'delete'; // Has create/delete, not edit
+        return false;
+      }
+    );
+    const props = { ...defaultProps, canCreateTemplates: true };
 
     await act(async () => {
       render(<UserTemplatesTab {...props} />);
@@ -132,16 +136,16 @@ describe('UserTemplatesTab Component', () => {
     // Clone and Delete might still be there
     expect(within(firstCard).getByRole('button', { name: /Clone/i })).toBeInTheDocument();
     expect(within(firstCard).getByRole('button', { name: /Delete/i })).toBeInTheDocument();
-
   });
 
   it('hides "Delete" if user lacks delete_template permission', async () => {
-    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation((resource: string, action: string) => {
-      if (resource === 'templates') return action === 'create' || action === 'edit'; // Has create/edit, not delete
-      return false;
-    });
+    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation(
+      (resource: string, action: string) => {
+        if (resource === 'templates') return action === 'create' || action === 'edit'; // Has create/edit, not delete
+        return false;
+      }
+    );
     const props = { ...defaultProps, canCreateTemplates: true };
-
 
     await act(async () => {
       render(<UserTemplatesTab {...props} />);
@@ -151,7 +155,7 @@ describe('UserTemplatesTab Component', () => {
     const firstCard = screen.getAllByRole('article')[0];
     expect(within(firstCard).queryByRole('button', { name: /Delete/i })).not.toBeInTheDocument();
     // Clone and Edit might still be there
-     expect(within(firstCard).getByRole('button', { name: /Clone/i })).toBeInTheDocument();
+    expect(within(firstCard).getByRole('button', { name: /Clone/i })).toBeInTheDocument();
     expect(within(firstCard).getByRole('button', { name: /Edit/i })).toBeInTheDocument();
   });
 
@@ -159,26 +163,29 @@ describe('UserTemplatesTab Component', () => {
     // This button is usually part of the empty state or header within UserTemplatesTab itself
     // For this test, we assume it's rendered when templates list is empty.
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ templates: [], pagination: {} }), // No templates
+      ok: true,
+      json: async () => ({ templates: [], pagination: {} }), // No templates
     });
     const props = { ...defaultProps, canCreateTemplates: true };
     await act(async () => {
-        render(<UserTemplatesTab {...props} />);
+      render(<UserTemplatesTab {...props} />);
     });
-    expect(await screen.findByRole('button', { name: /Create Your First Template/i })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: /Create Your First Template/i })
+    ).toBeInTheDocument();
   });
 
   it('hides main "Create Template" button if canCreateTemplates prop is false', async () => {
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ templates: [], pagination: {} }), // No templates
+      ok: true,
+      json: async () => ({ templates: [], pagination: {} }), // No templates
     });
-     const props = { ...defaultProps, canCreateTemplates: false };
+    const props = { ...defaultProps, canCreateTemplates: false };
     await act(async () => {
-        render(<UserTemplatesTab {...props} />);
+      render(<UserTemplatesTab {...props} />);
     });
-    expect(screen.queryByRole('button', { name: /Create Your First Template/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Create Your First Template/i })
+    ).not.toBeInTheDocument();
   });
-
 });

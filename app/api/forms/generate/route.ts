@@ -1,56 +1,64 @@
-import { auth } from "@clerk/nextjs";
-import { NextRequest, NextResponse } from "next/server";
-import { createId } from "@paralleldrive/cuid2";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { db } from "@/drizzle/db";
-import { forms, workspaceMembers } from "@/drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { auth } from '@clerk/nextjs';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createId } from '@paralleldrive/cuid2';
+import { eq, and } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
+import { db } from '@/drizzle/db';
+import { forms, workspaceMembers } from '@/drizzle/schema';
+
+
+const apiKey = process.env.GOOGLE_AI_API_KEY;
+if (!apiKey) {
+  throw new Error('GOOGLE_AI_API_KEY is not configured');
+}
+const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { prompt, workspaceId } = await request.json();
 
     if (!prompt) {
-      return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
+      return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
     }
 
     if (!workspaceId) {
-      return NextResponse.json({ error: "Workspace ID is required" }, { status: 400 });
+      return NextResponse.json({ error: 'Workspace ID is required' }, { status: 400 });
     }
 
     // Verify user has access to the workspace
     const workspaceMember = await db
       .select({
-        role: workspaceMembers.role
+        role: workspaceMembers.role,
       })
       .from(workspaceMembers)
-      .where(and(
-        eq(workspaceMembers.workspaceId, workspaceId),
-        eq(workspaceMembers.userId, userId)
-      ))
+      .where(
+        and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.userId, userId))
+      )
       .limit(1);
 
     if (workspaceMember.length === 0) {
-      return NextResponse.json({ error: "Access denied to workspace" }, { status: 403 });
+      return NextResponse.json({ error: 'Access denied to workspace' }, { status: 403 });
     }
 
     // Check if user has create_form permission (owner, admin, or member)
     const userRole = workspaceMember[0].role;
     if (!['owner', 'admin', 'member'].includes(userRole)) {
-      return NextResponse.json({ 
-        error: "Insufficient permissions. Requires create_form permission." 
-      }, { status: 403 });
+      return NextResponse.json(
+        {
+          error: 'Insufficient permissions. Requires create_form permission.',
+        },
+        { status: 403 }
+      );
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
     // Generate form metadata (name and description)
     const metadataPrompt = `Based on this form requirement, generate a JSON with a concise name and description:
@@ -69,15 +77,15 @@ Examples:
 
     const metadataResult = await model.generateContent(metadataPrompt);
     const metadataText = metadataResult.response.text();
-    
+
     let metadata;
     try {
       metadata = JSON.parse(metadataText);
     } catch (error) {
       // Fallback if JSON parsing fails
       metadata = {
-        name: "AI Generated Form",
-        description: "Form created based on your requirements"
+        name: 'AI Generated Form',
+        description: 'Form created based on your requirements',
       };
     }
 
@@ -131,30 +139,33 @@ Create a form configuration for: ${prompt}`;
       const cleanedText = configText.replace(/```json\n?|\n?```/g, '').trim();
       config = JSON.parse(cleanedText);
     } catch (error) {
-      console.error("Error parsing form configuration:", error);
-      return NextResponse.json({ error: "Invalid form configuration generated" }, { status: 500 });
+      console.error('Error parsing form configuration:', error);
+      return NextResponse.json({ error: 'Invalid form configuration generated' }, { status: 500 });
     }
 
     // Generate unique ID for the form
     const formId = createId();
 
     // Save form to database
-    const [newForm] = await db.insert(forms).values({
-      id: formId,
-      workspaceId,
-      createdBy: userId,
-      title: metadata.name,
-      description: metadata.description,
-      prompt,
-      config: JSON.stringify(config),
-      isConversational: false,
-      isPublished: false,
-      version: 1,
-    }).returning();
+    const [newForm] = await db
+      .insert(forms)
+      .values({
+        id: formId,
+        workspaceId,
+        createdBy: userId,
+        title: metadata.name,
+        description: metadata.description,
+        prompt,
+        config: JSON.stringify(config),
+        isConversational: false,
+        isPublished: false,
+        version: 1,
+      })
+      .returning();
 
     return NextResponse.json({ formId: newForm.id, title: newForm.title }, { status: 201 });
   } catch (error) {
-    console.error("Error generating form:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error generating form:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

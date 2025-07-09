@@ -1,6 +1,6 @@
 /**
  * Templates Components
- * 
+ *
  * This file exports all template-related components organized by category.
  */
 

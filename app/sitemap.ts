@@ -1,8 +1,8 @@
-import { MetadataRoute } from 'next'
+import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://convo.ai'
-  
+  const baseUrl = 'https://convo.ai';
+
   return [
     {
       url: `${baseUrl}/marketing`, // Root marketing page
@@ -94,5 +94,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 0.4,
     },
-  ]
+  ];
 }

@@ -7,8 +7,9 @@
         "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen", "layer"]
       }
     ],
-    "declaration-block-trailing-semicolon": null,
+    "at-rule-no-deprecated": null,
     "no-descending-specificity": null,
+    "keyframes-name-pattern": null,
     "function-no-unknown": [
       true,
       {

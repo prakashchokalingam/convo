@@ -1,5 +1,9 @@
-import { getCurrentWorkspace, validateWorkspaceAccess } from '@/lib/workspace-server';
-import { MembersList, InviteMemberButton, MembersHeader } from '@/components/app/members/members-components';
+import {
+  MembersList,
+  InviteMemberButton,
+  MembersHeader,
+} from '@/components/app/members/members-components';
+import { validateWorkspaceAccess } from '@/lib/workspace-server';
 
 interface MembersPageProps {
   params: {
@@ -12,19 +16,19 @@ export default async function MembersPage({ params }: MembersPageProps) {
   const workspace = await validateWorkspaceAccess(params.workspaceSlug, 'admin');
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Members Header */}
       <MembersHeader workspace={workspace} />
 
       {/* Page Header with Invite Button */}
-      <div className="flex justify-between items-center">
+      <div className='flex justify-between items-center'>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Members</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className='text-2xl font-bold text-gray-900'>Members</h1>
+          <p className='mt-1 text-sm text-gray-500'>
             Manage workspace members and their permissions
           </p>
         </div>
-        
+
         {(workspace.role === 'owner' || workspace.role === 'admin') && (
           <InviteMemberButton workspace={workspace} />
         )}

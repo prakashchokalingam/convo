@@ -1,11 +1,12 @@
 'use client'; // Make AppLayout a client component
 
 import { ReactNode } from 'react';
+
 import AppStoreInitializer from '@/components/shared/AppStoreInitializer';
 
 /**
  * App Layout
- * 
+ *
  * This layout applies to all app routes (/app/*).
  * Context verification is now handled by the path structure itself:
  * - All files in app/app/* are automatically app context

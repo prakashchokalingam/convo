@@ -8,11 +8,11 @@ import { createId } from '@paralleldrive/cuid2';
 import { POST as createTemplateHandler } from '@/app/api/templates/route';
 // For [id] routes, Next.js typically expects handler files in /api/templates/[id]/route.ts
 // If PUT and DELETE are in the same file:
-import { PUT as updateTemplateHandler, DELETE as deleteTemplateHandler }
-    from '@/app/api/templates/[id]/route';
-import { POST as cloneTemplateHandler }
-    from '@/app/api/templates/[id]/clone/route';
-
+import {
+  PUT as updateTemplateHandler,
+  DELETE as deleteTemplateHandler,
+} from '@/app/api/templates/[id]/route';
+import { POST as cloneTemplateHandler } from '@/app/api/templates/[id]/clone/route';
 
 // --- Mocks ---
 // Using vi from Vitest for mocking
@@ -41,10 +41,9 @@ vi.mock('@/lib/db', () => ({
   db: mockDbInstance,
 }));
 vi.mock('@/lib/db/schema', () => ({
-    templates: { name: 'templates_table_mock' },
-    workspaceMembers: { name: 'workspaceMembers_table_mock' },
+  templates: { name: 'templates_table_mock' },
+  workspaceMembers: { name: 'workspaceMembers_table_mock' },
 }));
-
 
 vi.mock('@/lib/rbac', () => ({
   getUserWorkspaceRole: vi.fn(),
@@ -55,26 +54,34 @@ vi.mock('@paralleldrive/cuid2', () => ({
   createId: vi.fn().mockReturnValue('new-cuid-id-from-mock'),
 }));
 
-async function callApiHandler(handler: Function, requestOptions: {
-    method?: string,
-    body?: any,
-    params?: any,
-    query?: any,
-    userId?: string | null
-}) {
-    const { method = 'GET', body = {}, params = {}, query = {}, userId = 'test-user-id' } = requestOptions;
-    (auth as ReturnType<typeof vi.fn>).mockReturnValue({ userId }); // Use Vitest mock type
-    let req = {
-        method,
-        headers: new Headers({ 'content-type': 'application/json' }),
-        json: async () => body,
-        url: `http://localhost/api/test?${new URLSearchParams(query).toString()}`,
-    } as any;
-    const response = await handler(req, { params });
-    const responseBody = await response.json();
-    return { status: response.status, body: responseBody };
+async function callApiHandler(
+  handler: Function,
+  requestOptions: {
+    method?: string;
+    body?: any;
+    params?: any;
+    query?: any;
+    userId?: string | null;
+  }
+) {
+  const {
+    method = 'GET',
+    body = {},
+    params = {},
+    query = {},
+    userId = 'test-user-id',
+  } = requestOptions;
+  (auth as ReturnType<typeof vi.fn>).mockReturnValue({ userId }); // Use Vitest mock type
+  let req = {
+    method,
+    headers: new Headers({ 'content-type': 'application/json' }),
+    json: async () => body,
+    url: `http://localhost/api/test?${new URLSearchParams(query).toString()}`,
+  } as any;
+  const response = await handler(req, { params });
+  const responseBody = await response.json();
+  return { status: response.status, body: responseBody };
 }
-
 
 describe('Templates API Endpoints', () => {
   beforeEach(() => {
@@ -82,7 +89,13 @@ describe('Templates API Endpoints', () => {
     (auth as ReturnType<typeof vi.fn>).mockReturnValue({ userId: 'test-user-id' });
     (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockResolvedValue('member');
     (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockResolvedValue(false);
-    mockDbInstance.returning.mockImplementation((fields?: Record<string, any>) => Promise.resolve(fields ? [{...fields, id: 'new-template-id', name: 'Test Template'}] : [{ id: 'new-template-id', name: 'Test Template' }]));
+    mockDbInstance.returning.mockImplementation((fields?: Record<string, any>) =>
+      Promise.resolve(
+        fields
+          ? [{ ...fields, id: 'new-template-id', name: 'Test Template' }]
+          : [{ id: 'new-template-id', name: 'Test Template' }]
+      )
+    );
     mockDbInstance.select.mockReturnThis();
     mockDbInstance.from.mockReturnThis();
     mockDbInstance.where.mockReturnThis();
@@ -112,12 +125,14 @@ describe('Templates API Endpoints', () => {
       expect(body.template.name).toBe(requestBody.name);
       expect(createId).toHaveBeenCalled();
       expect(mockDbInstance.insert).toHaveBeenCalledWith(expect.any(Object));
-      expect(mockDbInstance.values).toHaveBeenCalledWith(expect.objectContaining({
-        id: 'new-cuid-id-from-mock',
-        name: requestBody.name,
-        workspaceId: requestBody.workspaceId,
-        createdBy: 'user-with-permission',
-      }));
+      expect(mockDbInstance.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'new-cuid-id-from-mock',
+          name: requestBody.name,
+          workspaceId: requestBody.workspaceId,
+          createdBy: 'user-with-permission',
+        })
+      );
     });
 
     it('FAILS (403) if user does not have create_template permission', async () => {
@@ -131,7 +146,7 @@ describe('Templates API Endpoints', () => {
       });
 
       expect(status).toBe(403);
-      expect(body.error).toContain("Insufficient permissions");
+      expect(body.error).toContain('Insufficient permissions');
     });
 
     it('FAILS (403) if user is not a member of the workspace', async () => {
@@ -144,14 +159,20 @@ describe('Templates API Endpoints', () => {
       });
 
       expect(status).toBe(403);
-      expect(body.error).toContain("Access denied");
+      expect(body.error).toContain('Access denied');
     });
   });
 
   describe('PUT /api/templates/[id] (Edit Workspace Template)', () => {
     const templateId = 'tpl-ws-1';
     const workspaceId = 'ws-1';
-    const mockTemplate = { id: templateId, name: 'Original Name', workspaceId, isGlobal: false, formSchema: {} };
+    const mockTemplate = {
+      id: templateId,
+      name: 'Original Name',
+      workspaceId,
+      isGlobal: false,
+      formSchema: {},
+    };
     const requestBody = { name: 'Updated Name' };
 
     it('FAILS (403) if template is global', async () => {
@@ -162,7 +183,7 @@ describe('Templates API Endpoints', () => {
         body: requestBody,
       });
       expect(status).toBe(403);
-      expect(body.error).toContain("Global templates cannot be modified");
+      expect(body.error).toContain('Global templates cannot be modified');
     });
 
     it('SUCCEEDS (200) if user has edit_template permission', async () => {
@@ -192,7 +213,7 @@ describe('Templates API Endpoints', () => {
         body: requestBody,
       });
       expect(status).toBe(403);
-      expect(body.error).toContain("Insufficient permissions");
+      expect(body.error).toContain('Insufficient permissions');
     });
 
     it('FAILS (403) if user is not a member of the workspace', async () => {
@@ -204,7 +225,7 @@ describe('Templates API Endpoints', () => {
         body: requestBody,
       });
       expect(status).toBe(403);
-      expect(body.error).toContain("Access denied");
+      expect(body.error).toContain('Access denied');
     });
   });
 
@@ -220,7 +241,7 @@ describe('Templates API Endpoints', () => {
         params: { id: templateId },
       });
       expect(status).toBe(403);
-      expect(body.error).toContain("Global templates cannot be deleted");
+      expect(body.error).toContain('Global templates cannot be deleted');
     });
 
     it('SUCCEEDS (200) if user has delete_template permission', async () => {
@@ -247,18 +268,18 @@ describe('Templates API Endpoints', () => {
         params: { id: templateId },
       });
       expect(status).toBe(403);
-      expect(body.error).toContain("Insufficient permissions");
+      expect(body.error).toContain('Insufficient permissions');
     });
 
     it('FAILS (403) if user is not a member of the workspace', async () => {
-        mockDbInstance.limit.mockResolvedValueOnce([mockTemplate]);
-        (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockResolvedValue(null);
-        const { status, body } = await callApiHandler(deleteTemplateHandler, {
-            method: 'DELETE',
-            params: { id: templateId },
-        });
-        expect(status).toBe(403);
-        expect(body.error).toContain("Access denied");
+      mockDbInstance.limit.mockResolvedValueOnce([mockTemplate]);
+      (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+      const { status, body } = await callApiHandler(deleteTemplateHandler, {
+        method: 'DELETE',
+        params: { id: templateId },
+      });
+      expect(status).toBe(403);
+      expect(body.error).toContain('Access denied');
     });
   });
 
@@ -269,23 +290,39 @@ describe('Templates API Endpoints', () => {
     const sourceWorkspaceIdB = 'ws-b';
     const userId = 'user-clone-test';
 
-    const mockGlobalTemplate = { id: globalTemplateId, name: 'Global Test', isGlobal: true, formSchema: {}, cloneCount: 0 };
-    const mockWsTemplateB = { id: wsTemplateId, name: 'WS B Template', workspaceId: sourceWorkspaceIdB, isGlobal: false, formSchema: {}, cloneCount: 0 };
+    const mockGlobalTemplate = {
+      id: globalTemplateId,
+      name: 'Global Test',
+      isGlobal: true,
+      formSchema: {},
+      cloneCount: 0,
+    };
+    const mockWsTemplateB = {
+      id: wsTemplateId,
+      name: 'WS B Template',
+      workspaceId: sourceWorkspaceIdB,
+      isGlobal: false,
+      formSchema: {},
+      cloneCount: 0,
+    };
 
     beforeEach(() => {
-        (createId as ReturnType<typeof vi.fn>).mockReturnValue('cloned-cuid-id');
-        mockDbInstance.returning.mockImplementation((fields?: Record<string, any>) => Promise.resolve(fields ? [{...fields, id: 'cloned-cuid-id'}] : [{id: 'cloned-cuid-id'}]));
-        mockDbInstance.update.mockReturnThis();
-        mockDbInstance.set.mockResolvedValue({ affectedRows: 1 });
+      (createId as ReturnType<typeof vi.fn>).mockReturnValue('cloned-cuid-id');
+      mockDbInstance.returning.mockImplementation((fields?: Record<string, any>) =>
+        Promise.resolve(fields ? [{ ...fields, id: 'cloned-cuid-id' }] : [{ id: 'cloned-cuid-id' }])
+      );
+      mockDbInstance.update.mockReturnThis();
+      mockDbInstance.set.mockResolvedValue({ affectedRows: 1 });
     });
 
     describe('Cloning Global Template', () => {
       it('SUCCEEDS (201) if user has create_template in target workspace', async () => {
         mockDbInstance.limit.mockResolvedValueOnce([mockGlobalTemplate]);
         (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockImplementation(async (uid, wsId) =>
-            wsId === targetWorkspaceId ? 'member' : null
+          wsId === targetWorkspaceId ? 'member' : null
         );
-        (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockImplementation(async (uid, wsId, res, act) =>
+        (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockImplementation(
+          async (uid, wsId, res, act) =>
             wsId === targetWorkspaceId && res === 'templates' && act === 'create'
         );
 
@@ -309,47 +346,63 @@ describe('Templates API Endpoints', () => {
         (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockResolvedValue('member');
         (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockResolvedValue(false);
         const { status, body } = await callApiHandler(cloneTemplateHandler, {
-            method: 'POST', params: { id: globalTemplateId }, body: { workspaceId: targetWorkspaceId }, userId,
+          method: 'POST',
+          params: { id: globalTemplateId },
+          body: { workspaceId: targetWorkspaceId },
+          userId,
         });
         expect(status).toBe(403);
-        expect(body.error).toContain("Insufficient permissions");
+        expect(body.error).toContain('Insufficient permissions');
       });
 
       it('FAILS (403) if user not member of target workspace', async () => {
         mockDbInstance.limit.mockResolvedValueOnce([mockGlobalTemplate]);
         (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockImplementation(async (uid, wsId) =>
-            wsId === targetWorkspaceId ? null : 'member'
+          wsId === targetWorkspaceId ? null : 'member'
         );
         const { status, body } = await callApiHandler(cloneTemplateHandler, {
-            method: 'POST', params: { id: globalTemplateId }, body: { workspaceId: targetWorkspaceId }, userId,
+          method: 'POST',
+          params: { id: globalTemplateId },
+          body: { workspaceId: targetWorkspaceId },
+          userId,
         });
         expect(status).toBe(403);
-        expect(body.error).toContain("Access denied to target workspace");
+        expect(body.error).toContain('Access denied to target workspace');
       });
     });
 
     describe('Cloning Workspace Template (into same workspace)', () => {
       it('SUCCEEDS (201) if user has create_template in the workspace', async () => {
-        mockDbInstance.limit.mockResolvedValueOnce([{...mockWsTemplateB, workspaceId: targetWorkspaceId}]);
+        mockDbInstance.limit.mockResolvedValueOnce([
+          { ...mockWsTemplateB, workspaceId: targetWorkspaceId },
+        ]);
         (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockResolvedValue('member');
         (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockResolvedValue(true);
 
         const { status, body } = await callApiHandler(cloneTemplateHandler, {
-            method: 'POST', params: { id: wsTemplateId }, body: { workspaceId: targetWorkspaceId }, userId,
+          method: 'POST',
+          params: { id: wsTemplateId },
+          body: { workspaceId: targetWorkspaceId },
+          userId,
         });
         expect(status).toBe(201);
         expect(body.template.workspaceId).toBe(targetWorkspaceId);
       });
 
       it('FAILS (403) if user lacks create_template in the workspace', async () => {
-        mockDbInstance.limit.mockResolvedValueOnce([{...mockWsTemplateB, workspaceId: targetWorkspaceId}]);
+        mockDbInstance.limit.mockResolvedValueOnce([
+          { ...mockWsTemplateB, workspaceId: targetWorkspaceId },
+        ]);
         (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockResolvedValue('member');
         (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockResolvedValue(false);
         const { status, body } = await callApiHandler(cloneTemplateHandler, {
-            method: 'POST', params: { id: wsTemplateId }, body: { workspaceId: targetWorkspaceId }, userId,
+          method: 'POST',
+          params: { id: wsTemplateId },
+          body: { workspaceId: targetWorkspaceId },
+          userId,
         });
         expect(status).toBe(403);
-        expect(body.error).toContain("Insufficient permissions");
+        expect(body.error).toContain('Insufficient permissions');
       });
     });
 
@@ -357,15 +410,19 @@ describe('Templates API Endpoints', () => {
       it('SUCCEEDS (201) if user has create_template in target AND is member of source ws', async () => {
         mockDbInstance.limit.mockResolvedValueOnce([mockWsTemplateB]);
         (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockImplementation(async (uid, wsId) => {
-            if (wsId === targetWorkspaceId) return 'member';
-            if (wsId === sourceWorkspaceIdB) return 'member';
-            return null;
+          if (wsId === targetWorkspaceId) return 'member';
+          if (wsId === sourceWorkspaceIdB) return 'member';
+          return null;
         });
-        (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockImplementation(async (uid, wsId, res, act) =>
+        (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockImplementation(
+          async (uid, wsId, res, act) =>
             wsId === targetWorkspaceId && res === 'templates' && act === 'create'
         );
         const { status, body } = await callApiHandler(cloneTemplateHandler, {
-            method: 'POST', params: { id: wsTemplateId }, body: { workspaceId: targetWorkspaceId }, userId,
+          method: 'POST',
+          params: { id: wsTemplateId },
+          body: { workspaceId: targetWorkspaceId },
+          userId,
         });
         expect(status).toBe(201);
         expect(body.template.workspaceId).toBe(targetWorkspaceId);
@@ -376,22 +433,30 @@ describe('Templates API Endpoints', () => {
         (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockImplementation(async () => 'member');
         (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockResolvedValue(false);
         const { status, body } = await callApiHandler(cloneTemplateHandler, {
-            method: 'POST', params: { id: wsTemplateId }, body: { workspaceId: targetWorkspaceId }, userId,
+          method: 'POST',
+          params: { id: wsTemplateId },
+          body: { workspaceId: targetWorkspaceId },
+          userId,
         });
         expect(status).toBe(403);
-        expect(body.error).toContain("Insufficient permissions to create template in target workspace");
+        expect(body.error).toContain(
+          'Insufficient permissions to create template in target workspace'
+        );
       });
 
       it('FAILS (403) if user not member of source workspace', async () => {
         mockDbInstance.limit.mockResolvedValueOnce([mockWsTemplateB]);
         (getUserWorkspaceRole as ReturnType<typeof vi.fn>).mockImplementation(async (uid, wsId) => {
-            if (wsId === targetWorkspaceId) return 'member';
-            if (wsId === sourceWorkspaceIdB) return null;
-            return null;
+          if (wsId === targetWorkspaceId) return 'member';
+          if (wsId === sourceWorkspaceIdB) return null;
+          return null;
         });
         (checkWorkspacePermission as ReturnType<typeof vi.fn>).mockResolvedValue(true);
         const { status, body } = await callApiHandler(cloneTemplateHandler, {
-            method: 'POST', params: { id: wsTemplateId }, body: { workspaceId: targetWorkspaceId }, userId,
+          method: 'POST',
+          params: { id: wsTemplateId },
+          body: { workspaceId: targetWorkspaceId },
+          userId,
         });
         expect(status).toBe(403);
         expect(body.error).toContain("Access denied to source template's workspace");

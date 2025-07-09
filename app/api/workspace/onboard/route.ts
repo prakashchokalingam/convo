@@ -1,16 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs';
-import { db } from '@/drizzle/db';
-import { users, workspaceMembers, workspaceActivities } from '@/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/drizzle/db';
+import { users, workspaceActivities } from '@/drizzle/schema';
 import { createDefaultSubscription } from '@/lib/plans';
 import { createWorkspaceFromEmail, getUserDefaultWorkspace } from '@/lib/workspace-server';
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -19,8 +20,8 @@ export async function POST(req: NextRequest) {
     let userData;
     try {
       userData = await clerkClient.users.getUser(userId);
-    } catch (error) {
-      console.error('Failed to get user data from Clerk:', error);
+    } catch (_error) {
+      console.error('Failed to get user data from Clerk:', _error);
       return NextResponse.json({ error: 'Failed to get user information' }, { status: 400 });
     }
 
@@ -57,32 +58,32 @@ export async function POST(req: NextRequest) {
       // Create default subscription for new users
       try {
         await createDefaultSubscription(userId);
-      } catch (error) {
-        console.error('Failed to create default subscription:', error);
+      } catch (_error) {
+        console.error('Failed to create default subscription:', _error);
         // Continue with workspace creation even if subscription creation fails
       }
     }
 
     // SMART DEFAULT DETECTION: Check if user already has a default workspace
     const existingDefaultWorkspace = await getUserDefaultWorkspace();
-    
+
     if (existingDefaultWorkspace) {
       // User already has default workspace - redirect to existing one
-      console.log('✅ Existing default workspace found during onboarding:', {
-        userId,
-        email: email.split('@')[0] + '@***', // Partial email for privacy
-        workspaceSlug: existingDefaultWorkspace.slug,
-        workspaceName: existingDefaultWorkspace.name
-      });
+      // console.log('✅ Existing default workspace found during onboarding:', {
+      //   userId,
+      //   email: email.split('@')[0] + '@***', // Partial email for privacy
+      //   workspaceSlug: existingDefaultWorkspace.slug,
+      //   workspaceName: existingDefaultWorkspace.name,
+      // });
 
       return NextResponse.json({
         success: true,
         data: {
           workspaceSlug: existingDefaultWorkspace.slug,
           workspaceName: existingDefaultWorkspace.name,
-          isNewWorkspace: false // No welcome parameter
+          isNewWorkspace: false, // No welcome parameter
         },
-        message: 'Redirected to existing default workspace'
+        message: 'Redirected to existing default workspace',
       });
     }
 
@@ -107,7 +108,7 @@ export async function POST(req: NextRequest) {
           workspaceName: workspaceResult.name,
           workspaceType: 'default',
           source: 'automatic_onboarding',
-          email: email.split('@')[0] // Log username part only for privacy
+          email: email.split('@')[0], // Log username part only for privacy
         }),
         ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
         userAgent: req.headers.get('user-agent') || 'unknown',
@@ -115,34 +116,33 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    console.log('✅ New default workspace created via onboarding:', {
-      userId,
-      email: email.split('@')[0] + '@***', // Partial email for privacy
-      workspaceSlug: workspaceResult.slug,
-      workspaceName: workspaceResult.name
-    });
+    // console.log('✅ New default workspace created via onboarding:', {
+    //   userId,
+    //   email: email.split('@')[0] + '@***', // Partial email for privacy
+    //   workspaceSlug: workspaceResult.slug,
+    //   workspaceName: workspaceResult.name,
+    // });
 
     return NextResponse.json({
       success: true,
       data: {
         workspaceSlug: workspaceResult.slug,
         workspaceName: workspaceResult.name,
-        isNewWorkspace: true // Add welcome parameter
+        isNewWorkspace: true, // Add welcome parameter
       },
-      message: 'Default workspace created successfully'
+      message: 'Default workspace created successfully',
     });
+  } catch (_error) {
+    console.error('Error during automatic onboarding:', _error);
 
-  } catch (error) {
-    console.error('Error during automatic onboarding:', error);
-    
     // Return detailed error for debugging in development
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to create workspace automatically',
-        details: isDevelopment ? error.message : undefined
-      }, 
+        details: isDevelopment ? _error.message : undefined,
+      },
       { status: 500 }
     );
   }

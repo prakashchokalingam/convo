@@ -1,13 +1,11 @@
+import { auth } from '@clerk/nextjs/server';
+import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
+
 import { db } from '@/drizzle/db';
 import { forms } from '@/drizzle/schema';
-import { eq } from 'drizzle-orm';
-import { auth } from '@clerk/nextjs/server';
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { userId } = auth();
     if (!userId) {
@@ -24,7 +22,10 @@ export async function PATCH(
       const body = await request.json();
       isPublished = body.isPublished;
       if (typeof isPublished !== 'boolean') {
-        return NextResponse.json({ error: 'Invalid isPublished value. Must be a boolean.' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Invalid isPublished value. Must be a boolean.' },
+          { status: 400 }
+        );
       }
     } catch (error) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
@@ -61,16 +62,18 @@ export async function PATCH(
       .returning({ updatedId: forms.id });
 
     if (updateResult.length === 0) {
-        // This case should ideally not be reached if the prior check passed,
-        // but it's a safeguard.
-        return NextResponse.json({ error: 'Failed to update form, or form not found after ownership check.' }, { status: 404 });
+      // This case should ideally not be reached if the prior check passed,
+      // but it's a safeguard.
+      return NextResponse.json(
+        { error: 'Failed to update form, or form not found after ownership check.' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(
       { success: true, message: 'Form publish status updated successfully.' },
       { status: 200 }
     );
-
   } catch (error) {
     console.error('Error updating form publish status:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

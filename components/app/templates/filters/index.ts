@@ -1,6 +1,6 @@
 /**
  * Templates Filter Components
- * 
+ *
  * This file exports filter and search components for templates.
  */
 

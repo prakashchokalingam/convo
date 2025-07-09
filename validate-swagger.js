@@ -13,10 +13,10 @@ console.log('🔍 Validating Swagger API Documentation Setup...\n');
 // Check if directories exist
 const directories = [
   'docs/swagger',
-  'docs/swagger/schemas', 
+  'docs/swagger/schemas',
   'lib/swagger',
   'app/api/docs',
-  'app/docs'
+  'app/docs',
 ];
 
 let allDirectoriesExist = true;
@@ -32,7 +32,7 @@ directories.forEach(dir => {
 // Check if files exist
 const files = [
   'docs/swagger/config.ts',
-  'docs/swagger/generator.ts', 
+  'docs/swagger/generator.ts',
   'docs/swagger/schemas/api-schemas.ts',
   'docs/swagger/generated/openapi.json',
   'lib/swagger/types.ts',
@@ -40,7 +40,7 @@ const files = [
   'app/api/docs/route.ts',
   'app/docs/page.tsx',
   'docs/API_DOCUMENTATION.md',
-  'README_SWAGGER.md'
+  'README_SWAGGER.md',
 ];
 
 let allFilesExist = true;
@@ -58,14 +58,8 @@ files.forEach(file => {
 console.log('\n📦 Package.json Scripts:');
 try {
   const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const scriptsToCheck = [
-    'docs:generate',
-    'docs:watch',
-    'docs:dev', 
-    'docs:build',
-    'docs:serve'
-  ];
-  
+  const scriptsToCheck = ['docs:generate', 'docs:watch', 'docs:dev', 'docs:build', 'docs:serve'];
+
   scriptsToCheck.forEach(script => {
     if (packageJson.scripts && packageJson.scripts[script]) {
       console.log(`✅ Script: ${script}`);
@@ -82,7 +76,7 @@ console.log('\n🛠️  API Routes with Documentation:');
 const apiRoutes = [
   'app/api/forms/route.ts',
   'app/api/forms/[id]/route.ts',
-  'app/api/workspaces/route.ts'
+  'app/api/workspaces/route.ts',
 ];
 
 apiRoutes.forEach(route => {
@@ -116,7 +110,7 @@ console.log('\n🔍 OpenAPI Spec Validation:');
 try {
   const openApiContent = fs.readFileSync('docs/swagger/generated/openapi.json', 'utf8');
   const spec = JSON.parse(openApiContent);
-  
+
   if (spec.openapi && spec.info && spec.paths) {
     console.log('✅ OpenAPI spec is valid JSON');
     console.log(`   - OpenAPI version: ${spec.openapi}`);

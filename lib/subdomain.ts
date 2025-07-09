@@ -1,11 +1,11 @@
 /**
  * Subdomain Context Management
- * 
+ *
  * ConvoForms uses a subdomain-based architecture to separate different parts of the app:
  * - Marketing: convo.ai (landing page, pricing, about)
  * - App: app.convo.ai (authenticated dashboard, form builder)
  * - Forms: forms.convo.ai (public form submissions)
- * 
+ *
  * In development, we use path prefixes:
  * - Marketing: localhost:3002/marketing (or localhost:3002/ for the conceptual root landing)
  * - App: localhost:3002/app
@@ -17,10 +17,10 @@ export type SubdomainContext = 'marketing' | 'app' | 'forms';
 
 /**
  * Detects which context the current request is in
- * 
+ *
  * Works both client-side (browser) and server-side (API routes)
  * Handles both development (query params) and production (real subdomains)
- * 
+ *
  * @returns The current context: 'marketing', 'app', or 'forms'
  */
 
@@ -29,23 +29,23 @@ export function getSubdomainContext(): SubdomainContext {
     // CLIENT-SIDE DETECTION (in browser)
     const hostname = window.location.hostname;
     const pathname = window.location.pathname; // Get the path
-    
+
     if (process.env.NODE_ENV === 'development') {
       // Development: Check path prefix
       // Examples: /app/..., /forms/..., /marketing/... or /
-      if (pathname.startsWith('/app')) return 'app';
-      if (pathname.startsWith('/forms')) return 'forms';
+      if (pathname.startsWith('/app')) {return 'app';}
+      if (pathname.startsWith('/forms')) {return 'forms';}
       // All other paths, including / and /marketing, map to marketing
       return 'marketing';
     } else {
       // Production: Check actual subdomain in hostname
       // Examples: app.convo.ai, forms.convo.ai
-      if (hostname.startsWith('app.')) return 'app';
-      if (hostname.startsWith('forms.')) return 'forms';
+      if (hostname.startsWith('app.')) {return 'app';}
+      if (hostname.startsWith('forms.')) {return 'forms';}
       return 'marketing'; // Default for convo.ai
     }
   }
-  
+
   // SERVER-SIDE DETECTION (in API routes and server components)
   try {
     const { headers } = require('next/headers'); // Keep this for middleware header
@@ -53,10 +53,13 @@ export function getSubdomainContext(): SubdomainContext {
 
     // First, try to get context from middleware header (BEST WAY)
     const contextHeader = requestHeaders.get('x-subdomain-context');
-    if (contextHeader && (contextHeader === 'marketing' || contextHeader === 'app' || contextHeader === 'forms')) {
+    if (
+      contextHeader &&
+      (contextHeader === 'marketing' || contextHeader === 'app' || contextHeader === 'forms')
+    ) {
       return contextHeader as SubdomainContext;
     }
-    
+
     // Fallback detection if middleware header is not set (should be less common)
     const host = requestHeaders.get('host') || '';
     // For server components, NextRequest's url is available in headers as 'x-url' or similar.
@@ -66,8 +69,8 @@ export function getSubdomainContext(): SubdomainContext {
     // For now, the primary mechanism on the server should be the 'x-subdomain-context' header set by middleware.
 
     if (process.env.NODE_ENV === 'production') {
-      if (host.startsWith('app.')) return 'app';
-      if (host.startsWith('forms.')) return 'forms';
+      if (host.startsWith('app.')) {return 'app';}
+      if (host.startsWith('forms.')) {return 'forms';}
       return 'marketing'; // Default for convo.ai
     } else {
       // Development server-side:
@@ -79,8 +82,8 @@ export function getSubdomainContext(): SubdomainContext {
       const urlHeader = requestHeaders.get('x-url'); // Next.js specific header for request URL
       if (urlHeader) {
         const pathFromServer = new URL(urlHeader).pathname;
-        if (pathFromServer.startsWith('/app')) return 'app';
-        if (pathFromServer.startsWith('/forms')) return 'forms';
+        if (pathFromServer.startsWith('/app')) {return 'app';}
+        if (pathFromServer.startsWith('/forms')) {return 'forms';}
       }
       return 'marketing'; // Default for localhost:3002/ or if path undetermined
     }
@@ -92,14 +95,14 @@ export function getSubdomainContext(): SubdomainContext {
 
 /**
  * Builds context-aware URLs for the application
- * 
+ *
  * This is the core function that handles URL generation for different contexts.
  * It automatically switches between development and production URL formats.
- * 
+ *
  * @param context - Which context to build URL for ('marketing', 'app', 'forms')
  * @param path - The path to append (should start with /)
  * @returns Complete URL with proper subdomain or query parameter
- * 
+ *
  * Examples:
  * - buildContextUrl('app', '/workspace') → 'http://localhost:3002/app/workspace' (dev)
  * - buildContextUrl('app', '/workspace') → 'https://app.convo.ai/workspace' (prod)
@@ -107,7 +110,8 @@ export function getSubdomainContext(): SubdomainContext {
  */
 export function buildContextUrl(context: SubdomainContext, path: string): string {
   // Ensure the path starts with a slash if it's not empty or already starting with one.
-  const normalizedPath = path === '/' || path === '' ? '' : (path.startsWith('/') ? path : `/${path}`);
+  const normalizedPath =
+    path === '/' || path === '' ? '' : path.startsWith('/') ? path : `/${path}`;
 
   if (process.env.NODE_ENV === 'development') {
     const base = 'http://localhost:3002';
@@ -120,11 +124,12 @@ export function buildContextUrl(context: SubdomainContext, path: string): string
       // Or, if we decide marketing pages are always directly under root (e.g. /pricing, /about)
       // then it would be `${base}${normalizedPath}`.
       // Given current structure, /marketing is a path segment.
-      if (normalizedPath === '') return `${base}/marketing`; // Marketing root page
+      if (normalizedPath === '') {return `${base}/marketing`;} // Marketing root page
       return `${base}/marketing${normalizedPath}`; // Other marketing pages like /marketing/pricing
     } else if (context === 'app') {
       return `${base}/app${normalizedPath}`;
-    } else { // context === 'forms'
+    } else {
+      // context === 'forms'
       return `${base}/forms${normalizedPath}`;
     }
   } else {
@@ -162,23 +167,23 @@ export const getSignupUrl = () => buildContextUrl('app', '/signup');
 export const getOnboardingUrl = () => buildContextUrl('app', '/onboarding');
 
 /** Generate URL for workspace dashboard */
-export const getWorkspaceUrl = (workspaceSlug: string) => 
+export const getWorkspaceUrl = (workspaceSlug: string) =>
   buildContextUrl('app', `/${workspaceSlug}`);
 
 /** Generate URL for workspace forms list */
-export const getFormsUrl = (workspaceSlug: string) => 
+export const getFormsUrl = (workspaceSlug: string) =>
   buildContextUrl('app', `/${workspaceSlug}/forms`);
 
 /** Generate URL for form editor */
-export const getFormEditorUrl = (workspaceSlug: string, formId: string) => 
+export const getFormEditorUrl = (workspaceSlug: string, formId: string) =>
   buildContextUrl('app', `/${workspaceSlug}/forms/${formId}`);
 
 /** Generate URL for workspace settings */
-export const getWorkspaceSettingsUrl = (workspaceSlug: string) => 
+export const getWorkspaceSettingsUrl = (workspaceSlug: string) =>
   buildContextUrl('app', `/${workspaceSlug}/settings`);
 
 /** Generate URL for workspace members management */
-export const getMembersUrl = (workspaceSlug: string) => 
+export const getMembersUrl = (workspaceSlug: string) =>
   buildContextUrl('app', `/${workspaceSlug}/members`);
 
 // -----------------------------------------------------------------------------
@@ -186,12 +191,12 @@ export const getMembersUrl = (workspaceSlug: string) =>
 // -----------------------------------------------------------------------------
 // These URLs are for public form submissions and don't require authentication
 
-/** 
- * Generate URL for public form submission 
+/**
+ * Generate URL for public form submission
  * @param workspaceSlug - Workspace slug or form type (e.g., 'contact', 'survey', 'feedback')
  * @param formId - Unique form identifier
  */
-export const getPublicFormUrl = (workspaceSlug: string, formId: string) => 
+export const getPublicFormUrl = (workspaceSlug: string, formId: string) =>
   buildContextUrl('forms', `/${workspaceSlug}/${formId}`);
 
 // -----------------------------------------------------------------------------
@@ -200,5 +205,4 @@ export const getPublicFormUrl = (workspaceSlug: string, formId: string) =>
 // These URLs are for the public marketing website
 
 /** Generate URL for marketing pages (landing, pricing, about, etc.) */
-export const getMarketingUrl = (path: string) => 
-  buildContextUrl('marketing', path);
+export const getMarketingUrl = (path: string) => buildContextUrl('marketing', path);

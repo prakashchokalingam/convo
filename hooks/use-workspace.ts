@@ -39,13 +39,13 @@ export function useWorkspace() {
         setError(null);
 
         const response = await fetch(`/api/workspaces/${workspaceSlug}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch workspace');
         }
 
         const apiResponse = await response.json();
-        
+
         // Handle the API response format { success: true, data: { workspace: ... } }
         if (apiResponse.success && apiResponse.data?.workspace) {
           setWorkspace(apiResponse.data.workspace);
@@ -66,11 +66,11 @@ export function useWorkspace() {
   // Helper function to check permissions
   const hasPermission = (requiredRole: 'viewer' | 'member' | 'admin' | 'owner') => {
     if (!workspace) return false;
-    
+
     const roleHierarchy = { viewer: 1, member: 2, admin: 3, owner: 4 };
     const userRoleLevel = roleHierarchy[workspace.role];
     const requiredRoleLevel = roleHierarchy[requiredRole];
-    
+
     return userRoleLevel >= requiredRoleLevel;
   };
 

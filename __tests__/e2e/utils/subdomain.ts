@@ -17,23 +17,23 @@ export interface NavigationOptions {
  */
 const getBaseUrls = () => {
   const isDevelopment = process.env.NODE_ENV !== 'production';
-  
+
   if (isDevelopment) {
     // In development, contexts are path-based from the root origin.
     return {
       base: 'http://localhost:3002', // Root for all dev paths
       marketing: 'http://localhost:3002/marketing',
       app: 'http://localhost:3002/app',
-      forms: 'http://localhost:3002/forms'
+      forms: 'http://localhost:3002/forms',
     };
   }
-  
+
   // Production URLs remain subdomain-based
   return {
     base: 'https://convo.ai', // Marketing root
     marketing: 'https://convo.ai',
     app: 'https://app.convo.ai',
-    forms: 'https://forms.convo.ai'
+    forms: 'https://forms.convo.ai',
   };
 };
 
@@ -43,7 +43,8 @@ const getBaseUrls = () => {
  */
 export function buildContextUrl(context: SubdomainContext, path: string = ''): string {
   const isDevelopment = process.env.NODE_ENV !== 'production';
-  const normalizedPath = path === '/' || path === '' ? '' : (path.startsWith('/') ? path : `/${path}`);
+  const normalizedPath =
+    path === '/' || path === '' ? '' : path.startsWith('/') ? path : `/${path}`;
 
   if (isDevelopment) {
     const base = 'http://localhost:3002';
@@ -53,7 +54,8 @@ export function buildContextUrl(context: SubdomainContext, path: string = ''): s
       return `${base}/marketing${normalizedPath}`;
     } else if (context === 'app') {
       return `${base}/app${normalizedPath}`;
-    } else { // context === 'forms'
+    } else {
+      // context === 'forms'
       return `${base}/forms${normalizedPath}`;
     }
   } else {
@@ -74,7 +76,7 @@ export function buildContextUrl(context: SubdomainContext, path: string = ''): s
  */
 export class SubdomainNavigator {
   constructor(private page: Page) {}
-  
+
   /**
    * Navigate to marketing site
    */
@@ -83,7 +85,7 @@ export class SubdomainNavigator {
     await this.navigateToUrl(url, options);
     await this.verifyContext('marketing');
   }
-  
+
   /**
    * Navigate to app (authenticated area)
    */
@@ -92,7 +94,7 @@ export class SubdomainNavigator {
     await this.navigateToUrl(url, options);
     // Note: Context verification might show login page if not authenticated
   }
-  
+
   /**
    * Navigate to forms (public form area)
    */
@@ -102,7 +104,7 @@ export class SubdomainNavigator {
     await this.navigateToUrl(url, options);
     await this.verifyContext('forms');
   }
-  
+
   /**
    * Navigate to specific workspace
    */
@@ -110,47 +112,47 @@ export class SubdomainNavigator {
     const fullPath = path ? `${workspaceSlug}/${path}` : workspaceSlug;
     await this.toApp(fullPath, options);
   }
-  
+
   /**
    * Navigate to form builder
    */
   async toFormBuilder(workspaceSlug: string, formId?: string, options: NavigationOptions = {}) {
-    const path = formId 
-      ? `${workspaceSlug}/forms/${formId}/edit`
-      : `${workspaceSlug}/forms/new`;
+    const path = formId ? `${workspaceSlug}/forms/${formId}/edit` : `${workspaceSlug}/forms/new`;
     await this.toApp(path, options);
   }
-  
+
   /**
    * Navigate to workspace settings
    */
-  async toWorkspaceSettings(workspaceSlug: string, section: string = '', options: NavigationOptions = {}) {
-    const path = section 
-      ? `${workspaceSlug}/settings/${section}`
-      : `${workspaceSlug}/settings`;
+  async toWorkspaceSettings(
+    workspaceSlug: string,
+    section: string = '',
+    options: NavigationOptions = {}
+  ) {
+    const path = section ? `${workspaceSlug}/settings/${section}` : `${workspaceSlug}/settings`;
     await this.toApp(path, options);
   }
-  
+
   /**
    * Internal navigation method
    */
   private async navigateToUrl(url: string, options: NavigationOptions) {
     await this.page.goto(url, {
       waitUntil: options.waitForLoadState !== false ? 'networkidle' : undefined,
-      timeout: options.timeout || 30000
+      timeout: options.timeout || 30000,
     });
   }
-  
+
   /**
    * Verify we're in the correct context
    */
   private async verifyContext(expectedContext: SubdomainContext) {
     // Wait a moment for context to be established
     await this.page.waitForTimeout(1000);
-    
+
     const currentUrl = this.page.url();
     const isDevelopment = process.env.NODE_ENV !== 'production';
-    
+
     if (isDevelopment) {
       // In development, check path prefixes
       const parsedUrl = new URL(currentUrl);
@@ -158,7 +160,8 @@ export class SubdomainNavigator {
         expect(parsedUrl.pathname).toMatch(/^\/app(\/.*)?$/);
       } else if (expectedContext === 'forms') {
         expect(parsedUrl.pathname).toMatch(/^\/forms(\/.*)?$/);
-      } else { // marketing
+      } else {
+        // marketing
         // Marketing can be /marketing/* or just / if it's the root redirect target before JS hydration.
         // For simplicity after navigation, we expect it to be /marketing or /marketing/...
         expect(parsedUrl.pathname).toMatch(/^\/marketing(\/.*)?$/);
@@ -172,12 +175,13 @@ export class SubdomainNavigator {
         expect(hostname).toBe('app.convo.ai');
       } else if (expectedContext === 'forms') {
         expect(hostname).toBe('forms.convo.ai');
-      } else { // marketing
+      } else {
+        // marketing
         expect(hostname).toBe('convo.ai');
       }
     }
   }
-  
+
   /**
    * Wait for authentication redirect
    */
@@ -188,23 +192,23 @@ export class SubdomainNavigator {
       this.page.waitForURL('**/sign-up**', { timeout }),
       this.page.waitForURL('**/onboarding**', { timeout }),
       this.page.waitForSelector('[data-testid="workspace-dashboard"]', { timeout }),
-      this.page.waitForSelector('[data-testid="user-menu"]', { timeout })
+      this.page.waitForSelector('[data-testid="user-menu"]', { timeout }),
     ]);
   }
-  
+
   /**
    * Switch between workspaces
    */
   async switchWorkspace(workspaceSlug: string) {
     // Click workspace switcher
     await this.page.click('[data-testid="workspace-switcher"]');
-    
+
     // Wait for dropdown to open
     await this.page.waitForSelector('[data-testid="workspace-list"]');
-    
+
     // Select the target workspace
     await this.page.click(`[data-testid="workspace-option-${workspaceSlug}"]`);
-    
+
     // Wait for navigation to complete
     await this.page.waitForURL(new RegExp(`.*/${workspaceSlug}.*`));
   }
@@ -241,12 +245,14 @@ export function extractFormId(url: string): string | null {
 export async function waitForPageReady(page: Page, timeout: number = 10000) {
   // Wait for basic page readiness
   await page.waitForLoadState('networkidle', { timeout });
-  
+
   // Wait for React to hydrate (Next.js specific)
   await page.waitForFunction(() => window.next?.router?.isReady, { timeout });
-  
+
   // Wait for any loading spinners to disappear
-  await page.waitForSelector('[data-loading="true"]', { state: 'hidden', timeout: 5000 }).catch(() => {
-    // Ignore if no loading indicators found
-  });
+  await page
+    .waitForSelector('[data-loading="true"]', { state: 'hidden', timeout: 5000 })
+    .catch(() => {
+      // Ignore if no loading indicators found
+    });
 }

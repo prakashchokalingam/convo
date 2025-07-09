@@ -1,9 +1,6 @@
-import { test as baseTest } from '@playwright/test';
-import { clerkSetup } from '@clerk/testing/playwright';
+import { test as baseTest, expect } from '@playwright/test';
 
-// Extend base test with Clerk-specific setup.
-// This new 'test' object will have the 'clerk' fixture.
-export const test = baseTest.extend(clerkSetup);
-
-// Export expect as well, so tests can import it from here.
-export { expect } from '@playwright/test';
+// Since clerkSetup() is called in global setup, we can use the standard test object
+// The clerk helper functions are available through the @clerk/testing/playwright module
+export const test = baseTest;
+export { expect };

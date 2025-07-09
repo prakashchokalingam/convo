@@ -1,9 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs';
+import { eq, and } from 'drizzle-orm';
+import { NextRequest } from 'next/server';
+
 import { db } from '@/drizzle/db';
 import { workspaces, workspaceMembers } from '@/drizzle/schema';
-import { eq, and } from 'drizzle-orm';
-import { withErrorHandling, createSuccessResponse, ApiError, ErrorCodes, requireAuth } from '@/lib/api-errors';
+import {
+  withErrorHandling,
+  createSuccessResponse,
+  ApiError,
+  ErrorCodes,
+  requireAuth,
+} from '@/lib/api-errors';
 
 /**
  * @swagger
@@ -100,58 +107,41 @@ import { withErrorHandling, createSuccessResponse, ApiError, ErrorCodes, require
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-export const GET = withErrorHandling(async (
-  req: NextRequest,
-  { params }: { params: { workspaceSlug: string } }
-) => {
-  const { userId } = auth();
-  requireAuth(userId);
+export const GET = withErrorHandling(
+  async (req: NextRequest, { params }: { params: { workspaceSlug: string } }) => {
+    const { userId } = auth();
+    requireAuth(userId);
 
-  const { workspaceSlug } = params;
+    const { workspaceSlug } = params;
 
-  if (!workspaceSlug) {
-    throw new ApiError(
-      'Workspace slug is required',
-      400,
-      ErrorCodes.MISSING_FIELDS
-    );
+    if (!workspaceSlug) {
+      throw new ApiError('Workspace slug is required', 400, ErrorCodes.MISSING_FIELDS);
+    }
+
+    // Get workspace with user's role
+    const workspace = await db
+      .select({
+        id: workspaces.id,
+        name: workspaces.name,
+        slug: workspaces.slug,
+        type: workspaces.type,
+        ownerId: workspaces.ownerId,
+        description: workspaces.description,
+        avatarUrl: workspaces.avatarUrl,
+        settings: workspaces.settings,
+        role: workspaceMembers.role,
+        createdAt: workspaces.createdAt,
+        updatedAt: workspaces.updatedAt,
+      })
+      .from(workspaces)
+      .innerJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
+      .where(and(eq(workspaces.slug, workspaceSlug), eq(workspaceMembers.userId, userId)))
+      .limit(1);
+
+    if (workspace.length === 0) {
+      throw new ApiError('Workspace not found or access denied', 404, ErrorCodes.NOT_FOUND);
+    }
+
+    return createSuccessResponse({ workspace: workspace[0] }, 'Workspace retrieved successfully');
   }
-
-  // Get workspace with user's role
-  const workspace = await db
-    .select({
-      id: workspaces.id,
-      name: workspaces.name,
-      slug: workspaces.slug,
-      type: workspaces.type,
-      ownerId: workspaces.ownerId,
-      description: workspaces.description,
-      avatarUrl: workspaces.avatarUrl,
-      settings: workspaces.settings,
-      role: workspaceMembers.role,
-      createdAt: workspaces.createdAt,
-      updatedAt: workspaces.updatedAt,
-    })
-    .from(workspaces)
-    .innerJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
-    .where(
-      and(
-        eq(workspaces.slug, workspaceSlug),
-        eq(workspaceMembers.userId, userId)
-      )
-    )
-    .limit(1);
-
-  if (workspace.length === 0) {
-    throw new ApiError(
-      'Workspace not found or access denied',
-      404,
-      ErrorCodes.NOT_FOUND
-    );
-  }
-
-  return createSuccessResponse(
-    { workspace: workspace[0] },
-    'Workspace retrieved successfully'
-  );
-});
+);

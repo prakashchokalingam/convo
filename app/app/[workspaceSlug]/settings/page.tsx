@@ -1,5 +1,8 @@
+import {
+  WorkspaceSettings,
+  SettingsNavigation,
+} from '@/components/app/settings/settings-components';
 import { getCurrentWorkspace } from '@/lib/workspace-server';
-import { WorkspaceSettings, SettingsNavigation } from '@/components/app/settings/settings-components';
 
 interface SettingsPageProps {
   params: {
@@ -15,30 +18,22 @@ export default async function SettingsPage({ params, searchParams }: SettingsPag
   const activeTab = searchParams.tab || 'general';
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Manage your workspace settings and preferences
-        </p>
+        <h1 className='text-2xl font-bold text-gray-900'>Settings</h1>
+        <p className='mt-1 text-sm text-gray-500'>Manage your workspace settings and preferences</p>
       </div>
 
-      <div className="flex gap-6">
+      <div className='flex gap-6'>
         {/* Settings Navigation */}
-        <div className="w-64 flex-shrink-0">
-          <SettingsNavigation 
-            workspace={workspace} 
-            activeTab={activeTab} 
-          />
+        <div className='w-64 flex-shrink-0'>
+          <SettingsNavigation workspace={workspace} activeTab={activeTab} />
         </div>
 
         {/* Settings Content */}
-        <div className="flex-1">
-          <WorkspaceSettings 
-            workspace={workspace} 
-            activeTab={activeTab} 
-          />
+        <div className='flex-1'>
+          <WorkspaceSettings workspace={workspace} activeTab={activeTab} />
         </div>
       </div>
     </div>

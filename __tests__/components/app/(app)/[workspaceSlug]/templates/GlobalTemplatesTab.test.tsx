@@ -101,7 +101,7 @@ describe('GlobalTemplatesTab Component', () => {
   it('shows error state if fetching templates fails', async () => {
     (fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('API Error'));
     await act(async () => {
-        render(<GlobalTemplatesTab {...defaultProps} />);
+      render(<GlobalTemplatesTab {...defaultProps} />);
     });
     expect(await screen.findByText(/Failed to load global templates/i)).toBeInTheDocument();
   });

@@ -1,8 +1,9 @@
-import { auth } from "@clerk/nextjs";
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { forms, templates, workspaceMembers } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { auth } from '@clerk/nextjs';
+import { eq, and } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/lib/db';
+import { forms, templates, workspaceMembers } from '@/lib/db/schema';
 
 /**
  * @swagger
@@ -91,35 +92,31 @@ import { eq, and } from "drizzle-orm";
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { name, description, category, thumbnailUrl } = body;
 
     if (!name) {
-      return NextResponse.json({ 
-        error: "Missing required field: name" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Missing required field: name',
+        },
+        { status: 400 }
+      );
     }
 
     // Get source form
-    const sourceForm = await db
-      .select()
-      .from(forms)
-      .where(eq(forms.id, params.id))
-      .limit(1);
+    const sourceForm = await db.select().from(forms).where(eq(forms.id, params.id)).limit(1);
 
     if (sourceForm.length === 0) {
-      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
 
     const formData = sourceForm[0];
@@ -127,13 +124,15 @@ export async function POST(
     // Verify user has access to the form's workspace
     const workspaceMember = await db
       .select({
-        role: workspaceMembers.role
+        role: workspaceMembers.role,
       })
       .from(workspaceMembers)
-      .where(and(
-        eq(workspaceMembers.workspaceId, formData.workspaceId),
-        eq(workspaceMembers.userId, userId)
-      ))
+      .where(
+        and(
+          eq(workspaceMembers.workspaceId, formData.workspaceId),
+          eq(workspaceMembers.userId, userId)
+        )
+      )
       .limit(1);
 
     if (workspaceMember.length === 0) {
@@ -143,9 +142,12 @@ export async function POST(
     // Check if user has create_template permission (owner or admin)
     const userRole = workspaceMember[0].role;
     if (!['owner', 'admin'].includes(userRole)) {
-      return NextResponse.json({ 
-        error: "Insufficient permissions. Requires create_template permission." 
-      }, { status: 403 });
+      return NextResponse.json(
+        {
+          error: 'Insufficient permissions. Requires create_template permission.',
+        },
+        { status: 403 }
+      );
     }
 
     // Parse form config to formSchema format
@@ -153,9 +155,12 @@ export async function POST(
     try {
       formSchema = JSON.parse(formData.config);
     } catch (error) {
-      return NextResponse.json({ 
-        error: "Invalid form configuration format" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Invalid form configuration format',
+        },
+        { status: 400 }
+      );
     }
 
     // Create the template
@@ -175,18 +180,20 @@ export async function POST(
       })
       .returning();
 
-    return NextResponse.json({
-      success: true,
-      template: newTemplate,
-      form: {
-        id: formData.id,
-        title: formData.title
+    return NextResponse.json(
+      {
+        success: true,
+        template: newTemplate,
+        form: {
+          id: formData.id,
+          title: formData.title,
+        },
+        message: 'Template created successfully from form',
       },
-      message: "Template created successfully from form"
-    }, { status: 201 });
-
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("Error saving form as template:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error saving form as template:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

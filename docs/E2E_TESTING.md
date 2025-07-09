@@ -7,6 +7,7 @@ Convo uses Playwright for comprehensive end-to-end testing across the complex su
 ## Quick Start
 
 ### 1. Install Dependencies
+
 ```bash
 # Install Playwright
 npm install
@@ -16,6 +17,7 @@ npx playwright install
 ```
 
 ### 2. Start Development Environment
+
 ```bash
 # Start database
 npm run db:up
@@ -25,6 +27,7 @@ npm run dev
 ```
 
 ### 3. Run Tests
+
 ```bash
 # Run all E2E tests
 npm run test:e2e
@@ -45,6 +48,7 @@ npm run test:e2e:debug
 ## Test Architecture
 
 ### Directory Structure
+
 ```
 __tests__/e2e/
 ├── auth-onboarding.spec.ts        # Authentication and workspace creation
@@ -62,18 +66,21 @@ __tests__/e2e/
 ### Test Categories
 
 #### 1. Authentication Tests (`auth-onboarding.spec.ts`)
+
 - User signup and login flows
 - Workspace creation during onboarding
 - Form validation and error handling
 - Session management and logout
 
 #### 2. Subdomain Routing Tests (`subdomain-routing.spec.ts`)
+
 - Context detection (marketing, app, forms)
 - Cross-context navigation
 - URL building and deep linking
 - Mobile responsiveness per context
 
 #### 3. Form Lifecycle Tests (`form-lifecycle.spec.ts`)
+
 - AI-powered form generation
 - Manual form building
 - Static vs conversational mode
@@ -84,6 +91,7 @@ __tests__/e2e/
 ## Configuration
 
 ### Playwright Config (`playwright.config.ts`)
+
 ```typescript
 // Key configuration options:
 - baseURL: http://localhost:3002 (development)
@@ -94,6 +102,7 @@ __tests__/e2e/
 ```
 
 ### Environment Variables
+
 ```bash
 # Test environment
 NODE_ENV=test
@@ -112,18 +121,23 @@ CLERK_SECRET_KEY=...
 Convo's subdomain architecture requires special handling in tests:
 
 ### Development Mode (Path-based)
+
 Uses path prefixes to define contexts:
+
 - Marketing: `http://localhost:3002/marketing` (e.g., `/marketing/pricing`)
 - App: `http://localhost:3002/app` (e.g., `/app/workspace-slug/settings`)
 - Forms: `http://localhost:3002/forms` (e.g., `/forms/workspace-slug/form-id`)
 
 ### Production Mode
+
 Uses actual subdomains:
+
 - Marketing: `convo.ai`
 - App: `app.convo.ai`
 - Forms: `forms.convo.ai`
 
 ### Navigation Utilities
+
 ```typescript
 import { createNavigator } from './utils/subdomain';
 
@@ -140,12 +154,14 @@ await navigator.toForms('workspace-slug', 'form-id');
 Tests use a shared authentication state to avoid repeated login:
 
 ### Initial Setup (`auth.setup.ts`)
+
 1. Creates test user account
 2. Completes onboarding flow
 3. Creates test workspace
 4. Saves authentication state to `.auth/user.json`
 
 ### Test Usage
+
 ```typescript
 // Tests automatically use saved auth state
 test('authenticated test', async ({ page }) => {
@@ -158,6 +174,7 @@ test('authenticated test', async ({ page }) => {
 ## Form Testing Utilities
 
 ### Form Builder Helper
+
 ```typescript
 import { createFormHelpers } from './utils/form-helpers';
 
@@ -168,8 +185,8 @@ const formId = await builder.createFormWithAI('Create a contact form');
 
 // Submit form
 await submitter.submitStaticForm({
-  'Name': 'Test User',
-  'Email': 'test@example.com'
+  Name: 'Test User',
+  Email: 'test@example.com',
 });
 
 // View analytics
@@ -177,6 +194,7 @@ await analytics.viewFormAnalytics('workspace', formId);
 ```
 
 ### Test Data Generation
+
 ```typescript
 import { generateTestUser, createTestWorkspace } from './utils/test-data';
 
@@ -190,11 +208,13 @@ const testWorkspace = createTestWorkspace();
 ## Best Practices
 
 ### 1. Test Isolation
+
 - Each test should be independent
 - Use unique test data (timestamps, IDs)
 - Clean up test data when possible
 
 ### 2. Waiting Strategies
+
 ```typescript
 // Wait for network to be idle
 await page.waitForLoadState('networkidle');
@@ -207,6 +227,7 @@ await page.waitForURL('**/workspace/**');
 ```
 
 ### 3. Error Handling
+
 ```typescript
 try {
   await page.click('[data-testid="button"]');
@@ -218,10 +239,11 @@ try {
 ```
 
 ### 4. Mobile Testing
+
 ```typescript
 test('mobile test', async ({ page, isMobile }) => {
   if (!isMobile) test.skip('Mobile-only test');
-  
+
   // Mobile-specific assertions
   await expect(page.locator('[data-testid="mobile-menu"]')).toBeVisible();
 });
@@ -230,31 +252,38 @@ test('mobile test', async ({ page, isMobile }) => {
 ## Debugging Tests
 
 ### 1. UI Mode (Recommended)
+
 ```bash
 npm run test:e2e:ui
 ```
+
 - Visual test runner
 - Step-by-step execution
 - Live preview
 - Easy debugging
 
 ### 2. Headed Mode
+
 ```bash
 npm run test:e2e:headed
 ```
+
 - See browser while tests run
 - Good for understanding flow
 - Can pause execution
 
 ### 3. Debug Mode
+
 ```bash
 npm run test:e2e:debug
 ```
+
 - Starts with debugger
 - Step through line by line
 - Inspect page state
 
 ### 4. Screenshots and Videos
+
 ```typescript
 // Automatic on failure
 - Screenshots saved to test-results/
@@ -268,6 +297,7 @@ await page.screenshot({ path: 'debug.png', fullPage: true });
 ## CI/CD Integration
 
 ### GitHub Actions Example
+
 ```yaml
 name: E2E Tests
 on: [push, pull_request]
@@ -285,10 +315,11 @@ jobs:
 ```
 
 ### Parallel Execution
+
 ```typescript
 // In CI, tests run in parallel across browsers
 - Chrome (Desktop)
-- Firefox (Desktop) 
+- Firefox (Desktop)
 - Safari (Desktop)
 - Mobile Chrome
 - Mobile Safari
@@ -297,12 +328,14 @@ jobs:
 ## Common Issues and Solutions
 
 ### 1. Authentication Timeouts
+
 ```typescript
 // Increase timeout for auth-heavy operations
 await page.waitForURL('**/workspace/**', { timeout: 30000 });
 ```
 
 ### 2. Flaky Tests
+
 ```typescript
 // Use retry logic
 test.describe.configure({ retries: 2 });
@@ -312,6 +345,7 @@ await page.waitForFunction(() => window.dataLoaded);
 ```
 
 ### 3. Subdomain Routing
+
 ```typescript
 // Always use navigation utilities
 const navigator = createNavigator(page);
@@ -319,6 +353,7 @@ await navigator.toApp(); // Handles context correctly
 ```
 
 ### 4. Form Interactions
+
 ```typescript
 // Wait for form to be ready
 await page.waitForSelector('form');
@@ -331,12 +366,15 @@ await page.click('[data-testid="submit-button"]');
 ## Monitoring and Reporting
 
 ### 1. HTML Reports
+
 After test run, open `playwright-report/index.html`
 
 ### 2. JUnit Reports
+
 Generated at `test-results/junit.xml` for CI integration
 
 ### 3. Coverage Integration
+
 ```bash
 # Run with coverage
 npm run test:coverage && npm run test:e2e
@@ -345,18 +383,21 @@ npm run test:coverage && npm run test:e2e
 ## Future Enhancements
 
 ### 1. Visual Regression Testing
+
 ```typescript
 // Compare screenshots
 await expect(page).toHaveScreenshot('homepage.png');
 ```
 
 ### 2. Performance Testing
+
 ```typescript
 // Measure page load times
 const metrics = await page.evaluate(() => performance.getEntriesByType('navigation'));
 ```
 
 ### 3. Accessibility Testing
+
 ```typescript
 // Add axe-core integration
 await expect(page).toPassAxeChecks();

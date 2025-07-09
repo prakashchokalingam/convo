@@ -5,12 +5,8 @@ export function generateMetadata({ params }: { params: { workspaceSlug: string }
   };
 }
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren } from 'react';
 
 export default function Layout({ children }: PropsWithChildren) {
-  return (
-    <div className="flex h-screen w-screen items-center justify-center">
-      {children}
-    </div>
-  );
+  return <div className='flex h-screen w-screen items-center justify-center'>{children}</div>;
 }

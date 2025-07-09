@@ -61,7 +61,7 @@ export async function sendEmail({ to, subject, html, text, from = DEFAULT_FROM }
  */
 export async function sendInvitationEmail(data: InvitationEmailData) {
   const subject = `You're invited to join ${data.workspaceName} on ConvoForms`;
-  
+
   const html = generateInvitationEmailHTML(data);
   const text = generateInvitationEmailText(data);
 
@@ -78,7 +78,7 @@ export async function sendInvitationEmail(data: InvitationEmailData) {
  */
 export async function sendWelcomeEmail(data: WelcomeEmailData) {
   const subject = `Welcome to ${data.workspaceName}!`;
-  
+
   const html = generateWelcomeEmailHTML(data);
   const text = generateWelcomeEmailText(data);
 
@@ -97,13 +97,13 @@ function generateInvitationEmailHTML(data: InvitationEmailData): string {
   const roleDescriptions = {
     admin: 'manage workspace settings, members, and all forms',
     member: 'create, edit, and manage forms and responses',
-    viewer: 'view forms and responses'
+    viewer: 'view forms and responses',
   };
 
   const roleEmojis = {
     admin: '🛡️',
-    member: '👤', 
-    viewer: '👁️'
+    member: '👤',
+    viewer: '👁️',
   };
 
   return `

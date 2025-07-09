@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs';
+import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { db } from '@/drizzle/db';
 import { workspaceMembers, users } from '@/drizzle/schema';
-import { eq } from 'drizzle-orm';
 import { checkWorkspacePermission } from '@/lib/rbac';
 
 interface MembersParams {
@@ -15,7 +16,7 @@ interface MembersParams {
 export async function GET(req: NextRequest, { params }: MembersParams) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -23,16 +24,11 @@ export async function GET(req: NextRequest, { params }: MembersParams) {
     const { workspaceId } = params;
 
     // Check if user has permission to view members
-    const hasPermission = await checkWorkspacePermission(
-      userId, 
-      workspaceId, 
-      'members', 
-      'read'
-    );
+    const hasPermission = await checkWorkspacePermission(userId, workspaceId, 'members', 'read');
 
     if (!hasPermission) {
       return NextResponse.json(
-        { error: 'You do not have permission to view workspace members' }, 
+        { error: 'You do not have permission to view workspace members' },
         { status: 403 }
       );
     }
@@ -74,23 +70,20 @@ export async function GET(req: NextRequest, { params }: MembersParams) {
         email: member.email,
         username: member.username,
         avatarUrl: member.avatarUrl,
-        displayName: member.firstName && member.lastName 
-          ? `${member.firstName} ${member.lastName}` 
-          : member.firstName || member.username || member.email,
-      }
+        displayName:
+          member.firstName && member.lastName
+            ? `${member.firstName} ${member.lastName}`
+            : member.firstName || member.username || member.email,
+      },
     }));
 
     return NextResponse.json({
       success: true,
       members: formattedMembers,
-      count: formattedMembers.length
+      count: formattedMembers.length,
     });
-
   } catch (error) {
     console.error('Error fetching workspace members:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch workspace members' }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch workspace members' }, { status: 500 });
   }
 }

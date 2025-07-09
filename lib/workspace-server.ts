@@ -1,21 +1,24 @@
 // IMPORTANT: This file contains server-side code only.
 // Do not import this file into client components.
 
-import { db } from '@/lib/db';
-import { workspaces, workspaceMembers, users } from '@/lib/db/schema';
-import { eq, and, desc } from 'drizzle-orm';
 import { auth } from '@clerk/nextjs';
-import { redirect } from 'next/navigation';
-// import { cache } from 'react'; // Removed React.cache import
+import { clerkClient } from '@clerk/nextjs/server';
 import { createId } from '@paralleldrive/cuid2';
-import type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
+import { eq, and, desc } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
+
 import { getWorkspaceUrl } from '@/lib/context';
+import { db } from '@/lib/db';
+import { workspaces, workspaceMembers, subscriptions, type Workspace } from '@/lib/db/schema';
+import type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
+
+// import { cache } from 'react'; // Removed React.cache import
 
 // Get all workspaces accessible by current user
 export const getCurrentUserWorkspaces = async (): Promise<WorkspaceWithRole[]> => {
   try {
     const { userId } = auth();
-    if (!userId) return [];
+    if (!userId) {return [];}
 
     const userWorkspaces = await db
       .select({
@@ -47,7 +50,7 @@ export const getCurrentUserWorkspaces = async (): Promise<WorkspaceWithRole[]> =
 export const getUserDefaultWorkspace = async (): Promise<WorkspaceWithRole | null> => {
   try {
     const { userId } = auth();
-    if (!userId) return null;
+    if (!userId) {return null;}
 
     // First try to find a default workspace owned by the user
     const defaultWorkspace = await db
@@ -100,7 +103,7 @@ export const getUserDefaultWorkspace = async (): Promise<WorkspaceWithRole | nul
       .orderBy(desc(workspaces.createdAt))
       .limit(1);
 
-    return anyWorkspace[0] as WorkspaceWithRole || null;
+    return (anyWorkspace[0] as WorkspaceWithRole) || null;
   } catch (error) {
     console.error('Error getting default workspace:', error);
     return null;
@@ -111,7 +114,7 @@ export const getUserDefaultWorkspace = async (): Promise<WorkspaceWithRole | nul
 export const getWorkspaceBySlug = async (slug: string): Promise<WorkspaceWithRole | null> => {
   try {
     const { userId } = auth();
-    if (!userId) return null;
+    if (!userId) {return null;}
 
     const workspace = await db
       .select({
@@ -129,15 +132,10 @@ export const getWorkspaceBySlug = async (slug: string): Promise<WorkspaceWithRol
       })
       .from(workspaces)
       .innerJoin(workspaceMembers, eq(workspaces.id, workspaceMembers.workspaceId))
-      .where(
-        and(
-          eq(workspaces.slug, slug),
-          eq(workspaceMembers.userId, userId)
-        )
-      )
+      .where(and(eq(workspaces.slug, slug), eq(workspaceMembers.userId, userId)))
       .limit(1);
 
-    return workspace[0] as WorkspaceWithRole || null;
+    return (workspace[0] as WorkspaceWithRole) || null;
   } catch (error) {
     console.error('Error getting workspace by slug:', error);
     return null;
@@ -184,7 +182,7 @@ export async function validateWorkspaceAccess(
   requiredRole?: WorkspaceRole
 ): Promise<WorkspaceWithRole> {
   const workspace = await getWorkspaceBySlug(workspaceSlug);
-  
+
   if (!workspace) {
     redirect('/app/onboarding');
   }
@@ -194,7 +192,7 @@ export async function validateWorkspaceAccess(
     const roleHierarchy = { viewer: 1, member: 2, admin: 3, owner: 4 };
     const userRoleLevel = roleHierarchy[workspace.role];
     const requiredRoleLevel = roleHierarchy[requiredRole];
-    
+
     if (userRoleLevel < requiredRoleLevel) {
       redirect(getWorkspaceUrl(workspaceSlug));
     }
@@ -211,26 +209,29 @@ export async function createWorkspace(data: {
   type?: 'default' | 'team';
 }) {
   const { userId } = auth();
-  if (!userId) throw new Error('Not authenticated');
+  if (!userId) {throw new Error('Not authenticated');}
 
-  const workspace = await db.insert(workspaces).values({
-    id: createId(),
-    name: data.name,
-    slug: data.slug,
-    type: data.type || 'team',
-    ownerId: userId,
-    description: data.description || null,
-    settings: JSON.stringify({
-      theme: 'light',
-      timezone: 'UTC',
-      notifications: {
-        email: true,
-        browser: true,
-      }
-    }),
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }).returning();
+  const workspace = await db
+    .insert(workspaces)
+    .values({
+      id: createId(),
+      name: data.name,
+      slug: data.slug,
+      type: data.type || 'team',
+      ownerId: userId,
+      description: data.description || null,
+      settings: JSON.stringify({
+        theme: 'light',
+        timezone: 'UTC',
+        notifications: {
+          email: true,
+          browser: true,
+        },
+      }),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
 
   // Add creator as owner
   await db.insert(workspaceMembers).values({
@@ -249,18 +250,18 @@ export async function createWorkspace(data: {
 export async function generateWorkspaceSlugFromEmail(email: string): Promise<string> {
   const [username, domain] = email.split('@');
   let baseSlug = cleanSlugFromUsername(username);
-  
+
   // Add domain for generic terms to make slug more unique
   if (isGenericTerm(baseSlug)) {
     const domainPart = cleanSlugFromUsername(domain.split('.')[0]);
     baseSlug = `${baseSlug}-${domainPart}`;
   }
-  
+
   // Try base slug first
   if (await isSlugAvailable(baseSlug)) {
     return baseSlug;
   }
-  
+
   // Try numbered versions (reasonable attempts)
   for (let i = 2; i <= 10; i++) {
     const numberedSlug = `${baseSlug}-${i}`;
@@ -268,7 +269,7 @@ export async function generateWorkspaceSlugFromEmail(email: string): Promise<str
       return numberedSlug;
     }
   }
-  
+
   // Bulletproof fallback: guaranteed unique with random ID
   const randomId = generateRandomId(6);
   return `${baseSlug}-${randomId}`;
@@ -278,17 +279,28 @@ export async function generateWorkspaceSlugFromEmail(email: string): Promise<str
 function cleanSlugFromUsername(input: string): string {
   return input
     .toLowerCase()
-    .replace(/[^a-z0-9]/g, '-')  // Replace non-alphanumeric with hyphens
-    .replace(/-+/g, '-')        // Replace multiple hyphens with single
-    .replace(/^-|-$/g, '')      // Remove leading/trailing hyphens
-    .substring(0, 20);          // Limit length
+    .replace(/[^a-z0-9]/g, '-') // Replace non-alphanumeric with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+    .substring(0, 20); // Limit length
 }
 
 // Check if term is too generic and needs domain suffix
 function isGenericTerm(slug: string): boolean {
   const genericTerms = [
-    'user', 'admin', 'test', 'demo', 'info', 'contact',
-    'hello', 'hi', 'me', 'my', 'app', 'web', 'site'
+    'user',
+    'admin',
+    'test',
+    'demo',
+    'info',
+    'contact',
+    'hello',
+    'hi',
+    'me',
+    'my',
+    'app',
+    'web',
+    'site',
   ];
   return genericTerms.includes(slug) || slug.length < 3;
 }
@@ -312,7 +324,9 @@ function generateRandomId(length: number): string {
 }
 
 // Workspace count validation functions
-export async function getWorkspaceCount(userId: string): Promise<{ default: number; team: number }> {
+export async function getWorkspaceCount(
+  userId: string
+): Promise<{ default: number; team: number }> {
   const userWorkspaces = await db
     .select({
       type: workspaces.type,
@@ -328,8 +342,8 @@ export async function getWorkspaceCount(userId: string): Promise<{ default: numb
 
   const count = { default: 0, team: 0 };
   userWorkspaces.forEach(ws => {
-    if (ws.type === 'default') count.default++;
-    if (ws.type === 'team') count.team++;
+    if (ws.type === 'default') {count.default++;}
+    if (ws.type === 'team') {count.team++;}
   });
 
   return count;
@@ -352,12 +366,12 @@ export async function getWorkspaceLimitsInfo(userId: string): Promise<{
   limits: { default: number; team: number };
 }> {
   const currentCount = await getWorkspaceCount(userId);
-  
+
   return {
     canCreateDefault: currentCount.default === 0,
     canCreateTeam: currentCount.team < 3,
     currentCount,
-    limits: { default: 1, team: 3 }
+    limits: { default: 1, team: 3 },
   };
 }
 
@@ -365,32 +379,27 @@ export async function getWorkspaceLimitsInfo(userId: string): Promise<{
 export async function createWorkspaceFromEmail(
   email: string,
   firstName?: string,
-  lastName?: string
+  _lastName?: string
 ): Promise<{ slug: string; name: string }> {
   const slug = await generateWorkspaceSlugFromEmail(email);
-  
+
   // Generate workspace name from user info
-  const name = firstName 
-    ? `${firstName}'s Workspace`
-    : `${email.split('@')[0]} Workspace`;
-  
+  const name = firstName ? `${firstName}'s Workspace` : `${email.split('@')[0]} Workspace`;
+
   const workspace = await createWorkspace({
     name,
     slug,
     type: 'default',
-    description: 'Your default workspace for creating conversational forms'
+    description: 'Your default workspace for creating conversational forms',
   });
-  
+
   return {
     slug: workspace.slug,
-    name: workspace.name
+    name: workspace.name,
   };
 }
 
 // Admin specific functions
-import { clerkClient } from '@clerk/nextjs/server';
-import { subscriptions } from '@/lib/db/schema'; // Ensure subscriptions is imported if not already
-import type { Workspace } from '@/lib/db/schema';
 
 export interface AdminWorkspaceInfo extends Workspace {
   ownerName: string | null;
@@ -417,12 +426,17 @@ export const getAllWorkspacesForAdmin = async (): Promise<AdminWorkspaceInfo[]> 
       if (ws.ownerId) {
         try {
           const owner = await clerkClient.users.getUser(ws.ownerId);
-          ownerName = owner.firstName && owner.lastName ? `${owner.firstName} ${owner.lastName}` : (owner.firstName || owner.lastName || null);
+          ownerName =
+            owner.firstName && owner.lastName
+              ? `${owner.firstName} ${owner.lastName}`
+              : owner.firstName || owner.lastName || null;
           if (!ownerName && owner.username) {
             ownerName = owner.username;
           }
           const primaryEmail = owner.emailAddresses.find(e => e.id === owner.primaryEmailAddressId);
-          ownerEmail = primaryEmail ? primaryEmail.emailAddress : (owner.emailAddresses[0]?.emailAddress || 'No primary email');
+          ownerEmail = primaryEmail
+            ? primaryEmail.emailAddress
+            : owner.emailAddresses[0]?.emailAddress || 'No primary email';
         } catch (clerkError) {
           console.error(`Failed to fetch owner details for ${ws.ownerId}:`, clerkError);
           ownerName = 'Error fetching user';

@@ -1,10 +1,11 @@
-import { auth } from "@clerk/nextjs";
-import { NextRequest, NextResponse } from "next/server";
-import { createId } from "@paralleldrive/cuid2";
-import { db } from "@/lib/db";
-import { templates } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { checkWorkspacePermission, getUserWorkspaceRole } from "@/lib/rbac";
+import { auth } from '@clerk/nextjs';
+import { createId } from '@paralleldrive/cuid2';
+import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/lib/db';
+import { templates } from '@/lib/db/schema';
+import { checkWorkspacePermission, getUserWorkspaceRole } from '@/lib/rbac';
 
 /**
  * @swagger
@@ -74,7 +75,7 @@ export async function POST(
   try {
     const { userId } = auth();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -82,7 +83,10 @@ export async function POST(
     const customName = body.name; // Optional custom name from request body
 
     if (!targetWorkspaceId) {
-      return NextResponse.json({ error: "Target workspaceId is required in the request body" }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Target workspaceId is required in the request body' },
+        { status: 400 }
+      );
     }
 
     const sourceTemplateId = params.id;
@@ -95,7 +99,7 @@ export async function POST(
       .limit(1);
 
     if (sourceTemplateResults.length === 0) {
-      return NextResponse.json({ error: "Source template not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Source template not found' }, { status: 404 });
     }
     const sourceTemplateData = sourceTemplateResults[0];
 
@@ -103,27 +107,46 @@ export async function POST(
     // 2a. Check if user is part of the target workspace (required for all clone operations)
     const targetUserRole = await getUserWorkspaceRole(userId, targetWorkspaceId);
     if (!targetUserRole) {
-      return NextResponse.json({ error: "Access denied to target workspace. User is not a member." }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Access denied to target workspace. User is not a member.' },
+        { status: 403 }
+      );
     }
 
     // 2b. Check 'create_template' permission in the target workspace (required for all clone operations)
-    const canCreateInTarget = await checkWorkspacePermission(userId, targetWorkspaceId, 'templates', 'create');
+    const canCreateInTarget = await checkWorkspacePermission(
+      userId,
+      targetWorkspaceId,
+      'templates',
+      'create'
+    );
     if (!canCreateInTarget) {
-      return NextResponse.json({ error: "Insufficient permissions to create template in target workspace." }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Insufficient permissions to create template in target workspace.' },
+        { status: 403 }
+      );
     }
 
     // 2c. Additional checks if the source template is workspace-specific (not global)
     if (!sourceTemplateData.isGlobal) {
       if (!sourceTemplateData.workspaceId) {
-        console.error(`Source template ${sourceTemplateData.id} is not global but has no workspaceId.`);
-        return NextResponse.json({ error: "Source template data integrity issue." }, { status: 500 });
+        console.error(
+          `Source template ${sourceTemplateData.id} is not global but has no workspaceId.`
+        );
+        return NextResponse.json(
+          { error: 'Source template data integrity issue.' },
+          { status: 500 }
+        );
       }
       // If source and target workspaces are different, verify membership in source workspace.
       if (sourceTemplateData.workspaceId !== targetWorkspaceId) {
         const sourceUserRole = await getUserWorkspaceRole(userId, sourceTemplateData.workspaceId);
         if (!sourceUserRole) {
           // User must be a member of the source template's workspace to clone it to a different workspace.
-          return NextResponse.json({ error: "Access denied to source template's workspace. User is not a member." }, { status: 403 });
+          return NextResponse.json(
+            { error: "Access denied to source template's workspace. User is not a member." },
+            { status: 403 }
+          );
         }
       }
     }
@@ -158,21 +181,23 @@ export async function POST(
       .update(templates)
       .set({
         cloneCount: (sourceTemplateData.cloneCount || 0) + 1,
-        updatedAt: new Date() // Also update updatedAt for the source template
+        updatedAt: new Date(), // Also update updatedAt for the source template
       })
       .where(eq(templates.id, sourceTemplateData.id));
 
-    return NextResponse.json({
-      success: true,
-      template: newClonedTemplate,
-      message: "Template cloned successfully"
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        template: newClonedTemplate,
+        message: 'Template cloned successfully',
+      },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("Error cloning template:", error);
+    console.error('Error cloning template:', error);
     if (error instanceof SyntaxError) {
-        return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
     }
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import { test as setup, expect } from './fixtures'; // Import from custom fixtures
+import { clerk } from '@clerk/testing/playwright'; // Import clerk helper directly
 import { createTestWorkspace } from './utils/test-data'; // generateTestUser not needed for programmatic
 import { buildContextUrl } from './utils/subdomain';
 
@@ -8,7 +9,8 @@ const authFile = '.auth/user.json';
  * Authentication setup for E2E tests
  * This creates a test user and authenticates them before running tests
  */
-setup('authenticate', async ({ page, clerk }) => { // 'clerk' fixture should now be available
+setup('authenticate', async ({ page }) => {
+  // Remove clerk from parameters, use imported helper
   console.log('🔐 Setting up authentication for E2E tests programmatically...');
 
   const testUser = {
@@ -45,7 +47,10 @@ setup('authenticate', async ({ page, clerk }) => { // 'clerk' fixture should now
     console.log('Onboarding page loaded, workspace creation form visible.');
 
     const testWorkspace = createTestWorkspace();
-    await page.fill('[name="name"], [placeholder*="workspace"], input[type="text"]', testWorkspace.name);
+    await page.fill(
+      '[name="name"], [placeholder*="workspace"], input[type="text"]',
+      testWorkspace.name
+    );
     await page.fill('[name="slug"], [placeholder*="slug"]', testWorkspace.slug);
     await page.click('[type="submit"], button >> text="Create"');
     console.log(`Attempting to create workspace: ${testWorkspace.name}`);
@@ -61,14 +66,13 @@ setup('authenticate', async ({ page, clerk }) => { // 'clerk' fixture should now
     console.log('✅ Programmatic authentication setup completed successfully');
     console.log(`📝 Test user: ${testUser.email}`);
     console.log(`🏢 Test workspace: ${testWorkspace.name} (${testWorkspace.slug})`);
-
   } catch (error) {
     console.error('❌ Programmatic authentication setup in 00-auth.setup.spec.ts failed:', error);
 
     // Take a screenshot for debugging
     await page.screenshot({
       path: 'test-results/auth-setup-failure.png',
-      fullPage: true
+      fullPage: true,
     });
 
     throw error;

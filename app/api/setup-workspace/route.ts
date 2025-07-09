@@ -1,28 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs';
-import { db } from '@/drizzle/db';
-import { users, workspaces, workspaceMembers, workspaceActivities, subscriptions } from '@/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import { eq } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/drizzle/db';
+import {
+  users,
+  workspaces,
+  workspaceMembers,
+  workspaceActivities,
+  subscriptions,
+} from '@/drizzle/schema';
 import { createDefaultSubscription } from '@/lib/plans';
 import { sendSlackNotification, formatWorkspaceCreationMessage } from '@/lib/slack';
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await req.json();
-    const { 
-      email, 
-      firstName, 
-      lastName, 
-      username, 
-      avatarUrl 
-    } = body;
+    const { email, firstName, lastName, username, avatarUrl } = body;
 
     // Check if user already exists (prevent duplicate creation)
     const existingUser = await db.query.users.findFirst({
@@ -32,24 +33,22 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       // User already exists, return their workspace
       const workspace = await db.query.workspaces.findFirst({
-        where: (workspaces, { eq, and }) => and(
-          eq(workspaces.ownerId, userId),
-          eq(workspaces.type, 'default')
-        ),
+        where: (workspaces, { eq, and }) =>
+          and(eq(workspaces.ownerId, userId), eq(workspaces.type, 'default')),
       });
 
-      return NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         workspaceSlug: workspace?.slug,
-        message: 'User already exists' 
+        message: 'User already exists',
       });
     }
 
     // Generate unique workspace slug
-    const baseSlug = username 
-      ? username.toLowerCase().replace(/[^a-z0-9-]/g, '') 
+    const baseSlug = username
+      ? username.toLowerCase().replace(/[^a-z0-9-]/g, '')
       : firstName?.toLowerCase().replace(/[^a-z0-9-]/g, '') || 'user';
-    
+
     const workspaceSlug = await generateUniqueSlug(baseSlug);
     const workspaceId = createId();
     const now = new Date();
@@ -69,7 +68,7 @@ export async function POST(req: NextRequest) {
     // Create default subscription (starter plan)
     await createDefaultSubscription(userId);
 
-    // Create default workspace  
+    // Create default workspace
     await db.insert(workspaces).values({
       id: workspaceId,
       name: `${firstName || 'My'} Workspace`,
@@ -83,7 +82,7 @@ export async function POST(req: NextRequest) {
         notifications: {
           email: true,
           browser: true,
-        }
+        },
       }),
       createdAt: now,
       updatedAt: now,
@@ -112,19 +111,19 @@ export async function POST(req: NextRequest) {
       metadata: JSON.stringify({
         workspaceName: `${firstName || 'My'} Workspace`,
         workspaceType: 'default',
-        source: 'client_signup'
+        source: 'client_signup',
       }),
       ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
       userAgent: req.headers.get('user-agent') || 'unknown',
       createdAt: now,
     });
 
-    console.log('✅ User and workspace created via client:', { 
-      userId, 
-      email,
-      workspaceSlug,
-      workspaceName: `${firstName || 'My'} Workspace`
-    });
+    // console.log('✅ User and workspace created via client:', {
+    //   userId,
+    //   email,
+    //   workspaceSlug,
+    //   workspaceName: `${firstName || 'My'} Workspace`,
+    // });
 
     // Send Slack notification
     try {
@@ -148,37 +147,33 @@ export async function POST(req: NextRequest) {
       // Do not fail the request if Slack notification fails
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: {
         workspaceSlug,
-        workspaceName: `${firstName || 'My'} Workspace`
+        workspaceName: `${firstName || 'My'} Workspace`,
       },
-      message: 'Workspace created successfully'
+      message: 'Workspace created successfully',
     });
-
   } catch (error) {
     console.error('Error creating user workspace:', error);
-    return NextResponse.json(
-      { error: 'Failed to create workspace' }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create workspace' }, { status: 500 });
   }
 }
 
 async function generateUniqueSlug(baseSlug: string): Promise<string> {
   let slug = baseSlug;
   let counter = 1;
-  
+
   while (true) {
     const existing = await db.query.workspaces.findFirst({
       where: (workspaces, { eq }) => eq(workspaces.slug, slug),
     });
-    
+
     if (!existing) {
       return slug;
     }
-    
+
     counter++;
     slug = `${baseSlug}${counter}`;
   }

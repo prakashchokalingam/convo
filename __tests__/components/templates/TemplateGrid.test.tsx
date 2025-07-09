@@ -37,12 +37,12 @@ vi.mock('@/components/app/templates/core/TemplateCard', () => ({
 
 // Mock Lucide React icons
 vi.mock('lucide-react', () => ({
-  Search: () => <div data-testid="search-icon" />,
-  Filter: () => <div data-testid="filter-icon" />,
-  Plus: () => <div data-testid="plus-icon" />,
-  Grid: () => <div data-testid="grid-icon" />,
-  List: () => <div data-testid="list-icon" />,
-  X: () => <div data-testid="x-icon" />,
+  Search: () => <div data-testid='search-icon' />,
+  Filter: () => <div data-testid='filter-icon' />,
+  Plus: () => <div data-testid='plus-icon' />,
+  Grid: () => <div data-testid='grid-icon' />,
+  List: () => <div data-testid='list-icon' />,
+  X: () => <div data-testid='x-icon' />,
 }));
 
 describe('TemplateGrid Component', () => {
@@ -85,8 +85,8 @@ describe('TemplateGrid Component', () => {
         <TemplateGrid
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
-          title="My Templates"
-          description="Manage your custom templates"
+          title='My Templates'
+          description='Manage your custom templates'
         />
       );
 
@@ -97,12 +97,7 @@ describe('TemplateGrid Component', () => {
     it('should show results summary when templates are present', () => {
       const templates = createMockTemplatesArray(5);
 
-      render(
-        <TemplateGrid
-          templates={templates}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateGrid templates={templates} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       expect(screen.getByText('Showing 5 of 5 templates')).toBeInTheDocument();
     });
@@ -255,7 +250,7 @@ describe('TemplateGrid Component', () => {
       // Click filter and select a category
       const filterButton = screen.getByRole('button');
       await user.click(filterButton);
-      
+
       // Assuming the select shows options
       const hrOption = screen.getByText('HR');
       await user.click(hrOption);
@@ -295,7 +290,7 @@ describe('TemplateGrid Component', () => {
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
           onViewChange={mockOnViewChange}
-          variant="grid"
+          variant='grid'
         />
       );
 
@@ -312,7 +307,7 @@ describe('TemplateGrid Component', () => {
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
           onViewChange={mockOnViewChange}
-          variant="grid"
+          variant='grid'
         />
       );
 
@@ -330,14 +325,14 @@ describe('TemplateGrid Component', () => {
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
           onViewChange={mockOnViewChange}
-          variant="list"
+          variant='list'
         />
       );
 
       // List view should be active (specific implementation details)
       const listButton = screen.getByTestId('list-icon').closest('button');
       const gridButton = screen.getByTestId('grid-icon').closest('button');
-      
+
       expect(listButton).toHaveClass('default'); // or whatever active class
       expect(gridButton).toHaveClass('ghost'); // or whatever inactive class
     });
@@ -351,7 +346,7 @@ describe('TemplateGrid Component', () => {
         <TemplateGrid
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
-          searchQuery="test search"
+          searchQuery='test search'
           showFilters={true}
         />
       );
@@ -367,7 +362,7 @@ describe('TemplateGrid Component', () => {
         <TemplateGrid
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
-          categoryFilter="HR"
+          categoryFilter='HR'
           showFilters={true}
         />
       );
@@ -384,8 +379,8 @@ describe('TemplateGrid Component', () => {
         <TemplateGrid
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
-          searchQuery="test"
-          categoryFilter="HR"
+          searchQuery='test'
+          categoryFilter='HR'
           onSearchChange={mockOnSearchChange}
           onCategoryChange={mockOnCategoryChange}
           showFilters={true}
@@ -408,19 +403,16 @@ describe('TemplateGrid Component', () => {
 
   describe('Empty States', () => {
     it('should render default empty state when no templates', () => {
-      render(
-        <TemplateGrid
-          templates={[]}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateGrid templates={[]} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       expect(screen.getByText('No templates available')).toBeInTheDocument();
-      expect(screen.getByText('Get started by creating your first template or browse global templates')).toBeInTheDocument();
+      expect(
+        screen.getByText('Get started by creating your first template or browse global templates')
+      ).toBeInTheDocument();
     });
 
     it('should render custom empty state when provided', () => {
-      const customEmptyState = <div data-testid="custom-empty">Custom empty message</div>;
+      const customEmptyState = <div data-testid='custom-empty'>Custom empty message</div>;
 
       render(
         <TemplateGrid
@@ -452,7 +444,9 @@ describe('TemplateGrid Component', () => {
 
       await waitFor(() => {
         expect(screen.getByText('No templates found')).toBeInTheDocument();
-        expect(screen.getByText('Try adjusting your search criteria or filters')).toBeInTheDocument();
+        expect(
+          screen.getByText('Try adjusting your search criteria or filters')
+        ).toBeInTheDocument();
       });
     });
 
@@ -473,11 +467,7 @@ describe('TemplateGrid Component', () => {
   describe('Loading State', () => {
     it('should render loading skeleton when loading is true', () => {
       render(
-        <TemplateGrid
-          templates={[]}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-          loading={true}
-        />
+        <TemplateGrid templates={[]} permissions={PERMISSION_SCENARIOS.ADMIN} loading={true} />
       );
 
       // Should render skeleton cards
@@ -550,7 +540,7 @@ describe('TemplateGrid Component', () => {
         <TemplateGrid
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
-          variant="grid"
+          variant='grid'
         />
       );
 
@@ -565,7 +555,7 @@ describe('TemplateGrid Component', () => {
         <TemplateGrid
           templates={templates}
           permissions={PERMISSION_SCENARIOS.ADMIN}
-          variant="list"
+          variant='list'
         />
       );
 

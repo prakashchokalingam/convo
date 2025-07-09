@@ -1,4 +1,5 @@
 # ConvoForms shadcn/ui Design System
+
 ## Professional, Accessible UI Built on shadcn/ui Foundation
 
 ---
@@ -6,6 +7,7 @@
 ## 🎯 Design Philosophy
 
 **"Professional Elegance with Proven Foundation"**
+
 - **Battle-tested**: Built on shadcn/ui's proven component library
 - **Accessible**: WCAG 2.1 AA compliant out of the box
 - **Customizable**: Tailwind-first approach with ConvoForms branding
@@ -13,6 +15,7 @@
 - **Fast Development**: Zero component development time
 
 ### **Clean Import Philosophy**
+
 ```typescript
 // Professional, proven components with zero maintenance
 import { Button, Card, Input, Form } from '@/components/ui'
@@ -29,6 +32,7 @@ import { StatsCard, QuickActions } from '@/components/app'
 ## 🎨 ConvoForms Theme on shadcn/ui
 
 ### **Extended Tailwind Config for ConvoForms**
+
 ```javascript
 // tailwind.config.ts
 import type { Config } from "tailwindcss"
@@ -48,18 +52,18 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        
+
         // ConvoForms Primary (Purple)
         primary: {
           DEFAULT: "hsl(var(--primary))",        // 270 85% 60%
           foreground: "hsl(var(--primary-foreground))",
           50: '#faf5ff',   // Very light purple
-          100: '#f3e8ff',  
+          100: '#f3e8ff',
           500: '#a855f7',  // Main brand color
           600: '#9333ea',  // Hover states
-          700: '#7c3aed',  
+          700: '#7c3aed',
         },
-        
+
         // ConvoForms Secondary (Blue)
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -67,7 +71,7 @@ const config: Config = {
           500: '#3b82f6',  // ConvoForms blue
           600: '#2563eb',
         },
-        
+
         // shadcn/ui semantic colors
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -90,7 +94,7 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
-      
+
       // ConvoForms specific animations
       animation: {
         'fade-in': 'fadeIn 0.2s ease-out',
@@ -98,7 +102,7 @@ const config: Config = {
         'scale-in': 'scaleIn 0.2s ease-out',
         'pulse-subtle': 'pulseSubtle 2s infinite',
       },
-      
+
       keyframes: {
         fadeIn: {
           'from': { opacity: '0' },
@@ -126,6 +130,7 @@ export default config
 ```
 
 ### **CSS Variables for ConvoForms Theme**
+
 ```css
 /* globals.css */
 @tailwind base;
@@ -141,15 +146,15 @@ export default config
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    
+
     /* ConvoForms Purple Primary */
-    --primary: 270 85% 60%;           /* #a855f7 */
+    --primary: 270 85% 60%; /* #a855f7 */
     --primary-foreground: 210 40% 98%;
-    
+
     /* ConvoForms Blue Secondary */
-    --secondary: 220 85% 60%;         /* #3b82f6 */
+    --secondary: 220 85% 60%; /* #3b82f6 */
     --secondary-foreground: 222.2 84% 4.9%;
-    
+
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
     --accent: 210 40% 96%;
@@ -158,7 +163,7 @@ export default config
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 270 85% 60%;              /* Primary color for focus rings */
+    --ring: 270 85% 60%; /* Primary color for focus rings */
   }
 
   .dark {
@@ -169,11 +174,11 @@ export default config
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    
+
     /* Adjusted for dark mode */
-    --primary: 270 85% 65%;           /* Slightly lighter in dark */
+    --primary: 270 85% 65%; /* Slightly lighter in dark */
     --primary-foreground: 222.2 84% 4.9%;
-    
+
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -194,6 +199,7 @@ export default config
 ## 🧩 ConvoForms Components Built on shadcn/ui
 
 ### **Enhanced Button Examples**
+
 ```typescript
 // Basic shadcn/ui Button usage
 import { Button } from '@/components/ui/button'
@@ -217,6 +223,7 @@ import { Button } from '@/components/ui/button'
 ```
 
 ### **Enhanced Card Components**
+
 ```typescript
 // shadcn/ui Card with ConvoForms styling
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -233,6 +240,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 ```
 
 ### **Enhanced Form Components**
+
 ```typescript
 // shadcn/ui Form with validation
 import { Button } from '@/components/ui/button'
@@ -267,6 +275,7 @@ import { Input } from '@/components/ui/input'
 ## 🏗️ Custom ConvoForms Components
 
 ### **StatsCard Component (Built on shadcn/ui)**
+
 ```typescript
 // components/app/dashboard/stats-card.tsx
 import { Card, CardContent } from '@/components/ui/card'
@@ -318,6 +327,7 @@ export function StatsCard({ title, value, change, icon }: StatsCardProps) {
 ```
 
 ### **Enhanced Dialog for Form Builder**
+
 ```typescript
 // Form creation dialog with shadcn/ui
 import { Button } from '@/components/ui/button'
@@ -364,6 +374,7 @@ import { Label } from '@/components/ui/label'
 ## 📱 Responsive Design with shadcn/ui
 
 ### **Dashboard Layout Example**
+
 ```typescript
 // Responsive dashboard with shadcn/ui components
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -401,7 +412,7 @@ export function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        
+
         <div>
           <Card>
             <CardHeader>
@@ -428,6 +439,7 @@ export function Dashboard() {
 ## ♿ Accessibility (Built-in with shadcn/ui)
 
 ### **Focus Management**
+
 ```typescript
 // shadcn/ui provides excellent focus management out of the box
 <Button className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
@@ -444,6 +456,7 @@ export function Dashboard() {
 ```
 
 ### **Screen Reader Support**
+
 ```typescript
 // shadcn/ui components include proper ARIA attributes
 <Card role="region" aria-labelledby="stats-title">
@@ -474,6 +487,7 @@ export function Dashboard() {
 ## 🎭 Animation Patterns
 
 ### **Smooth Transitions with shadcn/ui**
+
 ```typescript
 // Hover effects with Tailwind + shadcn/ui
 <Card className="transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
@@ -503,6 +517,7 @@ export function Dashboard() {
 ## 🌙 Dark Mode (Built-in)
 
 ### **Theme Switching**
+
 ```typescript
 // shadcn/ui includes excellent dark mode support
 import { useTheme } from "next-themes"
@@ -531,6 +546,7 @@ function ThemeToggle() {
 ## 🚀 Implementation Strategy
 
 ### **Migration Benefits**
+
 - ✅ **Zero Component Development**: shadcn/ui handles all base components
 - ✅ **Proven Accessibility**: WCAG 2.1 AA compliant out of the box
 - ✅ **Excellent Documentation**: Comprehensive docs and examples
@@ -539,6 +555,7 @@ function ThemeToggle() {
 - ✅ **Customizable**: Easy to customize with Tailwind and CSS variables
 
 ### **ConvoForms Customization Plan**
+
 1. **Install shadcn/ui**: Use New York style with Slate base color
 2. **Apply ConvoForms Theme**: Purple/violet primary colors
 3. **Build Custom Components**: StatsCard, FormBuilder, etc. on shadcn/ui foundation

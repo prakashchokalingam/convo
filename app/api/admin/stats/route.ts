@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { withAdminApiAuth } from '@/lib/admin-api-auth';
-import { db } from '@/drizzle/db';
-import { users, workspaces, subscriptions as dbSubscriptions } from '@/drizzle/schema'; // Renamed to avoid conflict
 import { sql } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
+
+import { db } from '@/drizzle/db';
+import { workspaces, subscriptions as dbSubscriptions } from '@/drizzle/schema'; // Renamed to avoid conflict
+import { withAdminApiAuth } from '@/lib/admin-api-auth';
 
 // Mock data fetching for now, can be replaced with actual queries
 async function getApplicationStats() {
@@ -15,7 +16,8 @@ async function getApplicationStats() {
   const totalWorkspaces = totalWorkspacesResult[0]?.count || 0;
 
   // Example: Count active subscriptions (adjust based on your subscription status values)
-  const activeSubscriptionsResult = await db.select({ count: sql<number>`count(*)` })
+  const activeSubscriptionsResult = await db
+    .select({ count: sql<number>`count(*)` })
     .from(dbSubscriptions)
     .where(sql`${dbSubscriptions.status} = 'active'`); // Assuming 'active' is a status
   const activeSubscriptions = activeSubscriptionsResult[0]?.count || 0;
@@ -32,7 +34,7 @@ async function getApplicationStats() {
   };
 }
 
-export const GET = withAdminApiAuth(async (req, { authResult }) => {
+export const GET = withAdminApiAuth(async (_req, { authResult: _authResult }) => {
   // authResult contains { authorized: true, userId: '...' } if successful
   // The wrapper already handles unauthorized cases.
 

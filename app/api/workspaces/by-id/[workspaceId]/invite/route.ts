@@ -1,15 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+
 import { auth } from '@clerk/nextjs';
-import { db } from '@/drizzle/db';
-import { workspaceInvitations, workspaceMembers, users } from '@/drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import { eq, and } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/drizzle/db';
+import { workspaceInvitations, users } from '@/drizzle/schema';
+import {
+  withErrorHandling,
+  createSuccessResponse,
+  ApiError,
+  ErrorCodes,
+  requireAuth,
+  validateRequiredFields,
+  requirePermission,
+} from '@/lib/api-errors';
+import { sendInvitationEmail } from '@/lib/email';
 import { canInviteToWorkspace } from '@/lib/plans';
 import { checkWorkspacePermission, ActivityLogger } from '@/lib/rbac';
-import { validateWorkspaceAccess } from '@/lib/workspace-server';
-import { sendInvitationEmail } from '@/lib/email';
-import { withErrorHandling, createSuccessResponse, ApiError, ErrorCodes, requireAuth, validateRequiredFields, requirePermission } from '@/lib/api-errors';
-import crypto from 'crypto';
+
 
 interface InviteParams {
   params: {
@@ -41,20 +51,11 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: Invit
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    throw new ApiError(
-      'Invalid email format',
-      400,
-      ErrorCodes.INVALID_FORMAT
-    );
+    throw new ApiError('Invalid email format', 400, ErrorCodes.INVALID_FORMAT);
   }
 
   // Check if user has permission to invite members (admin+ required)
-  const hasPermission = await checkWorkspacePermission(
-    userId, 
-    workspaceId, 
-    'members', 
-    'invite'
-  );
+  const hasPermission = await checkWorkspacePermission(userId, workspaceId, 'members', 'invite');
 
   requirePermission(
     hasPermission,
@@ -64,11 +65,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: Invit
   // Check plan limits
   const canInvite = await canInviteToWorkspace(workspaceId, userId);
   if (!canInvite.allowed) {
-    throw new ApiError(
-      canInvite.reason!,
-      403,
-      ErrorCodes.PLAN_LIMIT_EXCEEDED
-    );
+    throw new ApiError(canInvite.reason || 'Plan limit exceeded', 403, ErrorCodes.PLAN_LIMIT_EXCEEDED);
   }
 
   // Check if user is already a member
@@ -95,20 +92,23 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: Invit
   expiresAt.setDate(expiresAt.getDate() + 7); // Invitation expires in 7 days
 
   // Create invitation
-  const invitation = await db.insert(workspaceInvitations).values({
-    id: createId(),
-    workspaceId,
-    email: email.toLowerCase(),
-    role: role as 'admin' | 'member' | 'viewer',
-    invitedBy: userId,
-    token,
-    expiresAt,
-    status: 'pending',
-    emailStatus: 'pending',
-    emailAttempts: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }).returning();
+  const invitation = await db
+    .insert(workspaceInvitations)
+    .values({
+      id: createId(),
+      workspaceId,
+      email: email.toLowerCase(),
+      role: role as 'admin' | 'member' | 'viewer',
+      invitedBy: userId,
+      token,
+      expiresAt,
+      status: 'pending',
+      emailStatus: 'pending',
+      emailAttempts: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
 
   // Get workspace and inviter details for email
   const [workspace, inviter] = await Promise.all([
@@ -117,30 +117,27 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: Invit
       columns: {
         name: true,
         description: true,
-      }
+      },
     }),
     db.query.users.findFirst({
       where: (users, { eq }) => eq(users.id, userId),
       columns: {
         firstName: true,
         lastName: true,
-      }
-    })
+      },
+    }),
   ]);
 
   if (!workspace || !inviter) {
-    throw new ApiError(
-      'Workspace or inviter not found',
-      404,
-      ErrorCodes.NOT_FOUND
-    );
+    throw new ApiError('Workspace or inviter not found', 404, ErrorCodes.NOT_FOUND);
   }
 
   // Send invitation email
   const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3002'}/invite?token=${token}`;
-  const inviterName = inviter.firstName && inviter.lastName 
-    ? `${inviter.firstName} ${inviter.lastName}` 
-    : inviter.firstName || 'A team member';
+  const inviterName =
+    inviter.firstName && inviter.lastName
+      ? `${inviter.firstName} ${inviter.lastName}`
+      : inviter.firstName || 'A team member';
 
   const emailResult = await sendInvitationEmail({
     inviteeEmail: email,
@@ -169,22 +166,16 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: Invit
     .where(eq(workspaceInvitations.id, invitation[0].id));
 
   // Log activity
-  await ActivityLogger.memberInvited(
-    workspaceId,
-    userId,
-    email,
-    role,
-    req
-  );
+  await ActivityLogger.memberInvited(workspaceId, userId, email, role, req);
 
-  console.log('✅ Invitation created:', { 
-    workspaceId,
-    email,
-    role,
-    token,
-    invitedBy: userId,
-    emailSent: emailResult.success
-  });
+  // console.log('✅ Invitation created:', {
+  //   workspaceId,
+  //   email,
+  //   role,
+  //   token,
+  //   invitedBy: userId,
+  //   emailSent: emailResult.success,
+  // });
 
   return createSuccessResponse(
     {
@@ -195,10 +186,10 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: Invit
         expiresAt: invitation[0].expiresAt,
         emailStatus,
         // Don't return the token for security
-      }
+      },
     },
-    emailResult.success 
-      ? 'Invitation sent successfully' 
+    emailResult.success
+      ? 'Invitation sent successfully'
       : `Invitation created but email failed to send: ${emailResult.error}`
   );
 });
@@ -207,7 +198,7 @@ export const POST = withErrorHandling(async (req: NextRequest, { params }: Invit
 export async function GET(req: NextRequest, { params }: InviteParams) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -215,16 +206,11 @@ export async function GET(req: NextRequest, { params }: InviteParams) {
     const { workspaceId } = params;
 
     // Check if user has permission to view invitations
-    const hasPermission = await checkWorkspacePermission(
-      userId, 
-      workspaceId, 
-      'members', 
-      'read'
-    );
+    const hasPermission = await checkWorkspacePermission(userId, workspaceId, 'members', 'read');
 
     if (!hasPermission) {
       return NextResponse.json(
-        { error: 'You do not have permission to view invitations' }, 
+        { error: 'You do not have permission to view invitations' },
         { status: 403 }
       );
     }
@@ -248,14 +234,10 @@ export async function GET(req: NextRequest, { params }: InviteParams) {
 
     return NextResponse.json({
       success: true,
-      invitations
+      invitations,
     });
-
-  } catch (error) {
-    console.error('Error fetching invitations:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch invitations' }, 
-      { status: 500 }
-    );
+  } catch (_error) {
+    console.error('Error fetching invitations:', _error);
+    return NextResponse.json({ error: 'Failed to fetch invitations' }, { status: 500 });
   }
 }

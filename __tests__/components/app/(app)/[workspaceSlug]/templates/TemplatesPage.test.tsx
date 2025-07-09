@@ -6,14 +6,14 @@ import { useWorkspace } from '@/hooks/use-workspace';
 
 // Mock child components to simplify TemplatesPage testing focus
 vi.mock('@/app/(app)/[workspaceSlug]/templates/GlobalTemplatesTab', () => ({
-  GlobalTemplatesTab: () => <div data-testid="global-templates-tab">GlobalTemplatesTab</div>,
+  GlobalTemplatesTab: () => <div data-testid='global-templates-tab'>GlobalTemplatesTab</div>,
 }));
 vi.mock('@/app/(app)/[workspaceSlug]/templates/UserTemplatesTab', () => ({
-  UserTemplatesTab: () => <div data-testid="user-templates-tab">UserTemplatesTab</div>,
+  UserTemplatesTab: () => <div data-testid='user-templates-tab'>UserTemplatesTab</div>,
 }));
 vi.mock('@/app/(app)/[workspaceSlug]/templates/TemplateCreateDialog', () => ({
   TemplateCreateDialog: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="template-create-dialog">TemplateCreateDialog</div> : null,
+    isOpen ? <div data-testid='template-create-dialog'>TemplateCreateDialog</div> : null,
 }));
 
 // Mock the useWorkspace hook
@@ -26,7 +26,7 @@ const mockUseWorkspaceValues = {
   error: null,
   isValidating: false,
   mutateWorkspace: vi.fn(),
-  currentMembership: { role: 'member' }
+  currentMembership: { role: 'member' },
 };
 
 vi.mock('@/hooks/use-workspace', () => ({
@@ -40,14 +40,15 @@ vi.mock('next/navigation', () => ({
     replace: vi.fn(),
     // ... other router methods if needed
   }),
-  useParams: () => ({ // If TemplatesPage uses useParams
+  useParams: () => ({
+    // If TemplatesPage uses useParams
     workspaceSlug: 'test-workspace',
   }),
-  useSearchParams: () => ({ // If TemplatesPage uses useSearchParams
+  useSearchParams: () => ({
+    // If TemplatesPage uses useSearchParams
     get: vi.fn(),
   }),
 }));
-
 
 describe('TemplatesPage Component', () => {
   beforeEach(() => {
@@ -58,11 +59,12 @@ describe('TemplatesPage Component', () => {
 
   it('shows "Create Template" button if user has create_template permission', () => {
     // Override the hasPermission mock for this specific test
-    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation((resource: string, action: string) => {
-      return resource === 'templates' && action === 'create';
-    });
+    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation(
+      (resource: string, action: string) => {
+        return resource === 'templates' && action === 'create';
+      }
+    );
     (useWorkspace as ReturnType<typeof vi.fn>).mockReturnValue(mockUseWorkspaceValues);
-
 
     render(<TemplatesPage />);
 
@@ -71,12 +73,14 @@ describe('TemplatesPage Component', () => {
 
   it('hides "Create Template" button if user does not have create_template permission', () => {
     // Ensure hasPermission returns false for 'templates' 'create'
-    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation((resource: string, action: string) => {
-      if (resource === 'templates' && action === 'create') {
-        return false;
+    (mockUseWorkspaceValues.hasPermission as ReturnType<typeof vi.fn>).mockImplementation(
+      (resource: string, action: string) => {
+        if (resource === 'templates' && action === 'create') {
+          return false;
+        }
+        return true; // For any other permission, if needed by the component
       }
-      return true; // For any other permission, if needed by the component
-    });
+    );
     (useWorkspace as ReturnType<typeof vi.fn>).mockReturnValue(mockUseWorkspaceValues);
 
     render(<TemplatesPage />);
@@ -92,9 +96,11 @@ describe('TemplatesPage Component', () => {
 
   // Test for loading state (if workspace is null initially)
   it('shows loading state if workspace is not yet available', () => {
-    (useWorkspace as ReturnType<typeof vi.fn>).mockReturnValue({ ...mockUseWorkspaceValues, workspace: null });
+    (useWorkspace as ReturnType<typeof vi.fn>).mockReturnValue({
+      ...mockUseWorkspaceValues,
+      workspace: null,
+    });
     render(<TemplatesPage />);
     expect(screen.getByText(/Loading workspace.../i)).toBeInTheDocument();
   });
-
 });

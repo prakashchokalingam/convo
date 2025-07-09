@@ -21,25 +21,25 @@ export default defineConfig({
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
-    process.env.CI ? ['github'] : ['list']
+    process.env.CI ? ['github'] : ['list'],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL for all tests */
     baseURL: process.env.E2E_BASE_URL || 'http://localhost:3002',
-    
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    
+
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
-    
+
     /* Record video on failure */
     video: 'retain-on-failure',
-    
+
     /* Global timeout for each action (e.g. click, fill) */
     actionTimeout: 10000,
-    
+
     /* Global timeout for navigation actions */
     navigationTimeout: 30000,
   },
@@ -51,10 +51,10 @@ export default defineConfig({
       testMatch: /00-auth\.setup\.spec\.ts/, // Point to the new setup file
       // No teardown needed here specifically unless it's different from global
     },
-    
+
     {
       name: 'chromium',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         // Use the setup project for authentication state
         storageState: '.auth/user.json',
@@ -123,7 +123,7 @@ export default defineConfig({
       NODE_ENV: 'development', // Changed from 'test' to 'development'
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
       CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
-    }
+    },
   },
 
   /* Expect timeout for assertions */

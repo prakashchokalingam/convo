@@ -113,7 +113,7 @@ import { SwaggerDecorator } from '@/lib/swagger/decorators';
 SwaggerDecorator.paginated({
   summary: 'List forms',
   tags: ['Forms'],
-  responseSchema: 'Form'
+  responseSchema: 'Form',
 });
 
 // Simple GET endpoint
@@ -121,12 +121,14 @@ SwaggerDecorator.get({
   summary: 'Get form',
   tags: ['Forms'],
   responseSchema: 'Form',
-  parameters: [{
-    name: 'id',
-    type: 'string',
-    description: 'Form ID',
-    required: true
-  }]
+  parameters: [
+    {
+      name: 'id',
+      type: 'string',
+      description: 'Form ID',
+      required: true,
+    },
+  ],
 });
 ```
 

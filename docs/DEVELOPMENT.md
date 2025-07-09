@@ -5,6 +5,7 @@ This guide covers everything you need for day-to-day development on Convo.
 ## 🚀 Daily Development Workflow
 
 ### Starting Your Day
+
 ```bash
 # 1. Start the database (if not running)
 npm run db:up
@@ -18,6 +19,7 @@ npm run dev
 ```
 
 ### During Development
+
 ```bash
 # Hot reload is automatic - just save your files!
 
@@ -29,6 +31,7 @@ npm run db:logs
 ```
 
 ### End of Day
+
 ```bash
 # Database keeps running (that's fine)
 # Or stop it if you prefer:
@@ -38,6 +41,7 @@ npm run db:down
 ## 🗄️ Database Development
 
 ### Schema Changes
+
 When you need to modify the database structure:
 
 ```bash
@@ -52,6 +56,7 @@ npm run db:push
 ```
 
 ### Inspecting Data
+
 ```bash
 # Visual database browser (recommended)
 npm run db:studio
@@ -64,6 +69,7 @@ npm run pgadmin
 ```
 
 ### Database Utilities
+
 ```bash
 # View real-time database logs
 npm run db:logs
@@ -80,6 +86,7 @@ npm run health
 ConvoForms has three different "contexts" that you can test:
 
 ### Marketing Context (Public Website)
+
 ```bash
 # URL: http://localhost:3002/
 # What it shows: Landing page, pricing, about
@@ -87,6 +94,7 @@ ConvoForms has three different "contexts" that you can test:
 ```
 
 ### App Context (SaaS Dashboard)
+
 ```bash
 # URL: http://localhost:3002/app/login
 # What it shows: Login, dashboard, form builder
@@ -94,6 +102,7 @@ ConvoForms has three different "contexts" that you can test:
 ```
 
 ### Forms Context (Public Form Submission)
+
 ```bash
 # URL: http://localhost:3002/forms/contact/[form-id]
 # What it shows: Public form for users to fill
@@ -103,6 +112,7 @@ ConvoForms has three different "contexts" that you can test:
 ## 🧪 Testing
 
 ### Running Tests
+
 ```bash
 # Run all tests
 npm test
@@ -118,7 +128,9 @@ npm run test:coverage
 ```
 
 ### Writing Tests
+
 Tests are located in `__tests__/` directory:
+
 ```
 __tests__/
 ├── components/     # Component tests
@@ -128,6 +140,7 @@ __tests__/
 ```
 
 ### Example Component Test
+
 ```typescript
 // __tests__/components/button.test.tsx
 import { render, screen } from '@testing-library/react'
@@ -142,6 +155,7 @@ test('renders button with text', () => {
 ## 🔧 Common Development Tasks
 
 ### Adding a New Component
+
 ```bash
 # 1. Create the component file
 touch components/ui/my-component.tsx
@@ -152,11 +166,12 @@ touch components/ui/my-component.tsx
 ```
 
 ### Adding a New Page
+
 ```bash
 # For app pages (authenticated)
 touch app/(app)/my-page/page.tsx
 
-# For marketing pages (public)  
+# For marketing pages (public)
 touch app/my-page/page.tsx
 
 # For form pages (public)
@@ -164,6 +179,7 @@ touch app/(forms)/my-form/page.tsx
 ```
 
 ### Adding a New API Route
+
 ```bash
 # Create API route file
 touch app/api/my-endpoint/route.ts
@@ -179,13 +195,14 @@ export async function POST(request: Request) {
 ```
 
 ### Adding a Database Table
+
 ```typescript
 // 1. Edit lib/db/schema.ts
 export const myTable = pgTable('my_table', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
-})
+});
 
 // 2. Generate and apply migration
 // npm run db:generate
@@ -195,6 +212,7 @@ export const myTable = pgTable('my_table', {
 ## 🔍 Debugging
 
 ### Database Issues
+
 ```bash
 # Check if database is running
 docker ps | grep postgres
@@ -207,6 +225,7 @@ npm run db:reset
 ```
 
 ### Application Issues
+
 ```bash
 # Clear Next.js cache
 rm -rf .next
@@ -216,6 +235,7 @@ npm run dev
 ```
 
 ### Environment Issues
+
 ```bash
 # Check environment variables are loaded
 cat .env.local
@@ -227,19 +247,22 @@ echo $DATABASE_URL
 ## 📁 File Organization
 
 ### Adding New Files
+
 Follow these conventions:
 
 **Components**
+
 ```
 components/
 ├── ui/              # Reusable UI components
-├── app/             # App-specific components  
+├── app/             # App-specific components
 ├── forms/           # Form-related components
 ├── marketing/       # Landing page components
 └── [feature]/       # Feature-specific components
 ```
 
 **Utilities**
+
 ```
 lib/
 ├── db/              # Database schema and utilities
@@ -249,6 +272,7 @@ lib/
 ```
 
 **Hooks**
+
 ```
 hooks/
 ├── use-forms.ts     # Form-related hooks
@@ -257,31 +281,34 @@ hooks/
 ```
 
 ### Import Organization
+
 Order imports consistently:
+
 ```typescript
 // 1. React and Next.js imports
-import React from 'react'
-import { NextRequest } from 'next/server'
+import React from 'react';
+import { NextRequest } from 'next/server';
 
 // 2. Third-party libraries
-import { z } from 'zod'
-import { eq } from 'drizzle-orm'
+import { z } from 'zod';
+import { eq } from 'drizzle-orm';
 
 // 3. Internal utilities and config
-import { db } from '@/lib/db'
-import { auth } from '@/lib/auth'
+import { db } from '@/lib/db';
+import { auth } from '@/lib/auth';
 
 // 4. Components
-import { Button } from '@/components/ui/button'
-import { FormBuilder } from '@/components/form-builder'
+import { Button } from '@/components/ui/button';
+import { FormBuilder } from '@/components/form-builder';
 
 // 5. Types
-import type { Form, Field } from '@/types'
+import type { Form, Field } from '@/types';
 ```
 
 ## 🔄 Git Workflow
 
 ### Daily Commits
+
 ```bash
 # Make small, frequent commits
 git add .
@@ -292,6 +319,7 @@ git push origin main
 ```
 
 ### Commit Message Format
+
 ```bash
 # Types: feat, fix, docs, style, refactor, test, chore
 feat: add conversational mode toggle
@@ -304,6 +332,7 @@ chore: update dependencies
 ```
 
 ### Branch Strategy
+
 ```bash
 # For features
 git checkout -b feature/conversational-mode
@@ -321,6 +350,7 @@ git push origin fix/form-validation-error
 ## 🚨 Common Issues & Solutions
 
 ### "Database connection failed"
+
 ```bash
 # Solution: Start the database
 npm run db:up
@@ -330,6 +360,7 @@ npm run db:push
 ```
 
 ### "Module not found" errors
+
 ```bash
 # Solution: Reinstall dependencies
 rm -rf node_modules package-lock.json
@@ -337,6 +368,7 @@ npm install
 ```
 
 ### "Environment variables not loading"
+
 ```bash
 # Solution: Check .env.local exists and has correct format
 ls -la .env.local
@@ -344,6 +376,7 @@ cat .env.local
 ```
 
 ### "Port 3002 already in use"
+
 ```bash
 # Solution: Kill process or use different port
 lsof -ti:3002 | xargs kill -9
@@ -352,6 +385,7 @@ npm run dev -- -p 3003
 ```
 
 ### "Authentication not working"
+
 ```bash
 # Solution: Check Clerk keys in .env.local
 # Make sure you're in the right context:
@@ -363,46 +397,53 @@ npm run dev -- -p 3003
 The application includes an admin dashboard with specific development patterns.
 
 ### Accessing the Admin Dashboard
--   **Local URL**: `http://localhost:3002/admin/overview` (or `/admin/workspaces`)
--   **Authentication**: Requires a user authenticated via Clerk whose email is listed in the `ADMIN_EMAILS` environment variable (comma-separated).
--   See `README.md` for `ADMIN_EMAILS` setup.
+
+- **Local URL**: `http://localhost:3002/admin/overview` (or `/admin/workspaces`)
+- **Authentication**: Requires a user authenticated via Clerk whose email is listed in the `ADMIN_EMAILS` environment variable (comma-separated).
+- See `README.md` for `ADMIN_EMAILS` setup.
 
 ### Admin Pages
--   Admin pages are located under `app/(admin)/admin/`.
--   The layout `app/(admin)/admin/layout.tsx` handles page-level authentication and authorization.
+
+- Admin pages are located under `app/(admin)/admin/`.
+- The layout `app/(admin)/admin/layout.tsx` handles page-level authentication and authorization.
 
 ### Admin API Routes
--   **Namespace**: Admin-specific API routes should be placed under `app/api/admin/`. For example, `app/api/admin/stats/route.ts`.
--   **Authorization**: All admin API routes **must** be protected using the `withAdminApiAuth` higher-order function from `lib/admin-api-auth.ts`. This helper verifies that the authenticated user's email is in `ADMIN_EMAILS`.
 
-    ```typescript
-    // Example: app/api/admin/some-action/route.ts
-    import { NextRequest, NextResponse } from 'next/server';
-    import { withAdminApiAuth } from '@/lib/admin-api-auth';
+- **Namespace**: Admin-specific API routes should be placed under `app/api/admin/`. For example, `app/api/admin/stats/route.ts`.
+- **Authorization**: All admin API routes **must** be protected using the `withAdminApiAuth` higher-order function from `lib/admin-api-auth.ts`. This helper verifies that the authenticated user's email is in `ADMIN_EMAILS`.
 
-    export const GET = withAdminApiAuth(async (req, { authResult }) => {
-      // authResult.userId is available if needed
-      // ... your admin logic here
-      return NextResponse.json({ message: "Admin action successful" });
-    });
-    ```
--   **Swagger Documentation**: All admin API routes must be documented using JSDoc comments for Swagger generation, similar to other API routes. Ensure you use the "Admin" tag. Schemas specific to admin APIs can be defined in `docs/swagger/schemas/admin-api-schemas.ts`.
+  ```typescript
+  // Example: app/api/admin/some-action/route.ts
+  import { NextRequest, NextResponse } from 'next/server';
+  import { withAdminApiAuth } from '@/lib/admin-api-auth';
+
+  export const GET = withAdminApiAuth(async (req, { authResult }) => {
+    // authResult.userId is available if needed
+    // ... your admin logic here
+    return NextResponse.json({ message: 'Admin action successful' });
+  });
+  ```
+
+- **Swagger Documentation**: All admin API routes must be documented using JSDoc comments for Swagger generation, similar to other API routes. Ensure you use the "Admin" tag. Schemas specific to admin APIs can be defined in `docs/swagger/schemas/admin-api-schemas.ts`.
 
 ## 📋 Development Checklist
 
 ### Before Starting Work
+
 - [ ] Database is running (`npm run db:up`)
 - [ ] Environment variables are set
 - [ ] Dependencies are installed (`npm install`)
 - [ ] Tests are passing (`npm test`)
 
 ### Before Committing
+
 - [ ] Code is properly formatted
 - [ ] No console.logs left in code
 - [ ] Tests are passing
 - [ ] TypeScript has no errors
 
 ### Before Deploying
+
 - [ ] All tests pass
 - [ ] Environment variables are set in production
 - [ ] Database migrations are applied

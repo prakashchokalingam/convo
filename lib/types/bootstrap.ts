@@ -1,5 +1,5 @@
-import type { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
 import type { Plan } from '@/lib/plans';
+import type { WorkspaceWithRole } from '@/lib/types/workspace';
 
 // 1. User Data
 export interface BootstrapUserData {

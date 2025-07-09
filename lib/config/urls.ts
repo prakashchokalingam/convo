@@ -1,13 +1,12 @@
 /**
  * URL Configuration for different environments and subdomains
- * 
+ *
  * Project structure:
  * / : website (marketing)
- * app.*.com : application 
+ * app.*.com : application
  * form.*.com : customer facing form
  */
 
-const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Base domains
@@ -53,7 +52,7 @@ export const urls = {
       viewBase: '/', // Represents /:workspaceSlug/:formId for public forms
     },
   },
-  
+
   // API base URLs
   // In this setup, API is not strictly context-path based in dev (e.g. /app/api) but at root /api
   apiBase: {
@@ -66,7 +65,7 @@ export const urls = {
     twitter: 'https://twitter.com/convoforms',
     linkedin: 'https://linkedin.com/company/convoforms',
     github: 'https://github.com/convoforms',
-  }
+  },
 };
 
 // API URL Helper function

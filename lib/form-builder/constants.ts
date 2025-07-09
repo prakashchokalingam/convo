@@ -1,12 +1,12 @@
 // Form Builder Constants and Default Configurations
 
-import { FieldType, FieldDefinition, FormSettings, ThemeConfig, ValidationRule } from './types'
+import { FieldType, FormSettings, ThemeConfig } from './types';
 
 export const FIELD_CATEGORIES = {
   BASIC: 'basic',
   ADVANCED: 'advanced',
-  LAYOUT: 'layout'
-} as const
+  LAYOUT: 'layout',
+} as const;
 
 export const FIELD_TYPES: Record<string, FieldType> = {
   // Basic Fields
@@ -19,7 +19,7 @@ export const FIELD_TYPES: Record<string, FieldType> = {
   RADIO: 'radio',
   CHECKBOX: 'checkbox',
   SWITCH: 'switch',
-  
+
   // Advanced Fields
   DATE: 'date',
   DATETIME: 'datetime',
@@ -28,35 +28,35 @@ export const FIELD_TYPES: Record<string, FieldType> = {
   FILE: 'file',
   SIGNATURE: 'signature',
   RATING: 'rating',
-  
+
   // Layout Fields
   SECTION: 'section',
   DIVIDER: 'divider',
-  HTML: 'html'
-} as const
+  HTML: 'html',
+} as const;
 
 export const VALIDATION_TYPES = {
   REQUIRED: 'required',
   MIN: 'min',
   MAX: 'max',
   PATTERN: 'pattern',
-  CUSTOM: 'custom'
-} as const
+  CUSTOM: 'custom',
+} as const;
 
 export const CONDITIONAL_OPERATORS = {
   EQUALS: 'equals',
   NOT_EQUALS: 'not_equals',
   CONTAINS: 'contains',
   GREATER_THAN: 'greater_than',
-  LESS_THAN: 'less_than'
-} as const
+  LESS_THAN: 'less_than',
+} as const;
 
 export const FIELD_WIDTHS = {
   FULL: 'full',
   HALF: 'half',
   THIRD: 'third',
-  QUARTER: 'quarter'
-} as const
+  QUARTER: 'quarter',
+} as const;
 
 export const DEFAULT_FORM_SETTINGS: FormSettings = {
   title: 'Untitled Form',
@@ -67,8 +67,8 @@ export const DEFAULT_FORM_SETTINGS: FormSettings = {
   allowDrafts: true,
   oneSubmissionPerUser: false,
   requireAuth: false,
-  notificationEmail: undefined
-}
+  notificationEmail: undefined,
+};
 
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   primaryColor: '#3b82f6',
@@ -77,8 +77,8 @@ export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   borderColor: '#d1d5db',
   borderRadius: 6,
   spacing: 'normal',
-  font: 'Inter, sans-serif'
-}
+  font: 'Inter, sans-serif',
+};
 
 export const DEFAULT_VALIDATION_MESSAGES = {
   required: 'This field is required',
@@ -89,8 +89,8 @@ export const DEFAULT_VALIDATION_MESSAGES = {
   minLength: 'Must be at least {min} characters',
   maxLength: 'Must be at most {max} characters',
   pattern: 'Please enter a valid format',
-  custom: 'Invalid value'
-}
+  custom: 'Invalid value',
+};
 
 export const COMMON_VALIDATION_PATTERNS = {
   email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -98,63 +98,70 @@ export const COMMON_VALIDATION_PATTERNS = {
   url: /^https?:\/\/.+/,
   alphanumeric: /^[a-zA-Z0-9]+$/,
   alphabetic: /^[a-zA-Z]+$/,
-  numeric: /^\d+$/
-}
+  numeric: /^\d+$/,
+};
 
 export const FILE_UPLOAD_LIMITS = {
   MAX_SIZE: 10 * 1024 * 1024, // 10MB
   MAX_FILES: 5,
   ALLOWED_TYPES: {
     image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-    document: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-    spreadsheet: ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-    text: ['text/plain', 'text/csv']
-  }
-}
+    document: [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ],
+    spreadsheet: [
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ],
+    text: ['text/plain', 'text/csv'],
+  },
+};
 
 export const SIGNATURE_DEFAULTS = {
   WIDTH: 400,
   HEIGHT: 200,
   BACKGROUND_COLOR: '#ffffff',
-  PEN_COLOR: '#000000'
-}
+  PEN_COLOR: '#000000',
+};
 
 export const RATING_DEFAULTS = {
   MAX: 5,
   ALLOW_HALF: false,
-  ICON: 'star'
-}
+  ICON: 'star',
+};
 
 export const DATE_FORMATS = {
   'MM/DD/YYYY': 'MM/dd/yyyy',
   'DD/MM/YYYY': 'dd/MM/yyyy',
   'YYYY-MM-DD': 'yyyy-MM-dd',
   'MMM DD, YYYY': 'MMM dd, yyyy',
-  'DD MMM YYYY': 'dd MMM yyyy'
-}
+  'DD MMM YYYY': 'dd MMM yyyy',
+};
 
 export const DRAG_TYPES = {
   FIELD: 'field',
-  NEW_FIELD: 'new-field'
-} as const
+  NEW_FIELD: 'new-field',
+} as const;
 
 export const DROP_POSITIONS = {
   BEFORE: 'before',
   AFTER: 'after',
-  INSIDE: 'inside'
-} as const
+  INSIDE: 'inside',
+} as const;
 
 export const FORM_BUILDER_PANELS = {
   FIELD_LIBRARY: 'field-library',
   CANVAS: 'canvas',
-  PROPERTIES: 'properties'
-} as const
+  PROPERTIES: 'properties',
+} as const;
 
-export const UNDO_REDO_LIMIT = 50
+export const UNDO_REDO_LIMIT = 50;
 
-export const AUTO_SAVE_DELAY = 1000 // milliseconds
+export const AUTO_SAVE_DELAY = 1000; // milliseconds
 
-export const FIELD_LIBRARY_SEARCH_DEBOUNCE = 300 // milliseconds
+export const FIELD_LIBRARY_SEARCH_DEBOUNCE = 300; // milliseconds
 
 // Default field configurations for each type
 export const DEFAULT_FIELD_CONFIGS = {
@@ -165,27 +172,27 @@ export const DEFAULT_FIELD_CONFIGS = {
     required: false,
     validation: [],
     maxLength: 255,
-    order: 0
+    order: 0,
   },
-  
+
   email: {
     type: 'email' as const,
     label: 'Email Field',
     placeholder: 'Enter email address...',
     required: false,
     validation: [],
-    order: 0
+    order: 0,
   },
-  
+
   number: {
     type: 'number' as const,
     label: 'Number Field',
     placeholder: 'Enter number...',
     required: false,
     validation: [],
-    order: 0
+    order: 0,
   },
-  
+
   textarea: {
     type: 'textarea' as const,
     label: 'Textarea Field',
@@ -193,9 +200,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     required: false,
     validation: [],
     rows: 4,
-    order: 0
+    order: 0,
   },
-  
+
   select: {
     type: 'select' as const,
     label: 'Select Field',
@@ -205,12 +212,12 @@ export const DEFAULT_FIELD_CONFIGS = {
     options: [
       { label: 'Option 1', value: 'option1' },
       { label: 'Option 2', value: 'option2' },
-      { label: 'Option 3', value: 'option3' }
+      { label: 'Option 3', value: 'option3' },
     ],
     searchable: false,
-    order: 0
+    order: 0,
   },
-  
+
   multiselect: {
     type: 'multiselect' as const,
     label: 'Multi-Select Field',
@@ -220,13 +227,13 @@ export const DEFAULT_FIELD_CONFIGS = {
     options: [
       { label: 'Option 1', value: 'option1' },
       { label: 'Option 2', value: 'option2' },
-      { label: 'Option 3', value: 'option3' }
+      { label: 'Option 3', value: 'option3' },
     ],
     multiple: true,
     searchable: true,
-    order: 0
+    order: 0,
   },
-  
+
   radio: {
     type: 'radio' as const,
     label: 'Radio Field',
@@ -235,48 +242,48 @@ export const DEFAULT_FIELD_CONFIGS = {
     options: [
       { label: 'Option 1', value: 'option1' },
       { label: 'Option 2', value: 'option2' },
-      { label: 'Option 3', value: 'option3' }
+      { label: 'Option 3', value: 'option3' },
     ],
     layout: 'vertical' as const,
-    order: 0
+    order: 0,
   },
-  
+
   checkbox: {
     type: 'checkbox' as const,
     label: 'Checkbox Field',
     required: false,
     validation: [],
     defaultChecked: false,
-    order: 0
+    order: 0,
   },
-  
+
   switch: {
     type: 'switch' as const,
     label: 'Switch Field',
     required: false,
     validation: [],
     defaultChecked: false,
-    order: 0
+    order: 0,
   },
-  
+
   date: {
     type: 'date' as const,
     label: 'Date Field',
     required: false,
     validation: [],
     format: 'MM/dd/yyyy',
-    order: 0
+    order: 0,
   },
-  
+
   datetime: {
     type: 'datetime' as const,
     label: 'Date & Time Field',
     required: false,
     validation: [],
     format: 'MM/dd/yyyy HH:mm',
-    order: 0
+    order: 0,
   },
-  
+
   country: {
     type: 'country' as const,
     label: 'Country Field',
@@ -285,9 +292,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     validation: [],
     searchable: true,
     showFlag: true,
-    order: 0
+    order: 0,
   },
-  
+
   phone: {
     type: 'phone' as const,
     label: 'Phone Field',
@@ -295,9 +302,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     required: false,
     validation: [],
     defaultCountry: 'US',
-    order: 0
+    order: 0,
   },
-  
+
   file: {
     type: 'file' as const,
     label: 'File Upload',
@@ -307,9 +314,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     multiple: false,
     maxSize: FILE_UPLOAD_LIMITS.MAX_SIZE,
     maxFiles: 1,
-    order: 0
+    order: 0,
   },
-  
+
   signature: {
     type: 'signature' as const,
     label: 'Signature Field',
@@ -317,9 +324,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     validation: [],
     width: SIGNATURE_DEFAULTS.WIDTH,
     height: SIGNATURE_DEFAULTS.HEIGHT,
-    order: 0
+    order: 0,
   },
-  
+
   rating: {
     type: 'rating' as const,
     label: 'Rating Field',
@@ -328,9 +335,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     max: RATING_DEFAULTS.MAX,
     allowHalf: RATING_DEFAULTS.ALLOW_HALF,
     icon: RATING_DEFAULTS.ICON as 'star',
-    order: 0
+    order: 0,
   },
-  
+
   section: {
     type: 'section' as const,
     label: 'Section',
@@ -342,9 +349,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     children: [],
     isCollapsed: false,
     allowNesting: true,
-    order: 0
+    order: 0,
   },
-  
+
   divider: {
     type: 'divider' as const,
     label: 'Divider',
@@ -352,9 +359,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     validation: [],
     style: 'solid' as const,
     thickness: 1,
-    order: 0
+    order: 0,
   },
-  
+
   html: {
     type: 'html' as const,
     label: 'HTML Content',
@@ -362,9 +369,9 @@ export const DEFAULT_FIELD_CONFIGS = {
     validation: [],
     content: '<p>Custom HTML content</p>',
     sanitize: true,
-    order: 0
-  }
-}
+    order: 0,
+  },
+};
 
 export const COUNTRY_OPTIONS = [
   { label: 'United States', value: 'US', flag: '🇺🇸' },
@@ -376,5 +383,5 @@ export const COUNTRY_OPTIONS = [
   { label: 'Japan', value: 'JP', flag: '🇯🇵' },
   { label: 'China', value: 'CN', flag: '🇨🇳' },
   { label: 'India', value: 'IN', flag: '🇮🇳' },
-  { label: 'Brazil', value: 'BR', flag: '🇧🇷' }
-]
+  { label: 'Brazil', value: 'BR', flag: '🇧🇷' },
+];

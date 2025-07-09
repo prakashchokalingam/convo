@@ -1,20 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/shared/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowRight, 
-  Sparkles, 
-  TrendingUp, 
-  Users, 
+import {
+  ArrowRight,
+  Sparkles,
+  TrendingUp,
+  Users,
   MessageSquare,
   Play,
   CheckCircle,
   BarChart3,
-  Zap
+  Zap,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+import { Button } from '@/components/shared/ui/button';
 
 const stats = [
   { label: 'Completion Rate Increase', value: '267%', icon: TrendingUp },
@@ -23,21 +24,21 @@ const stats = [
 ];
 
 const aiDemo = [
-  { text: "Create a customer feedback form", delay: 0 },
-  { text: "✨ AI analyzing requirements...", delay: 1500 },
-  { text: "📝 Generating form fields...", delay: 3000 },
-  { text: "🎯 Adding smart validation...", delay: 4500 },
-  { text: "💬 Converting to conversation...", delay: 6000 },
-  { text: "🚀 Form ready in 8 seconds!", delay: 7500 },
+  { text: 'Create a customer feedback form', delay: 0 },
+  { text: '✨ AI analyzing requirements...', delay: 1500 },
+  { text: '📝 Generating form fields...', delay: 3000 },
+  { text: '🎯 Adding smart validation...', delay: 4500 },
+  { text: '💬 Converting to conversation...', delay: 6000 },
+  { text: '🚀 Form ready in 8 seconds!', delay: 7500 },
 ];
 
 const conversationalDemo = [
   { type: 'bot', message: "Hi! I'd love to get your feedback 😊", delay: 8500 },
-  { type: 'user', message: "Sure, happy to help!", delay: 10000 },
+  { type: 'user', message: 'Sure, happy to help!', delay: 10000 },
   { type: 'bot', message: "Great! What's your name?", delay: 11500 },
-  { type: 'user', message: "Alex Johnson", delay: 13000 },
-  { type: 'bot', message: "Nice to meet you, Alex! How would you rate our service?", delay: 14500 },
-  { type: 'rating', message: "⭐⭐⭐⭐⭐", delay: 16000 },
+  { type: 'user', message: 'Alex Johnson', delay: 13000 },
+  { type: 'bot', message: 'Nice to meet you, Alex! How would you rate our service?', delay: 14500 },
+  { type: 'rating', message: '⭐⭐⭐⭐⭐', delay: 16000 },
 ];
 
 export function HeroSection() {
@@ -76,23 +77,22 @@ export function HeroSection() {
   }, [currentDemo]);
 
   return (
-    <section className="relative pt-24 pb-12 lg:pt-32 lg:pb-20 overflow-hidden">
+    <section className='relative pt-24 pb-12 lg:pt-32 lg:pb-20 overflow-hidden'>
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5"></div>
-      <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
-      
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          
+      <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5'></div>
+      <div className='absolute inset-0 bg-grid-pattern opacity-30'></div>
+
+      <div className='relative max-w-7xl mx-auto px-6 lg:px-8'>
+        <div className='grid lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
           {/* Left Column - Content */}
-          <div className="text-center lg:text-left">
+          <div className='text-center lg:text-left'>
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 border border-primary/20"
+              className='inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 border border-primary/20'
             >
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles className='w-4 h-4 mr-2' />
               AI-Powered Form Builder
             </motion.div>
 
@@ -100,37 +100,47 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold text-balance mb-6"
+              className='text-4xl md:text-5xl lg:text-6xl font-bold text-balance mb-6'
             >
               Forms that feel like
-              <span className="block text-primary">conversations</span>
+              <span className='block text-primary'>conversations</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg lg:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0"
+              className='text-lg lg:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto lg:mx-0'
             >
-              Transform boring forms into engaging conversations with AI. Boost completion rates by up to 300% with intelligent, adaptive forms that understand and respond to your users.
+              Transform boring forms into engaging conversations with AI. Boost completion rates by
+              up to 300% with intelligent, adaptive forms that understand and respond to your users.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 mb-12"
+              className='flex flex-col sm:flex-row gap-4 mb-12'
             >
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all" asChild>
-                <Link href="/sign-up" className="flex items-center gap-2">
+              <Button
+                size='lg'
+                className='bg-primary hover:bg-primary/90 text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all'
+                asChild
+              >
+                <Link href='/sign-up' className='flex items-center gap-2'>
                   Start Building Free
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className='w-5 h-5' />
                 </Link>
               </Button>
-              
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2 hover:bg-muted" asChild>
-                <Link href="#demo" className="flex items-center gap-2">
-                  <Play className="w-5 h-5" />
+
+              <Button
+                size='lg'
+                variant='outline'
+                className='text-lg px-8 py-6 border-2 hover:bg-muted'
+                asChild
+              >
+                <Link href='#demo' className='flex items-center gap-2'>
+                  <Play className='w-5 h-5' />
                   Watch Demo
                 </Link>
               </Button>
@@ -141,17 +151,17 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-6"
+              className='grid grid-cols-1 sm:grid-cols-3 gap-6'
             >
               {stats.map((stat, index) => {
                 const Icon = stat.icon;
                 return (
-                  <div key={index} className="text-center lg:text-left">
-                    <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
-                      <Icon className="w-5 h-5 text-primary" />
-                      <span className="text-2xl lg:text-3xl font-bold">{stat.value}</span>
+                  <div key={index} className='text-center lg:text-left'>
+                    <div className='flex items-center justify-center lg:justify-start gap-2 mb-2'>
+                      <Icon className='w-5 h-5 text-primary' />
+                      <span className='text-2xl lg:text-3xl font-bold'>{stat.value}</span>
                     </div>
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    <p className='text-sm text-muted-foreground'>{stat.label}</p>
                   </div>
                 );
               })}
@@ -163,42 +173,41 @@ export function HeroSection() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
+            className='relative'
           >
-            <div className="relative bg-card border border-border rounded-2xl shadow-2xl overflow-hidden">
-              
+            <div className='relative bg-card border border-border rounded-2xl shadow-2xl overflow-hidden'>
               {/* Demo Header */}
-              <div className="bg-muted/50 border-b px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className='bg-muted/50 border-b px-6 py-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='flex gap-2'>
+                    <div className='w-3 h-3 bg-red-500 rounded-full'></div>
+                    <div className='w-3 h-3 bg-yellow-500 rounded-full'></div>
+                    <div className='w-3 h-3 bg-green-500 rounded-full'></div>
                   </div>
-                  <div className="text-sm font-medium text-muted-foreground">
+                  <div className='text-sm font-medium text-muted-foreground'>
                     Convo AI Form Builder
                   </div>
                 </div>
               </div>
 
               {/* Demo Content */}
-              <div className="p-6 h-80">
-                <AnimatePresence mode="wait">
+              <div className='p-6 h-80'>
+                <AnimatePresence mode='wait'>
                   {currentDemo === 'ai' && (
                     <motion.div
-                      key="ai-demo"
+                      key='ai-demo'
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="space-y-4"
+                      className='space-y-4'
                     >
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-primary/10 rounded-lg p-2">
-                          <Sparkles className="w-5 h-5 text-primary" />
+                      <div className='flex items-center gap-3 mb-6'>
+                        <div className='bg-primary/10 rounded-lg p-2'>
+                          <Sparkles className='w-5 h-5 text-primary' />
                         </div>
-                        <h3 className="font-semibold">AI Form Generation</h3>
+                        <h3 className='font-semibold'>AI Form Generation</h3>
                       </div>
-                      
+
                       {aiDemo.slice(0, visibleSteps).map((step, index) => (
                         <motion.div
                           key={index}
@@ -218,20 +227,20 @@ export function HeroSection() {
 
                   {currentDemo === 'conversation' && (
                     <motion.div
-                      key="conversation-demo"
+                      key='conversation-demo'
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="space-y-4"
+                      className='space-y-4'
                     >
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-primary/10 rounded-lg p-2">
-                          <MessageSquare className="w-5 h-5 text-primary" />
+                      <div className='flex items-center gap-3 mb-6'>
+                        <div className='bg-primary/10 rounded-lg p-2'>
+                          <MessageSquare className='w-5 h-5 text-primary' />
                         </div>
-                        <h3 className="font-semibold">Conversational Experience</h3>
+                        <h3 className='font-semibold'>Conversational Experience</h3>
                       </div>
-                      
-                      <div className="space-y-3 max-h-60 overflow-y-auto">
+
+                      <div className='space-y-3 max-h-60 overflow-y-auto'>
                         {conversationalDemo.slice(0, visibleMessages).map((message, index) => (
                           <motion.div
                             key={index}
@@ -244,8 +253,8 @@ export function HeroSection() {
                                 message.type === 'user'
                                   ? 'bg-primary text-primary-foreground'
                                   : message.type === 'rating'
-                                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                                  : 'bg-muted'
+                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                    : 'bg-muted'
                               }`}
                             >
                               {message.message}
@@ -259,21 +268,21 @@ export function HeroSection() {
               </div>
 
               {/* Demo Footer */}
-              <div className="bg-muted/30 border-t px-6 py-4">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-muted-foreground">Live Demo</span>
+              <div className='bg-muted/30 border-t px-6 py-4'>
+                <div className='flex items-center justify-between text-sm'>
+                  <div className='flex items-center gap-4'>
+                    <div className='flex items-center gap-2'>
+                      <div className='w-2 h-2 bg-green-500 rounded-full animate-pulse'></div>
+                      <span className='text-muted-foreground'>Live Demo</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-primary" />
-                      <span className="text-primary font-medium">+267% completion</span>
+                    <div className='flex items-center gap-2'>
+                      <BarChart3 className='w-4 h-4 text-primary' />
+                      <span className='text-primary font-medium'>+267% completion</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-500" />
-                    <span className="text-muted-foreground">AI-Powered</span>
+                  <div className='flex items-center gap-2'>
+                    <Zap className='w-4 h-4 text-yellow-500' />
+                    <span className='text-muted-foreground'>AI-Powered</span>
                   </div>
                 </div>
               </div>
@@ -282,22 +291,22 @@ export function HeroSection() {
             {/* Floating Elements */}
             <motion.div
               animate={{ y: [-10, 10, -10] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-4 -right-4 bg-green-500 text-white rounded-lg px-3 py-2 text-sm font-medium shadow-lg"
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              className='absolute -top-4 -right-4 bg-green-500 text-white rounded-lg px-3 py-2 text-sm font-medium shadow-lg'
             >
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4" />
+              <div className='flex items-center gap-2'>
+                <CheckCircle className='w-4 h-4' />
                 87% completion rate
               </div>
             </motion.div>
 
             <motion.div
               animate={{ y: [10, -10, 10] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-              className="absolute -bottom-4 -left-4 bg-blue-500 text-white rounded-lg px-3 py-2 text-sm font-medium shadow-lg"
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+              className='absolute -bottom-4 -left-4 bg-blue-500 text-white rounded-lg px-3 py-2 text-sm font-medium shadow-lg'
             >
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4" />
+              <div className='flex items-center gap-2'>
+                <Zap className='w-4 h-4' />
                 Built in 8 seconds
               </div>
             </motion.div>

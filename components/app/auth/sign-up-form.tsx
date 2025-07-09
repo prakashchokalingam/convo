@@ -1,21 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
 import { useSignUp } from '@clerk/nextjs';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useWorkspaceSetup } from '@/hooks/use-workspace-setup';
-import { getWorkspaceUrl, getMarketingUrl } from '@/lib/context';
+import React, { useState } from 'react';
+
+import { Alert, AlertDescription } from '@/components/shared/ui/alert';
 import { Button } from '@/components/shared/ui/button';
 import { Input } from '@/components/shared/ui/input';
 import { Label } from '@/components/shared/ui/label';
-import { Alert, AlertDescription } from '@/components/shared/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { useWorkspaceSetup } from '@/hooks/use-workspace-setup';
+import { getWorkspaceUrl, getMarketingUrl } from '@/lib/context';
+
 
 export function SignUpForm() {
   const { signUp, setActive, isLoaded } = useSignUp();
   const { setupWorkspace, isLoading: isSettingUpWorkspace } = useWorkspaceSetup();
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState({
     emailAddress: '',
     password: '',
@@ -36,8 +38,8 @@ export function SignUpForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!isLoaded || isLoading) return;
+
+    if (!isLoaded || isLoading) {return;}
 
     setIsLoading(true);
     setErrors([]);
@@ -54,7 +56,7 @@ export function SignUpForm() {
       if (result.status === 'complete') {
         // Step 2: Set the active session
         await setActive({ session: result.createdSessionId });
-        
+
         // Step 3: Setup workspace immediately after successful signup
         const workspaceResult = await setupWorkspace({
           email: formData.emailAddress,
@@ -80,15 +82,17 @@ export function SignUpForm() {
           setErrors(['Signup incomplete. Please check your information.']);
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Signup error:', err);
-      
+
       // Handle Clerk-specific errors
-      if (err.errors) {
-        const errorMessages = err.errors.map((error: any) => error.message);
+      if (err && typeof err === 'object' && 'errors' in err && Array.isArray(err.errors)) {
+        const errorMessages = err.errors.map((error: { message: string }) => error.message);
         setErrors(errorMessages);
+      } else if (err instanceof Error) {
+        setErrors([err.message]);
       } else {
-        setErrors([err.message || 'An error occurred during signup']);
+        setErrors(['An error occurred during signup']);
       }
     } finally {
       setIsLoading(false);
@@ -98,14 +102,14 @@ export function SignUpForm() {
   const isSubmitting = isLoading || isSettingUpWorkspace;
 
   return (
-    <div className="max-w-md mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="firstName">First Name</Label>
+    <div className='max-w-md mx-auto'>
+      <form onSubmit={handleSubmit} className='space-y-4'>
+        <div className='space-y-2'>
+          <Label htmlFor='firstName'>First Name</Label>
           <Input
-            id="firstName"
-            name="firstName"
-            type="text"
+            id='firstName'
+            name='firstName'
+            type='text'
             value={formData.firstName}
             onChange={handleInputChange}
             required
@@ -113,12 +117,12 @@ export function SignUpForm() {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="lastName">Last Name</Label>
+        <div className='space-y-2'>
+          <Label htmlFor='lastName'>Last Name</Label>
           <Input
-            id="lastName"
-            name="lastName"
-            type="text"
+            id='lastName'
+            name='lastName'
+            type='text'
             value={formData.lastName}
             onChange={handleInputChange}
             required
@@ -126,12 +130,12 @@ export function SignUpForm() {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="emailAddress">Email</Label>
+        <div className='space-y-2'>
+          <Label htmlFor='emailAddress'>Email</Label>
           <Input
-            id="emailAddress"
-            name="emailAddress"
-            type="email"
+            id='emailAddress'
+            name='emailAddress'
+            type='email'
             value={formData.emailAddress}
             onChange={handleInputChange}
             required
@@ -139,12 +143,12 @@ export function SignUpForm() {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+        <div className='space-y-2'>
+          <Label htmlFor='password'>Password</Label>
           <Input
-            id="password"
-            name="password"
-            type="password"
+            id='password'
+            name='password'
+            type='password'
             value={formData.password}
             onChange={handleInputChange}
             required
@@ -154,9 +158,9 @@ export function SignUpForm() {
         </div>
 
         {errors.length > 0 && (
-          <Alert variant="destructive">
+          <Alert variant='destructive'>
             <AlertDescription>
-              <ul className="list-disc list-inside space-y-1">
+              <ul className='list-disc list-inside space-y-1'>
                 {errors.map((error, index) => (
                   <li key={index}>{error}</li>
                 ))}
@@ -165,14 +169,10 @@ export function SignUpForm() {
           </Alert>
         )}
 
-        <Button 
-          type="submit" 
-          className="w-full" 
-          disabled={isSubmitting}
-        >
+        <Button type='submit' className='w-full' disabled={isSubmitting}>
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
               {isLoading ? 'Creating Account...' : 'Setting up Workspace...'}
             </>
           ) : (
@@ -183,14 +183,16 @@ export function SignUpForm() {
 
       {/* Progress indicator */}
       {isSubmitting && (
-        <div className="mt-4 text-center text-sm text-muted-foreground">
-          <div className="space-y-1">
-            <div className="flex items-center justify-center space-x-2">
+        <div className='mt-4 text-center text-sm text-muted-foreground'>
+          <div className='space-y-1'>
+            <div className='flex items-center justify-center space-x-2'>
               <div className={`h-2 w-2 rounded-full ${isLoading ? 'bg-primary' : 'bg-muted'}`} />
               <span>Creating account</span>
             </div>
-            <div className="flex items-center justify-center space-x-2">
-              <div className={`h-2 w-2 rounded-full ${isSettingUpWorkspace ? 'bg-primary' : 'bg-muted'}`} />
+            <div className='flex items-center justify-center space-x-2'>
+              <div
+                className={`h-2 w-2 rounded-full ${isSettingUpWorkspace ? 'bg-primary' : 'bg-muted'}`}
+              />
               <span>Setting up workspace</span>
             </div>
           </div>

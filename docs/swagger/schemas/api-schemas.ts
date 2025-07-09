@@ -1,6 +1,6 @@
 /**
  * OpenAPI Schema Definitions
- * 
+ *
  * This file defines OpenAPI schemas that correspond to the database models
  * and API request/response structures. These schemas are used for automatic
  * documentation generation and validation.

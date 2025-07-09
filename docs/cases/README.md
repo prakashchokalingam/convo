@@ -1,6 +1,7 @@
 # ConvoForms: Use Cases, Scenarios & Technical Deep Dives
 
 This directory serves as a knowledge base, containing detailed documents that explore:
+
 - Specific use cases and user scenarios.
 - In-depth explanations of particular features or functionalities.
 - Discussions of edge cases and how they are handled.
@@ -13,6 +14,7 @@ These documents are intended to supplement the main architecture and development
 The documents are loosely categorized by the primary area they concern. Note that some documents might cover aspects of multiple categories.
 
 ### Core Application & User Flows
+
 - **`authentication.md`**: Details user signup, login, logout flows, onboarding, and authentication context protection.
 - **`workspace-management.md`**: Covers workspace creation, switching, member management, and role-based access control (RBAC) within workspaces.
 - **`form-generation.md`**: Explains the AI-powered form creation process from user prompts, including schema generation and validation.
@@ -22,6 +24,7 @@ The documents are loosely categorized by the primary area they concern. Note tha
 - **`path-based-routing.md`**: (Assumed, link to be created if file exists) Documents any path-based routing logic if distinct from subdomain routing.
 
 ### Features & Business Logic
+
 - **`pricing-plans.md`**: (Assumed, link to be created if file exists) Outlines subscription tiers, feature entitlements, and billing integration logic.
 - **`member-invites.md`**: (Assumed, link to be created if file exists) Covers the process for inviting team members to workspaces and managing their access.
 - **`analytics.md`**: Describes how form response data is tracked, aggregated, and presented for insights.
@@ -30,6 +33,7 @@ The documents are loosely categorized by the primary area they concern. Note tha
 - **`automatic-workspace-creation.md`**: (Note: This might be a duplicate or older version of `docs/technical_details/implementation-automatic-workspace-creation.md`. Review for consolidation.)
 
 ### Technical Infrastructure & API
+
 - **`api-endpoints.md`**: Provides an overview or specific details about key backend API endpoints, their validation, and expected behavior.
 - **`database-operations.md`**: (Assumed, link to be created if file exists) May cover specific database operations, data integrity rules, or complex queries not detailed elsewhere.
 - **`performance.md`**: (Assumed, link to be created if file exists) Could discuss performance considerations, load testing results, or optimization strategies for specific parts of the application.
@@ -39,6 +43,7 @@ The documents are loosely categorized by the primary area they concern. Note tha
 ## 📄 Document Structure & Status
 
 While the structure may vary, many documents in this section, especially those detailing features or flows, might include:
+
 - **Objective/Goal**: What the feature or flow achieves.
 - **Key Scenarios**: Step-by-step descriptions of user interactions or system processes.
 - **Technical Details**: Relevant implementation notes, data models, or algorithms.

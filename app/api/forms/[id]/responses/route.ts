@@ -1,21 +1,19 @@
-import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { auth } from '@clerk/nextjs/server';
+import { eq, and, desc, count as drizzleCount } from 'drizzle-orm'; // aliasing count to avoid conflict if any
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/lib/db';
 // Assuming forms schema has createdBy and workspaceId.
 // Assuming workspaceMembers schema exists and has workspaceId and userId.
-import { forms, responses, workspaceMembers } from "@/lib/db/schema";
-import { eq, and, desc, count as drizzleCount } from "drizzle-orm"; // aliasing count to avoid conflict if any
+import { forms, responses, workspaceMembers } from '@/lib/db/schema';
 
 // GET /api/forms/[id]/responses - Get responses for a specific form
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const formId = params.id;
@@ -48,7 +46,7 @@ export async function GET(
       .limit(1);
 
     if (formResult.length === 0) {
-      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
     const formDetails = formResult[0];
 
@@ -73,7 +71,7 @@ export async function GET(
     }
 
     if (!isAuthorized) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Get responses for the form
@@ -113,7 +111,7 @@ export async function GET(
       form: formDetails, // Use the fetched formDetails
     });
   } catch (error) {
-    console.error("Error fetching form responses:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error fetching form responses:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

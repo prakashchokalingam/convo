@@ -1,10 +1,11 @@
-import { auth } from "@clerk/nextjs";
-import { NextRequest, NextResponse } from "next/server";
-import { createId } from "@paralleldrive/cuid2";
-import { db } from "@/lib/db";
-import { templates, workspaceMembers, workspaces } from "@/lib/db/schema"; // Assuming workspaceMembers is still needed for other checks or can be removed if not.
-import { eq, and, or, count, desc, ilike } from "drizzle-orm";
-import { checkWorkspacePermission, getUserWorkspaceRole } from "@/lib/rbac"; // Added checkWorkspacePermission and getUserWorkspaceRole
+import { auth } from '@clerk/nextjs';
+import { createId } from '@paralleldrive/cuid2';
+import { eq, and, or, count, desc, ilike } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
+
+import { db } from '@/lib/db';
+import { templates, workspaceMembers } from '@/lib/db/schema';
+import { checkWorkspacePermission, getUserWorkspaceRole } from '@/lib/rbac';
 
 /**
  * @swagger
@@ -12,7 +13,7 @@ import { checkWorkspacePermission, getUserWorkspaceRole } from "@/lib/rbac"; // 
  *   get:
  *     summary: List templates with filtering
  *     description: |
- *       Retrieves templates available to the user. Returns both global templates 
+ *       Retrieves templates available to the user. Returns both global templates
  *       and workspace-specific templates based on user permissions.
  *     tags: [Templates]
  *     security:
@@ -91,9 +92,9 @@ import { checkWorkspacePermission, getUserWorkspaceRole } from "@/lib/rbac"; // 
 export async function GET(request: NextRequest) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -106,25 +107,24 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     if (!workspaceId) {
-      return NextResponse.json({ error: "Workspace ID is required" }, { status: 400 });
+      return NextResponse.json({ error: 'Workspace ID is required' }, { status: 400 });
     }
 
     // Verify user has access to the workspace
     const workspaceMember = await db
       .select()
       .from(workspaceMembers)
-      .where(and(
-        eq(workspaceMembers.workspaceId, workspaceId),
-        eq(workspaceMembers.userId, userId)
-      ))
+      .where(
+        and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.userId, userId))
+      )
       .limit(1);
 
     if (workspaceMember.length === 0) {
-      return NextResponse.json({ error: "Access denied to workspace" }, { status: 403 });
+      return NextResponse.json({ error: 'Access denied to workspace' }, { status: 403 });
     }
 
     // Build query conditions
-    let conditions = [];
+    const conditions = [];
 
     // Determine the value of isGlobal from searchParams
     const isGlobalParam = searchParams.get('isGlobal');
@@ -134,12 +134,7 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(templates.isGlobal, true));
     } else if (isGlobalParam === 'false') {
       // Only workspace-specific templates
-      conditions.push(
-        and(
-          eq(templates.isGlobal, false),
-          eq(templates.workspaceId, workspaceId)
-        )
-      );
+      conditions.push(and(eq(templates.isGlobal, false), eq(templates.workspaceId, workspaceId)));
     } else {
       // Default behavior: Global templates OR workspace templates for the given workspaceId
       // This handles cases where isGlobal is not 'true' or 'false' or is missing
@@ -160,10 +155,7 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       conditions.push(
-        or(
-          ilike(templates.name, `%${search}%`),
-          ilike(templates.description, `%${search}%`)
-        )
+        or(ilike(templates.name, `%${search}%`), ilike(templates.description, `%${search}%`))
       );
     }
 
@@ -195,12 +187,12 @@ export async function GET(request: NextRequest) {
         totalTemplates,
         totalPages,
         hasNext: page < totalPages,
-        hasPrev: page > 1
-      }
+        hasPrev: page > 1,
+      },
     });
   } catch (error) {
-    console.error("Error fetching templates:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error fetching templates:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -210,7 +202,7 @@ export async function GET(request: NextRequest) {
  *   post:
  *     summary: Create a new template
  *     description: |
- *       Creates a new template in the specified workspace. 
+ *       Creates a new template in the specified workspace.
  *       Requires create_template permission.
  *     tags: [Templates]
  *     security:
@@ -295,9 +287,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -305,24 +297,38 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!name || !formSchema || !workspaceId) {
-      return NextResponse.json({ 
-        error: "Missing required fields: name, formSchema, workspaceId" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Missing required fields: name, formSchema, workspaceId',
+        },
+        { status: 400 }
+      );
     }
 
     // Verify user has create_template permission in the workspace
     // First, ensure the user is part of the workspace.
     const userRole = await getUserWorkspaceRole(userId, workspaceId);
     if (!userRole) {
-      return NextResponse.json({ error: "Access denied to workspace. User is not a member." }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Access denied to workspace. User is not a member.' },
+        { status: 403 }
+      );
     }
 
     // Now, check for specific 'create_template' permission
-    const canCreateTemplate = await checkWorkspacePermission(userId, workspaceId, 'templates', 'create');
+    const canCreateTemplate = await checkWorkspacePermission(
+      userId,
+      workspaceId,
+      'templates',
+      'create'
+    );
     if (!canCreateTemplate) {
-      return NextResponse.json({ 
-        error: "Insufficient permissions. Requires 'create_template' permission."
-      }, { status: 403 });
+      return NextResponse.json(
+        {
+          error: "Insufficient permissions. Requires 'create_template' permission.",
+        },
+        { status: 403 }
+      );
     }
 
     // Generate unique ID for the template
@@ -346,14 +352,16 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    return NextResponse.json({
-      success: true,
-      template: newTemplate,
-      message: "Template created successfully"
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        success: true,
+        template: newTemplate,
+        message: 'Template created successfully',
+      },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("Error creating template:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error creating template:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

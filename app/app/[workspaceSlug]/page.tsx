@@ -9,13 +9,10 @@ interface WorkspaceRootProps {
   };
 }
 
-export default async function WorkspaceRoot({ 
-  params, 
-  searchParams 
-}: WorkspaceRootProps) {
+export default async function WorkspaceRoot({ params, searchParams }: WorkspaceRootProps) {
   const dashboardUrl = `/app/${params.workspaceSlug}/dashboard`;
   const searchParamsString = new URLSearchParams(searchParams).toString();
   const redirectUrl = searchParamsString ? `${dashboardUrl}?${searchParamsString}` : dashboardUrl;
-  
+
   redirect(redirectUrl);
 }

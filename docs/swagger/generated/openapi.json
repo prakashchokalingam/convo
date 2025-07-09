@@ -304,14 +304,7 @@
             "example": false
           }
         },
-        "required": [
-          "page",
-          "limit",
-          "totalItems",
-          "totalPages",
-          "hasNext",
-          "hasPrev"
-        ]
+        "required": ["page", "limit", "totalItems", "totalPages", "hasNext", "hasPrev"]
       },
       "SuccessResponse": {
         "type": "object",
@@ -325,9 +318,7 @@
             "example": "Operation completed successfully"
           }
         },
-        "required": [
-          "success"
-        ]
+        "required": ["success"]
       },
       "AdminStatsResponse": {
         "type": "object",
@@ -349,11 +340,7 @@
             "example": 75
           }
         },
-        "required": [
-          "totalUsers",
-          "totalWorkspaces",
-          "activeSubscriptions"
-        ]
+        "required": ["totalUsers", "totalWorkspaces", "activeSubscriptions"]
       },
       "ErrorResponse": {
         "type": "object",
@@ -365,9 +352,7 @@
             "example": "Resource not found"
           }
         },
-        "required": [
-          "error"
-        ]
+        "required": ["error"]
       },
       "User": {
         "type": "object",
@@ -418,12 +403,7 @@
             "example": "2024-01-20T14:45:00Z"
           }
         },
-        "required": [
-          "id",
-          "email",
-          "createdAt",
-          "updatedAt"
-        ]
+        "required": ["id", "email", "createdAt", "updatedAt"]
       },
       "Workspace": {
         "type": "object",
@@ -450,10 +430,7 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "personal",
-              "team"
-            ],
+            "enum": ["personal", "team"],
             "description": "Workspace type",
             "example": "team"
           },
@@ -480,10 +457,7 @@
             "properties": {
               "theme": {
                 "type": "string",
-                "enum": [
-                  "light",
-                  "dark"
-                ],
+                "enum": ["light", "dark"],
                 "default": "light"
               },
               "timezone": {
@@ -518,15 +492,7 @@
             "example": "2024-01-20T14:45:00Z"
           }
         },
-        "required": [
-          "id",
-          "name",
-          "slug",
-          "type",
-          "ownerId",
-          "createdAt",
-          "updatedAt"
-        ]
+        "required": ["id", "name", "slug", "type", "ownerId", "createdAt", "updatedAt"]
       },
       "WorkspaceMember": {
         "type": "object",
@@ -551,12 +517,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "owner",
-              "admin",
-              "member",
-              "viewer"
-            ],
+            "enum": ["owner", "admin", "member", "viewer"],
             "description": "Member's role and permissions",
             "example": "member"
           },
@@ -587,14 +548,7 @@
             "$ref": "#/components/schemas/User"
           }
         },
-        "required": [
-          "id",
-          "workspaceId",
-          "userId",
-          "role",
-          "createdAt",
-          "updatedAt"
-        ]
+        "required": ["id", "workspaceId", "userId", "role", "createdAt", "updatedAt"]
       },
       "Form": {
         "type": "object",
@@ -683,15 +637,7 @@
             "readOnly": true
           }
         },
-        "required": [
-          "id",
-          "workspaceId",
-          "createdBy",
-          "title",
-          "config",
-          "createdAt",
-          "updatedAt"
-        ]
+        "required": ["id", "workspaceId", "createdBy", "title", "config", "createdAt", "updatedAt"]
       },
       "FormConfig": {
         "type": "object",
@@ -711,9 +657,7 @@
             "$ref": "#/components/schemas/FormStyling"
           }
         },
-        "required": [
-          "fields"
-        ]
+        "required": ["fields"]
       },
       "FormField": {
         "type": "object",
@@ -772,23 +716,13 @@
             "items": {
               "type": "string"
             },
-            "example": [
-              "Option 1",
-              "Option 2",
-              "Option 3"
-            ]
+            "example": ["Option 1", "Option 2", "Option 3"]
           },
           "validation": {
             "$ref": "#/components/schemas/FieldValidation"
           }
         },
-        "required": [
-          "id",
-          "type",
-          "label",
-          "required",
-          "order"
-        ]
+        "required": ["id", "type", "label", "required", "order"]
       },
       "FieldValidation": {
         "type": "object",
@@ -983,14 +917,7 @@
             "example": "2024-01-20T14:45:00Z"
           }
         },
-        "required": [
-          "id",
-          "formId",
-          "workspaceId",
-          "data",
-          "createdAt",
-          "updatedAt"
-        ]
+        "required": ["id", "formId", "workspaceId", "data", "createdAt", "updatedAt"]
       },
       "ResponseMetadata": {
         "type": "object",
@@ -1081,11 +1008,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "admin",
-              "member",
-              "viewer"
-            ],
+            "enum": ["admin", "member", "viewer"],
             "description": "Role to assign when invitation is accepted",
             "example": "member"
           },
@@ -1107,24 +1030,13 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "accepted",
-              "expired",
-              "revoked"
-            ],
+            "enum": ["pending", "accepted", "expired", "revoked"],
             "description": "Current invitation status",
             "example": "pending"
           },
           "emailStatus": {
             "type": "string",
-            "enum": [
-              "pending",
-              "sent",
-              "delivered",
-              "failed",
-              "bounced"
-            ],
+            "enum": ["pending", "sent", "delivered", "failed", "bounced"],
             "description": "Email delivery status",
             "example": "delivered"
           },
@@ -1173,19 +1085,13 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "personal",
-              "team"
-            ],
+            "enum": ["personal", "team"],
             "description": "Workspace type",
             "example": "team",
             "default": "team"
           }
         },
-        "required": [
-          "name",
-          "slug"
-        ]
+        "required": ["name", "slug"]
       },
       "UpdateWorkspaceRequest": {
         "type": "object",
@@ -1210,10 +1116,7 @@
             "properties": {
               "theme": {
                 "type": "string",
-                "enum": [
-                  "light",
-                  "dark"
-                ]
+                "enum": ["light", "dark"]
               },
               "timezone": {
                 "type": "string",
@@ -1253,9 +1156,7 @@
             "maxLength": 2000
           }
         },
-        "required": [
-          "title"
-        ]
+        "required": ["title"]
       },
       "UpdateFormRequest": {
         "type": "object",
@@ -1301,20 +1202,13 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "admin",
-              "member",
-              "viewer"
-            ],
+            "enum": ["admin", "member", "viewer"],
             "description": "Role to assign",
             "example": "member",
             "default": "member"
           }
         },
-        "required": [
-          "email",
-          "role"
-        ]
+        "required": ["email", "role"]
       },
       "UpdateMemberRequest": {
         "type": "object",
@@ -1322,18 +1216,12 @@
         "properties": {
           "role": {
             "type": "string",
-            "enum": [
-              "admin",
-              "member",
-              "viewer"
-            ],
+            "enum": ["admin", "member", "viewer"],
             "description": "New role to assign",
             "example": "admin"
           }
         },
-        "required": [
-          "role"
-        ]
+        "required": ["role"]
       },
       "WorkspaceListResponse": {
         "type": "object",
@@ -1355,12 +1243,7 @@
                   "properties": {
                     "role": {
                       "type": "string",
-                      "enum": [
-                        "owner",
-                        "admin",
-                        "member",
-                        "viewer"
-                      ],
+                      "enum": ["owner", "admin", "member", "viewer"],
                       "description": "Current user's role in this workspace"
                     }
                   }
@@ -1373,10 +1256,7 @@
             "example": "Workspaces retrieved successfully"
           }
         },
-        "required": [
-          "success",
-          "data"
-        ]
+        "required": ["success", "data"]
       },
       "WorkspaceResponse": {
         "type": "object",
@@ -1394,10 +1274,7 @@
             "example": "Workspace retrieved successfully"
           }
         },
-        "required": [
-          "success",
-          "data"
-        ]
+        "required": ["success", "data"]
       },
       "FormListResponse": {
         "type": "object",
@@ -1421,11 +1298,7 @@
             "example": "Forms retrieved successfully"
           }
         },
-        "required": [
-          "success",
-          "data",
-          "pagination"
-        ]
+        "required": ["success", "data", "pagination"]
       },
       "SingleFormEntityResponse": {
         "type": "object",
@@ -1443,10 +1316,7 @@
             "example": "Form retrieved successfully"
           }
         },
-        "required": [
-          "success",
-          "data"
-        ]
+        "required": ["success", "data"]
       },
       "ResponseListResponse": {
         "type": "object",
@@ -1470,11 +1340,7 @@
             "example": "Responses retrieved successfully"
           }
         },
-        "required": [
-          "success",
-          "data",
-          "pagination"
-        ]
+        "required": ["success", "data", "pagination"]
       },
       "MemberListResponse": {
         "type": "object",
@@ -1495,10 +1361,7 @@
             "example": "Members retrieved successfully"
           }
         },
-        "required": [
-          "success",
-          "data"
-        ]
+        "required": ["success", "data"]
       },
       "InvitationListResponse": {
         "type": "object",
@@ -1519,10 +1382,7 @@
             "example": "Invitations retrieved successfully"
           }
         },
-        "required": [
-          "success",
-          "data"
-        ]
+        "required": ["success", "data"]
       }
     }
   },
@@ -1565,9 +1425,7 @@
       "get": {
         "summary": "Retrieve application statistics for admins",
         "description": "Provides key statistics about the application, such as total users,\ntotal workspaces, and active subscriptions.\nRequires admin privileges.\n",
-        "tags": [
-          "Admin"
-        ],
+        "tags": ["Admin"],
         "security": [
           {
             "clerkAuth": []
@@ -1621,19 +1479,14 @@
       "get": {
         "summary": "Get OpenAPI specification",
         "description": "Returns the complete OpenAPI specification for the Convo Forms API",
-        "tags": [
-          "Documentation"
-        ],
+        "tags": ["Documentation"],
         "parameters": [
           {
             "in": "query",
             "name": "format",
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "yaml"
-              ],
+              "enum": ["json", "yaml"],
               "default": "json"
             },
             "description": "Response format (json or yaml)"
@@ -1694,9 +1547,7 @@
       "post": {
         "summary": "Regenerate API documentation",
         "description": "Triggers regeneration of the OpenAPI specification",
-        "tags": [
-          "Documentation"
-        ],
+        "tags": ["Documentation"],
         "security": [
           {
             "ClerkAuth": []
@@ -1753,9 +1604,7 @@
       "get": {
         "summary": "Get a specific form",
         "description": "Retrieves detailed information about a specific form.\nOnly returns forms that belong to the authenticated user.\n",
-        "tags": [
-          "Forms"
-        ],
+        "tags": ["Forms"],
         "security": [
           {
             "ClerkAuth": []
@@ -1807,9 +1656,7 @@
       "patch": {
         "summary": "Update a specific form",
         "description": "Updates form properties such as name, description, configuration, and publish status.\nOnly the form owner can update their forms.\n\n**Updatable Fields:**\n- name: Form display name\n- description: Form description\n- config: Form structure and fields (JSON)\n- isConversational: Enable/disable conversational mode\n- isPublished: Publish/unpublish the form\n",
-        "tags": [
-          "Forms"
-        ],
+        "tags": ["Forms"],
         "security": [
           {
             "ClerkAuth": []
@@ -1909,9 +1756,7 @@
       "delete": {
         "summary": "Delete a specific form",
         "description": "Permanently deletes a form and all associated data including responses.\nOnly the form owner can delete their forms.\n\n**⚠️ Warning:** This action cannot be undone. All form responses will be permanently deleted.\n",
-        "tags": [
-          "Forms"
-        ],
+        "tags": ["Forms"],
         "security": [
           {
             "ClerkAuth": []
@@ -1959,10 +1804,7 @@
       "post": {
         "summary": "Save form as template",
         "description": "Creates a new template based on an existing form's configuration.\nThe form's config field is converted to the template's formSchema format.\nRequires create_template permission in the form's workspace.\n",
-        "tags": [
-          "Forms",
-          "Templates"
-        ],
+        "tags": ["Forms", "Templates"],
         "security": [
           {
             "ClerkAuth": []
@@ -1986,9 +1828,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -2091,9 +1931,7 @@
       "get": {
         "summary": "List user's forms with statistics",
         "description": "Retrieves a paginated list of forms belonging to the authenticated user.",
-        "tags": [
-          "Forms"
-        ],
+        "tags": ["Forms"],
         "security": [
           {
             "ClerkAuth": []
@@ -2175,9 +2013,7 @@
       "post": {
         "summary": "Create a new form",
         "description": "Creates a new form in the specified workspace. The user must have\ncreate_form permission in the workspace (member role or above).\n",
-        "tags": [
-          "Forms"
-        ],
+        "tags": ["Forms"],
         "security": [
           {
             "ClerkAuth": []
@@ -2189,11 +2025,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "workspaceId",
-                  "title",
-                  "config"
-                ],
+                "required": ["workspaceId", "title", "config"],
                 "properties": {
                   "workspaceId": {
                     "type": "string",
@@ -2285,9 +2117,7 @@
       "post": {
         "summary": "Clone a template to a workspace",
         "description": "Creates a copy of an existing template (either global or workspace-specific)\ninto the specified target workspace.\nPermissions are checked based on the source template type and target workspace.\n",
-        "tags": [
-          "Templates"
-        ],
+        "tags": ["Templates"],
         "security": [
           {
             "ClerkAuth": []
@@ -2310,9 +2140,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "workspaceId"
-                ],
+                "required": ["workspaceId"],
                 "properties": {
                   "workspaceId": {
                     "type": "string",
@@ -2373,9 +2201,7 @@
       "post": {
         "summary": "Create a form from template",
         "description": "Creates a new form using the specified template as a starting point.\nCopies the template's form schema and increments the template's usage count.\nRequires create_form permission in the target workspace.\n",
-        "tags": [
-          "Templates"
-        ],
+        "tags": ["Templates"],
         "security": [
           {
             "ClerkAuth": []
@@ -2399,10 +2225,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "workspaceId",
-                  "name"
-                ],
+                "required": ["workspaceId", "name"],
                 "properties": {
                   "workspaceId": {
                     "type": "string",
@@ -2503,9 +2326,7 @@
       "get": {
         "summary": "Get a specific template",
         "description": "Retrieves detailed information about a specific template.\nReturns global templates or workspace templates the user has access to.\n",
-        "tags": [
-          "Templates"
-        ],
+        "tags": ["Templates"],
         "security": [
           {
             "ClerkAuth": []
@@ -2577,9 +2398,7 @@
       "put": {
         "summary": "Update a specific template",
         "description": "Updates template properties such as name, description, form schema, and category.\nOnly workspace templates can be updated, and only by users with edit_template permission.\nGlobal templates cannot be modified by users.\n",
-        "tags": [
-          "Templates"
-        ],
+        "tags": ["Templates"],
         "security": [
           {
             "ClerkAuth": []
@@ -2695,9 +2514,7 @@
       "delete": {
         "summary": "Delete a specific template",
         "description": "Permanently deletes a template. Only workspace templates can be deleted,\nand only by users with edit_template permission. Global templates cannot be deleted.\n\n⚠️ Warning: This action cannot be undone. Forms created from this template will not be affected.\n",
-        "tags": [
-          "Templates"
-        ],
+        "tags": ["Templates"],
         "security": [
           {
             "ClerkAuth": []
@@ -2755,9 +2572,7 @@
       "get": {
         "summary": "List templates with filtering",
         "description": "Retrieves templates available to the user. Returns both global templates \nand workspace-specific templates based on user permissions.\n",
-        "tags": [
-          "Templates"
-        ],
+        "tags": ["Templates"],
         "security": [
           {
             "ClerkAuth": []
@@ -2875,9 +2690,7 @@
       "post": {
         "summary": "Create a new template",
         "description": "Creates a new template in the specified workspace. \nRequires create_template permission.\n",
-        "tags": [
-          "Templates"
-        ],
+        "tags": ["Templates"],
         "security": [
           {
             "ClerkAuth": []
@@ -2889,11 +2702,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "name",
-                  "formSchema",
-                  "workspaceId"
-                ],
+                "required": ["name", "formSchema", "workspaceId"],
                 "properties": {
                   "name": {
                     "type": "string",
@@ -3007,9 +2816,7 @@
       "get": {
         "summary": "Get workspace by slug",
         "description": "Retrieves a specific workspace by its slug. The user must be a member\nof the workspace to access it. Returns workspace details along with\nthe user's role in the workspace.\n",
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "ClerkAuth": []
@@ -3141,9 +2948,7 @@
       "post": {
         "summary": "Create a new workspace",
         "description": "Creates a new workspace for organizing forms and team collaboration.\nThe authenticated user becomes the owner of the workspace.\n\n**Features:**\n- Automatic owner assignment\n- Unique slug validation\n- Plan limit enforcement\n- Activity logging\n- Default settings initialization\n",
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "ClerkAuth": []
@@ -3290,9 +3095,7 @@
       "get": {
         "summary": "List all workspaces for the current user",
         "description": "Retrieves all workspaces where the authenticated user is a member.\nIncludes the user's role in each workspace.\n\n**Returned Data:**\n- Workspace basic information\n- User's role in each workspace\n- Ordered by creation date\n",
-        "tags": [
-          "Workspaces"
-        ],
+        "tags": ["Workspaces"],
         "security": [
           {
             "ClerkAuth": []

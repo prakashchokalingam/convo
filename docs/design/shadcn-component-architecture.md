@@ -1,4 +1,5 @@
 # ConvoForms shadcn/ui Component Architecture
+
 ## Professional Component System Built on shadcn/ui Foundation
 
 ---
@@ -15,7 +16,7 @@ The ConvoForms component system uses **shadcn/ui as the foundation** with custom
 components/
 ├── ui/                           # shadcn/ui foundation components
 │   ├── button.tsx               # Base Button component
-│   ├── card.tsx                 # Base Card component  
+│   ├── card.tsx                 # Base Card component
 │   ├── input.tsx                # Base Input component
 │   ├── form.tsx                 # Form components (Field, Label, etc.)
 │   ├── dialog.tsx               # Modal and dialog components
@@ -69,6 +70,7 @@ components/
 ## 🎨 **shadcn/ui Component Examples**
 
 ### **Enhanced Button Usage**
+
 ```typescript
 // components/app/dashboard/quick-actions.tsx
 import { Button } from '@/components/ui/button'
@@ -81,12 +83,12 @@ export function QuickActions() {
         <Plus className="h-5 w-5" />
         <span>Create Form</span>
       </Button>
-      
+
       <Button variant="outline" size="lg" className="h-auto p-4 flex-col gap-2">
         <BarChart3 className="h-5 w-5" />
         <span>View Analytics</span>
       </Button>
-      
+
       <Button variant="ghost" size="lg" className="h-auto p-4 flex-col gap-2">
         <Settings className="h-5 w-5" />
         <span>Settings</span>
@@ -97,6 +99,7 @@ export function QuickActions() {
 ```
 
 ### **Enhanced Card Components**
+
 ```typescript
 // components/app/dashboard/stats-card.tsx
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -124,7 +127,7 @@ export function StatsCard({ title, value, change, icon }: StatsCardProps) {
             <div className="flex items-baseline space-x-3">
               <p className="text-2xl font-bold">{value}</p>
               {change && (
-                <Badge 
+                <Badge
                   variant={change.trend === 'up' ? 'default' : 'destructive'}
                   className="text-xs"
                 >
@@ -158,6 +161,7 @@ export function StatsCard({ title, value, change, icon }: StatsCardProps) {
 ```
 
 ### **Enhanced Form Components**
+
 ```typescript
 // components/app/form-builder/properties-panel.tsx
 import { Button } from '@/components/ui/button'
@@ -275,6 +279,7 @@ export function PropertiesPanel({ selectedField, onFieldUpdate }: PropertiesPane
 ## 🏗️ **Layout Components (shadcn/ui Based)**
 
 ### **AppLayout Component**
+
 ```typescript
 // components/app/layout/app-layout.tsx
 import { cn } from '@/lib/utils'
@@ -302,6 +307,7 @@ export function AppLayout({ children, className }: AppLayoutProps) {
 ```
 
 ### **AppHeader Component**
+
 ```typescript
 // components/app/layout/app-header.tsx
 import { Button } from '@/components/ui/button'
@@ -333,7 +339,7 @@ export function AppHeader() {
               </kbd>
             </Button>
           </div>
-          
+
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-4 w-4" />
@@ -363,19 +369,20 @@ export function AppHeader() {
 ```
 
 ### **AppSidebar Component**
+
 ```typescript
 // components/app/layout/app-sidebar.tsx
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Users, 
-  Settings, 
-  BarChart3, 
-  Plus 
+import {
+  LayoutDashboard,
+  FileText,
+  Users,
+  Settings,
+  BarChart3,
+  Plus
 } from 'lucide-react'
 
 interface AppSidebarProps {
@@ -447,6 +454,7 @@ export function AppSidebar({ className }: AppSidebarProps) {
 ## 🎭 **Form Builder Components (shadcn/ui UI Only)**
 
 ### **FormBuilder Main Component**
+
 ```typescript
 // components/app/form-builder/form-builder.tsx
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -496,20 +504,21 @@ export function FormBuilder() {
 ```
 
 ### **Field Library Component**
+
 ```typescript
 // components/app/form-builder/field-library.tsx
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Type, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  CheckSquare, 
-  Radio, 
-  List, 
-  FileText 
+import {
+  Type,
+  Mail,
+  Phone,
+  Calendar,
+  CheckSquare,
+  Radio,
+  List,
+  FileText
 } from 'lucide-react'
 
 const fieldTypes = [
@@ -563,6 +572,7 @@ export function FieldLibrary() {
 ## 📱 **Responsive Design Patterns**
 
 ### **Dashboard Grid with shadcn/ui**
+
 ```typescript
 // Responsive dashboard layout
 export function Dashboard() {
@@ -619,6 +629,7 @@ export function Dashboard() {
 ## ♿ **Accessibility (Built-in with shadcn/ui)**
 
 ### **Form Accessibility**
+
 ```typescript
 // shadcn/ui provides excellent accessibility out of the box
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -632,8 +643,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
         <FormItem>
           <FormLabel>Form Name *</FormLabel>
           <FormControl>
-            <Input 
-              {...field} 
+            <Input
+              {...field}
               placeholder="Enter form name"
               aria-describedby="form-name-description form-name-error"
             />
@@ -650,6 +661,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 ```
 
 ### **Navigation Accessibility**
+
 ```typescript
 // Accessible navigation with proper ARIA labels
 <nav role="navigation" aria-label="Main navigation">
@@ -675,6 +687,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 ## 🛠️ **Utility Functions & Hooks**
 
 ### **shadcn/ui Utilities**
+
 ```typescript
 // lib/utils.ts (provided by shadcn/ui)
 import { type ClassValue, clsx } from "clsx"
@@ -689,19 +702,20 @@ export function cn(...inputs: ClassValue[]) {
 ```
 
 ### **Theme Hook**
+
 ```typescript
 // hooks/use-theme.ts
-import { useTheme } from "next-themes"
+import { useTheme } from 'next-themes';
 
 export function useConvoTheme() {
-  const { theme, setTheme } = useTheme()
-  
+  const { theme, setTheme } = useTheme();
+
   return {
     theme,
     setTheme,
-    isDark: theme === "dark",
-    toggleTheme: () => setTheme(theme === "light" ? "dark" : "light")
-  }
+    isDark: theme === 'dark',
+    toggleTheme: () => setTheme(theme === 'light' ? 'dark' : 'light'),
+  };
 }
 ```
 

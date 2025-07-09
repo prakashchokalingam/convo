@@ -1,4 +1,4 @@
-import { Workspace } from '@/lib/db/schema'; // Assuming Workspace type is needed for context, adjust if not.
+// Slack notification utilities
 
 // Define the structure of the Slack message payload
 interface SlackPayload {
@@ -15,7 +15,7 @@ interface SlackPayload {
  */
 export async function sendSlackNotification(
   message: string,
-  details?: Record<string, any> // For potential future structured messages
+  _details?: Record<string, any> // For potential future structured messages
 ): Promise<boolean> {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
 
@@ -56,10 +56,9 @@ export async function sendSlackNotification(
 
     if (!response.ok) {
       const responseBody = await response.text();
-      console.error(
-        `Error sending Slack notification: ${response.status} ${response.statusText}`,
-        { responseBody }
-      );
+      console.error(`Error sending Slack notification: ${response.status} ${response.statusText}`, {
+        responseBody,
+      });
       return false;
     }
 

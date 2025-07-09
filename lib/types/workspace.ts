@@ -20,18 +20,15 @@ export type WorkspaceRole = 'owner' | 'admin' | 'member' | 'viewer';
 export type WorkspaceType = 'default' | 'team';
 
 // Role hierarchy utility (client-safe)
-export const roleHierarchy = { 
-  viewer: 1, 
-  member: 2, 
-  admin: 3, 
-  owner: 4 
+export const roleHierarchy = {
+  viewer: 1,
+  member: 2,
+  admin: 3,
+  owner: 4,
 } as const;
 
 // Helper function to check role permissions (client-safe)
-export function hasPermission(
-  userRole: WorkspaceRole, 
-  requiredRole: WorkspaceRole
-): boolean {
+export function hasPermission(userRole: WorkspaceRole, requiredRole: WorkspaceRole): boolean {
   const userRoleLevel = roleHierarchy[userRole];
   const requiredRoleLevel = roleHierarchy[requiredRole];
   return userRoleLevel >= requiredRoleLevel;

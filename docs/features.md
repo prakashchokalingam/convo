@@ -11,15 +11,18 @@ Traditional forms have 81% abandonment rates. ConvoForms reduces this to 40-60% 
 ## 🤖 AI Form Generation
 
 ### How It Works
+
 Users describe their form in natural language, and AI generates the complete form structure.
 
 **Example Prompts:**
+
 - "Create a job application form"
 - "I need a customer feedback survey for my restaurant"
 - "Build a contact form for my website"
 - "Make an event registration form with meal preferences"
 
 **AI Output:**
+
 - Form fields with proper types (text, email, select, etc.)
 - Validation rules (required fields, email format, etc.)
 - Smart labels and placeholder text
@@ -27,6 +30,7 @@ Users describe their form in natural language, and AI generates the complete for
 - Appropriate form settings
 
 ### Supported Field Types
+
 - **Text Input** - Single line text with validation
 - **Email** - Email validation built-in
 - **Textarea** - Multi-line text for longer responses
@@ -40,9 +44,11 @@ Users describe their form in natural language, and AI generates the complete for
 ## 💬 Conversational Mode
 
 ### The Magic Feature
+
 Any form can be toggled into "conversational mode" - transforming it into a chat-like experience.
 
 ### How It Works
+
 ```
 Traditional Form:
 [Name: ______]
@@ -61,6 +67,7 @@ Bot: "Thanks for reaching out! We'll be in touch soon."
 ```
 
 ### Benefits
+
 - **Higher completion rates** (40-60% improvement)
 - **Better user experience** (feels more personal)
 - **Mobile-friendly** (easier on small screens)
@@ -70,13 +77,16 @@ Bot: "Thanks for reaching out! We'll be in touch soon."
 ## 🏗️ Visual Form Builder
 
 ### Drag & Drop Interface
+
 - Add fields from sidebar library
 - Reorder fields by dragging
 - Delete fields with confirmation
 - Real-time preview as you build
 
 ### Field Customization
+
 For each field, you can customize:
+
 - **Label** - The question text
 - **Placeholder** - Hint text in the input
 - **Help Text** - Additional instructions
@@ -85,6 +95,7 @@ For each field, you can customize:
 - **Default Values** - Pre-filled answers
 
 ### Smart Suggestions
+
 - AI suggests improvements to form flow
 - Recommends field types based on labels
 - Warns about potential usability issues
@@ -93,12 +104,14 @@ For each field, you can customize:
 ## 📊 Response Management
 
 ### Response Collection
+
 - **Real-time notifications** when someone submits
 - **Data validation** before saving
 - **Spam protection** built-in
 - **File upload handling** for documents/images
 
 ### Response Viewing
+
 - **Table view** of all responses
 - **Individual response details**
 - **Search and filter** responses
@@ -107,7 +120,9 @@ For each field, you can customize:
 - **Add internal notes**
 
 ### Analytics Dashboard
+
 Track form performance:
+
 - **View count** - How many people saw your form
 - **Start rate** - How many began filling it out
 - **Completion rate** - How many finished
@@ -120,15 +135,15 @@ Track form performance:
 ### Multiple Sharing Options
 
 1. **Direct Link**
+
    ```
    https://forms.convo.ai/contact/abc123
    ```
 
 2. **Embed Code**
+
    ```html
-   <iframe src="https://forms.convo.ai/embed/abc123" 
-           width="100%" height="600">
-   </iframe>
+   <iframe src="https://forms.convo.ai/embed/abc123" width="100%" height="600"> </iframe>
    ```
 
 3. **JavaScript Widget**
@@ -138,6 +153,7 @@ Track form performance:
    ```
 
 ### Customization Options
+
 - **Custom branding** (Pro plan)
 - **Remove "Powered by ConvoForms"** (Pro plan)
 - **Custom thank you pages**
@@ -147,6 +163,7 @@ Track form performance:
 ## 🎨 Form Templates
 
 ### Ready-to-Use Templates
+
 - **Contact Form** - Name, email, message
 - **Job Application** - Resume upload, experience, skills
 - **Customer Feedback** - Ratings, comments, contact info
@@ -156,6 +173,7 @@ Track form performance:
 - **Support Ticket** - Issue description, priority level
 
 ### Template Features
+
 - **Instant setup** - One-click to create
 - **Fully customizable** - Modify any field
 - **Industry-specific** - Tailored for different use cases
@@ -164,12 +182,14 @@ Track form performance:
 ## 👥 Team Collaboration
 
 ### Workspace Management
+
 - **Personal workspaces** - For individual users
 - **Team workspaces** - For organizations
 - **Role-based access** - Owner, Admin, Member, Viewer
 - **Member management** - Invite/remove team members
 
 ### Permissions System
+
 - **Owner** - Full access, billing, delete workspace
 - **Admin** - Manage forms, members, settings
 - **Member** - Create and edit forms
@@ -178,6 +198,7 @@ Track form performance:
 ## 🔧 Integrations (Coming Soon)
 
 ### Planned Integrations
+
 - **Zapier** - Connect to 5000+ apps
 - **Webhooks** - Send data to any endpoint
 - **Google Sheets** - Auto-populate spreadsheets
@@ -190,6 +211,7 @@ Track form performance:
 ## 💳 Pricing Plans
 
 ### Free Plan
+
 - **3 forms** maximum
 - **100 responses** per month
 - **Basic analytics**
@@ -197,6 +219,7 @@ Track form performance:
 - **Community support**
 
 ### Starter Plan ($19/month)
+
 - **10 forms** maximum
 - **1,000 responses** per month
 - **Advanced analytics**
@@ -205,6 +228,7 @@ Track form performance:
 - **Custom thank you pages**
 
 ### Professional Plan ($49/month)
+
 - **Unlimited forms**
 - **10,000 responses** per month
 - **Team collaboration** (up to 5 members)
@@ -213,6 +237,7 @@ Track form performance:
 - **Custom domains**
 
 ### Enterprise Plan (Custom)
+
 - **Unlimited everything**
 - **White-label solution**
 - **Custom integrations**
@@ -223,30 +248,35 @@ Track form performance:
 ## 🎯 Target Use Cases
 
 ### Small Businesses
+
 - Contact forms for websites
 - Customer feedback collection
 - Lead generation forms
 - Event registration
 
 ### HR & Recruiting
+
 - Job application forms
 - Employee feedback surveys
 - Interview scheduling
 - Onboarding questionnaires
 
 ### Marketing Teams
+
 - Lead capture forms
 - Newsletter signups
 - Event registrations
 - Customer surveys
 
 ### Customer Support
+
 - Support ticket forms
 - Bug report submissions
 - Feature request collection
 - Satisfaction surveys
 
 ### Education
+
 - Student registration
 - Course feedback
 - Application forms
@@ -255,26 +285,31 @@ Track form performance:
 ## 🚀 What Makes ConvoForms Special
 
 ### 1. AI-First Approach
+
 - Generate forms from natural language
 - Smart field suggestions
 - Automated form optimization
 
 ### 2. Conversational Experience
+
 - Chat-like interface option
 - Higher completion rates
 - Better user engagement
 
 ### 3. Developer-Friendly
+
 - Clean embed codes
 - Webhook support
 - API access (coming soon)
 
 ### 4. Mobile-Optimized
+
 - Responsive design
 - Touch-friendly interface
 - Fast loading on mobile
 
 ### 5. Privacy-Focused
+
 - GDPR compliant
 - Data encryption
 - User consent management

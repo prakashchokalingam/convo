@@ -1,14 +1,14 @@
 // URL helper functions for workspace navigation
 // Safe to import in client components (no database dependencies)
 
-import { 
+import {
   getWorkspaceUrl as getBaseWorkspaceUrl,
   getWorkspaceSettingsUrl as getBaseWorkspaceSettingsUrl,
   getMembersUrl as getBaseMembersUrl,
   getFormsListUrl,
   getFormEditorUrl as getBaseFormEditorUrl,
   getPublicFormUrl as getBasePublicFormUrl,
-  getMarketingUrl as getBaseMarketingUrl
+  getMarketingUrl as getBaseMarketingUrl,
 } from '@/lib/context';
 
 // Workspace URLs (app context)
@@ -23,8 +23,12 @@ export function getWorkspaceDashboardUrl(workspaceSlug: string): string {
   return `/app/${workspaceSlug}/dashboard`;
 }
 
-export function getFormsUrl(workspaceSlug: string): string {
-  return getFormsListUrl(workspaceSlug);
+export function getFormsUrl(workspaceSlug: string, path?: string): string {
+  const baseUrl = getFormsListUrl(workspaceSlug);
+  if (path) {
+    return `${baseUrl}${path.startsWith('/') ? path : '/' + path}`;
+  }
+  return baseUrl;
 }
 
 export function getFormEditorUrl(workspaceSlug: string, formId: string): string {

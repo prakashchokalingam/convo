@@ -1,10 +1,11 @@
-import { MetadataRoute } from 'next'
+import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'ConvoForms - AI-Powered Conversational Forms',
     short_name: 'ConvoForms',
-    description: 'Create engaging conversational forms with AI in seconds. Boost completion rates by 300%.',
+    description:
+      'Create engaging conversational forms with AI in seconds. Boost completion rates by 300%.',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
@@ -18,40 +19,40 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/icon-192x192.png',
         sizes: '192x192',
         type: 'image/png',
-        purpose: 'maskable'
+        purpose: 'maskable',
       },
       {
         src: '/icon-512x512.png',
         sizes: '512x512',
         type: 'image/png',
-        purpose: 'maskable'
+        purpose: 'maskable',
       },
       {
         src: '/icon-192x192.png',
         sizes: '192x192',
         type: 'image/png',
-        purpose: 'any'
+        purpose: 'any',
       },
       {
         src: '/icon-512x512.png',
         sizes: '512x512',
         type: 'image/png',
-        purpose: 'any'
-      }
+        purpose: 'any',
+      },
     ],
     screenshots: [
       {
         src: '/screenshot-wide.png',
         sizes: '1280x720',
         type: 'image/png',
-        form_factor: 'wide'
+        form_factor: 'wide',
       },
       {
         src: '/screenshot-narrow.png',
         sizes: '640x1136',
         type: 'image/png',
-        form_factor: 'narrow'
-      }
+        form_factor: 'narrow',
+      },
     ],
     shortcuts: [
       {
@@ -63,9 +64,9 @@ export default function manifest(): MetadataRoute.Manifest {
           {
             src: '/shortcut-new.png',
             sizes: '96x96',
-            type: 'image/png'
-          }
-        ]
+            type: 'image/png',
+          },
+        ],
       },
       {
         name: 'View Analytics',
@@ -76,9 +77,9 @@ export default function manifest(): MetadataRoute.Manifest {
           {
             src: '/shortcut-analytics.png',
             sizes: '96x96',
-            type: 'image/png'
-          }
-        ]
+            type: 'image/png',
+          },
+        ],
       },
       {
         name: 'Templates',
@@ -89,10 +90,10 @@ export default function manifest(): MetadataRoute.Manifest {
           {
             src: '/shortcut-templates.png',
             sizes: '96x96',
-            type: 'image/png'
-          }
-        ]
-      }
-    ]
-  }
+            type: 'image/png',
+          },
+        ],
+      },
+    ],
+  };
 }

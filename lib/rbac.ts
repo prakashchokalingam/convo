@@ -1,7 +1,8 @@
+import { createId } from '@paralleldrive/cuid2';
+import { eq, and } from 'drizzle-orm';
+
 import { db } from '@/drizzle/db';
 import { workspaceMembers, workspaceActivities } from '@/drizzle/schema';
-import { eq, and } from 'drizzle-orm';
-import { createId } from '@paralleldrive/cuid2';
 
 export type Role = 'owner' | 'admin' | 'member' | 'viewer';
 
@@ -51,16 +52,13 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   ],
 };
 
-export function hasPermission(
-  role: Role,
-  resource: string,
-  action: string
-): boolean {
+export function hasPermission(role: Role, resource: string, action: string): boolean {
   const permissions = ROLE_PERMISSIONS[role];
-  
-  return permissions.some(permission => 
-    (permission.resource === resource || permission.resource === '*') &&
-    (permission.action === action || permission.action === '*')
+
+  return permissions.some(
+    permission =>
+      (permission.resource === resource || permission.resource === '*') &&
+      (permission.action === action || permission.action === '*')
   );
 }
 
@@ -91,17 +89,14 @@ export function canViewActivities(userRole: Role): boolean {
 
 // Get user's role in a workspace
 export async function getUserWorkspaceRole(
-  userId: string, 
+  userId: string,
   workspaceId: string
 ): Promise<Role | null> {
   const member = await db.query.workspaceMembers.findFirst({
-    where: and(
-      eq(workspaceMembers.userId, userId),
-      eq(workspaceMembers.workspaceId, workspaceId)
-    ),
+    where: and(eq(workspaceMembers.userId, userId), eq(workspaceMembers.workspaceId, workspaceId)),
   });
 
-  return member?.role as Role || null;
+  return (member?.role as Role) || null;
 }
 
 // Check if user can perform action on resource in workspace
@@ -112,8 +107,8 @@ export async function checkWorkspacePermission(
   action: string
 ): Promise<boolean> {
   const role = await getUserWorkspaceRole(userId, workspaceId);
-  if (!role) return false;
-  
+  if (!role) {return false;}
+
   return hasPermission(role, resource, action);
 }
 
@@ -128,12 +123,11 @@ export async function logWorkspaceActivity(
   request?: Request
 ) {
   const now = new Date();
-  
+
   // Extract IP and User-Agent from request if available
-  const ipAddress = request?.headers.get('x-forwarded-for') || 
-                   request?.headers.get('x-real-ip') || 
-                   'unknown';
-  
+  const ipAddress =
+    request?.headers.get('x-forwarded-for') || request?.headers.get('x-real-ip') || 'unknown';
+
   const userAgent = request?.headers.get('user-agent') || 'unknown';
 
   await db.insert(workspaceActivities).values({
@@ -152,7 +146,13 @@ export async function logWorkspaceActivity(
 
 // Common activity logging helpers
 export const ActivityLogger = {
-  formCreated: async (workspaceId: string, userId: string, formId: string, formTitle: string, request?: Request) => {
+  formCreated: async (
+    workspaceId: string,
+    userId: string,
+    formId: string,
+    formTitle: string,
+    request?: Request
+  ) => {
     await logWorkspaceActivity(
       workspaceId,
       userId,
@@ -164,7 +164,13 @@ export const ActivityLogger = {
     );
   },
 
-  formUpdated: async (workspaceId: string, userId: string, formId: string, changes: Record<string, any>, request?: Request) => {
+  formUpdated: async (
+    workspaceId: string,
+    userId: string,
+    formId: string,
+    changes: Record<string, any>,
+    request?: Request
+  ) => {
     await logWorkspaceActivity(
       workspaceId,
       userId,
@@ -176,7 +182,13 @@ export const ActivityLogger = {
     );
   },
 
-  formDeleted: async (workspaceId: string, userId: string, formId: string, formTitle: string, request?: Request) => {
+  formDeleted: async (
+    workspaceId: string,
+    userId: string,
+    formId: string,
+    formTitle: string,
+    request?: Request
+  ) => {
     await logWorkspaceActivity(
       workspaceId,
       userId,
@@ -188,7 +200,13 @@ export const ActivityLogger = {
     );
   },
 
-  formPublished: async (workspaceId: string, userId: string, formId: string, formTitle: string, request?: Request) => {
+  formPublished: async (
+    workspaceId: string,
+    userId: string,
+    formId: string,
+    formTitle: string,
+    request?: Request
+  ) => {
     await logWorkspaceActivity(
       workspaceId,
       userId,
@@ -200,7 +218,13 @@ export const ActivityLogger = {
     );
   },
 
-  memberInvited: async (workspaceId: string, userId: string, invitedEmail: string, role: string, request?: Request) => {
+  memberInvited: async (
+    workspaceId: string,
+    userId: string,
+    invitedEmail: string,
+    role: string,
+    request?: Request
+  ) => {
     await logWorkspaceActivity(
       workspaceId,
       userId,
@@ -212,7 +236,13 @@ export const ActivityLogger = {
     );
   },
 
-  memberJoined: async (workspaceId: string, userId: string, joinedUserId: string, role: string, request?: Request) => {
+  memberJoined: async (
+    workspaceId: string,
+    userId: string,
+    joinedUserId: string,
+    role: string,
+    request?: Request
+  ) => {
     await logWorkspaceActivity(
       workspaceId,
       userId,
@@ -224,7 +254,12 @@ export const ActivityLogger = {
     );
   },
 
-  memberRemoved: async (workspaceId: string, userId: string, removedUserId: string, request?: Request) => {
+  memberRemoved: async (
+    workspaceId: string,
+    userId: string,
+    removedUserId: string,
+    request?: Request
+  ) => {
     await logWorkspaceActivity(
       workspaceId,
       userId,
@@ -236,7 +271,12 @@ export const ActivityLogger = {
     );
   },
 
-  workspaceUpdated: async (workspaceId: string, userId: string, changes: Record<string, any>, request?: Request) => {
+  workspaceUpdated: async (
+    workspaceId: string,
+    userId: string,
+    changes: Record<string, any>,
+    request?: Request
+  ) => {
     await logWorkspaceActivity(
       workspaceId,
       userId,
@@ -263,13 +303,13 @@ export function isRoleHigherOrEqual(userRole: Role, requiredRole: Role): boolean
 
 export function canManageRole(managerRole: Role, targetRole: Role): boolean {
   // Owners can manage all roles
-  if (managerRole === 'owner') return true;
-  
+  if (managerRole === 'owner') {return true;}
+
   // Admins can manage members and viewers but not other admins or owners
   if (managerRole === 'admin') {
     return targetRole === 'member' || targetRole === 'viewer';
   }
-  
+
   // Members and viewers cannot manage any roles
   return false;
 }

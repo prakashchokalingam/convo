@@ -30,15 +30,15 @@ vi.mock('@clerk/nextjs', () => ({
 
 // Mock Lucide React icons
 vi.mock('lucide-react', () => ({
-  Copy: () => <div data-testid="copy-icon" />,
-  Eye: () => <div data-testid="eye-icon" />,
-  FileText: () => <div data-testid="file-text-icon" />,
-  Globe: () => <div data-testid="globe-icon" />,
-  MoreHorizontal: () => <div data-testid="more-horizontal-icon" />,
-  Pencil: () => <div data-testid="pencil-icon" />,
-  Plus: () => <div data-testid="plus-icon" />,
-  Trash2: () => <div data-testid="trash-icon" />,
-  Users: () => <div data-testid="users-icon" />,
+  Copy: () => <div data-testid='copy-icon' />,
+  Eye: () => <div data-testid='eye-icon' />,
+  FileText: () => <div data-testid='file-text-icon' />,
+  Globe: () => <div data-testid='globe-icon' />,
+  MoreHorizontal: () => <div data-testid='more-horizontal-icon' />,
+  Pencil: () => <div data-testid='pencil-icon' />,
+  Plus: () => <div data-testid='plus-icon' />,
+  Trash2: () => <div data-testid='trash-icon' />,
+  Users: () => <div data-testid='users-icon' />,
 }));
 
 describe('TemplateCard Component', () => {
@@ -348,12 +348,7 @@ describe('TemplateCard Component', () => {
       const user = userEvent.setup();
       const template = createMockTemplate();
 
-      render(
-        <TemplateCard
-          template={template}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateCard template={template} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       // Should not throw error
       await user.click(screen.getByText('Create Form'));
@@ -400,7 +395,7 @@ describe('TemplateCard Component', () => {
         <TemplateCard
           template={template}
           permissions={PERMISSION_SCENARIOS.ADMIN}
-          variant="compact"
+          variant='compact'
         />
       );
 
@@ -416,7 +411,7 @@ describe('TemplateCard Component', () => {
         <TemplateCard
           template={template}
           permissions={PERMISSION_SCENARIOS.ADMIN}
-          variant="default"
+          variant='default'
         />
       );
 
@@ -429,15 +424,12 @@ describe('TemplateCard Component', () => {
   describe('Category Colors', () => {
     it('should apply correct color classes for different categories', () => {
       const categories = ['HR', 'Marketing', 'Support', 'Sales'];
-      
+
       categories.forEach(category => {
         const template = createMockTemplate({ category });
-        
+
         const { unmount } = render(
-          <TemplateCard
-            template={template}
-            permissions={PERMISSION_SCENARIOS.ADMIN}
-          />
+          <TemplateCard template={template} permissions={PERMISSION_SCENARIOS.ADMIN} />
         );
 
         expect(screen.getByText(category)).toBeInTheDocument();
@@ -448,12 +440,7 @@ describe('TemplateCard Component', () => {
     it('should handle unknown category gracefully', () => {
       const template = createMockTemplate({ category: 'Unknown' as any });
 
-      render(
-        <TemplateCard
-          template={template}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateCard template={template} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       expect(screen.getByText('Unknown')).toBeInTheDocument();
     });
@@ -465,12 +452,7 @@ describe('TemplateCard Component', () => {
         formSchema: 'invalid json' as any,
       });
 
-      render(
-        <TemplateCard
-          template={template}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateCard template={template} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       expect(screen.getByText('0 fields')).toBeInTheDocument();
     });
@@ -480,12 +462,7 @@ describe('TemplateCard Component', () => {
         formSchema: { fields: [], settings: {} },
       });
 
-      render(
-        <TemplateCard
-          template={template}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateCard template={template} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       expect(screen.getByText('0 fields')).toBeInTheDocument();
     });
@@ -493,12 +470,7 @@ describe('TemplateCard Component', () => {
     it('should handle null category gracefully', () => {
       const template = createMockTemplate({ category: null });
 
-      render(
-        <TemplateCard
-          template={template}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateCard template={template} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       // Should not crash, category section should be absent
       expect(screen.getByText(template.name)).toBeInTheDocument();
@@ -525,12 +497,7 @@ describe('TemplateCard Component', () => {
     it('should have proper aria labels and roles', () => {
       const template = createMockTemplate();
 
-      render(
-        <TemplateCard
-          template={template}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateCard template={template} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       // Check that buttons have proper roles
       expect(screen.getByRole('button', { name: /create form/i })).toBeInTheDocument();
@@ -541,12 +508,7 @@ describe('TemplateCard Component', () => {
       const user = userEvent.setup();
       const template = createMockTemplate();
 
-      render(
-        <TemplateCard
-          template={template}
-          permissions={PERMISSION_SCENARIOS.ADMIN}
-        />
-      );
+      render(<TemplateCard template={template} permissions={PERMISSION_SCENARIOS.ADMIN} />);
 
       // Tab to create form button
       await user.tab();

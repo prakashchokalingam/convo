@@ -23,7 +23,7 @@ export function createMockTemplate(overrides?: Partial<Template>): Template {
           label: 'Email Address',
           placeholder: 'your@email.com',
           required: true,
-        }
+        },
       ],
       settings: {
         submitButtonText: 'Submit',
@@ -73,7 +73,9 @@ export function createMockWorkspace(overrides?: Partial<Workspace>): Workspace {
 }
 
 // Mock permissions factory
-export function createMockPermissions(overrides?: Partial<TemplatePermissions>): TemplatePermissions {
+export function createMockPermissions(
+  overrides?: Partial<TemplatePermissions>
+): TemplatePermissions {
   return {
     canClone: true,
     canCreateForm: true,
@@ -169,9 +171,10 @@ export function createMockTemplateAction(type: string, templateId: string) {
 // Form schema helpers
 export function getFormFieldCount(template: Template): number {
   try {
-    const schema = typeof template.formSchema === 'string' 
-      ? JSON.parse(template.formSchema) 
-      : template.formSchema;
+    const schema =
+      typeof template.formSchema === 'string'
+        ? JSON.parse(template.formSchema)
+        : template.formSchema;
     return schema?.fields?.length || 0;
   } catch {
     return 0;
@@ -179,21 +182,49 @@ export function getFormFieldCount(template: Template): number {
 }
 
 // Test data categories
-export const TEST_CATEGORIES = ['HR', 'Marketing', 'Support', 'Sales', 'Education', 'Healthcare', 'Other'];
+export const TEST_CATEGORIES = [
+  'HR',
+  'Marketing',
+  'Support',
+  'Sales',
+  'Education',
+  'Healthcare',
+  'Other',
+];
 
 // Mock permission scenarios
 export const PERMISSION_SCENARIOS = {
-  ADMIN: createMockPermissions({ canClone: true, canCreateForm: true, canEdit: true, canDelete: true }),
-  MEMBER: createMockPermissions({ canClone: false, canCreateForm: true, canEdit: false, canDelete: false }),
-  VIEWER: createMockPermissions({ canClone: false, canCreateForm: false, canEdit: false, canDelete: false }),
-  OWNER: createMockPermissions({ canClone: true, canCreateForm: true, canEdit: true, canDelete: true }),
+  ADMIN: createMockPermissions({
+    canClone: true,
+    canCreateForm: true,
+    canEdit: true,
+    canDelete: true,
+  }),
+  MEMBER: createMockPermissions({
+    canClone: false,
+    canCreateForm: true,
+    canEdit: false,
+    canDelete: false,
+  }),
+  VIEWER: createMockPermissions({
+    canClone: false,
+    canCreateForm: false,
+    canEdit: false,
+    canDelete: false,
+  }),
+  OWNER: createMockPermissions({
+    canClone: true,
+    canCreateForm: true,
+    canEdit: true,
+    canDelete: true,
+  }),
 };
 
 // Mock workspace context
 export function mockWorkspaceContext(role: 'owner' | 'admin' | 'member' | 'viewer' = 'admin') {
   const workspace = createMockWorkspace();
   const permissions = PERMISSION_SCENARIOS[role.toUpperCase() as keyof typeof PERMISSION_SCENARIOS];
-  
+
   return {
     workspace,
     userRole: role,
@@ -211,7 +242,7 @@ export function mockWorkspaceContext(role: 'owner' | 'admin' | 'member' | 'viewe
 // Form schema mock with different field types
 export function createMockFormSchema(fieldCount: number = 3) {
   const fieldTypes = ['text', 'email', 'textarea', 'select', 'radio', 'checkbox', 'number', 'date'];
-  
+
   return {
     fields: Array.from({ length: fieldCount }, (_, index) => ({
       id: `field_${index}`,
@@ -219,12 +250,13 @@ export function createMockFormSchema(fieldCount: number = 3) {
       label: `Field ${index + 1}`,
       placeholder: `Enter field ${index + 1}`,
       required: index % 2 === 0,
-      options: fieldTypes[index % fieldTypes.length] === 'select' 
-        ? [
-            { value: 'option1', label: 'Option 1' },
-            { value: 'option2', label: 'Option 2' },
-          ]
-        : undefined,
+      options:
+        fieldTypes[index % fieldTypes.length] === 'select'
+          ? [
+              { value: 'option1', label: 'Option 1' },
+              { value: 'option2', label: 'Option 2' },
+            ]
+          : undefined,
     })),
     settings: {
       submitButtonText: 'Submit Form',
