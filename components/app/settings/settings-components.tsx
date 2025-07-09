@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { WorkspaceWithRole } from '@/lib/types/workspace';
 import { getWorkspaceSettingsUrl } from '@/lib/urls/workspace-urls';
 import { cn } from '@/lib/utils';
 
@@ -18,7 +19,7 @@ export function SettingsNavigation({
   workspace,
   activeTab,
 }: {
-  workspace: any;
+  workspace: WorkspaceWithRole;
   activeTab: string;
 }) {
   const tabs = [
@@ -62,7 +63,13 @@ export function SettingsNavigation({
   );
 }
 
-export function WorkspaceSettings({ workspace, activeTab }: { workspace: any; activeTab: string }) {
+export function WorkspaceSettings({
+  workspace,
+  activeTab,
+}: {
+  workspace: WorkspaceWithRole;
+  activeTab: string;
+}) {
   if (activeTab === 'general') {
     return (
       <div className='space-y-6'>

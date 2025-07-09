@@ -47,11 +47,8 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  showWarning,
-  handleApiError,
-  workspaceToasts,
-} from '@/lib/toast-utils';
+import { showWarning, handleApiError, workspaceToasts } from '@/lib/toast-utils';
+import { WorkspaceWithRole, WorkspaceRole } from '@/lib/types/workspace';
 
 // Types
 interface Member {
@@ -99,7 +96,7 @@ export function MembersHeader({
   onSearchChange,
   onRoleFilterChange,
 }: {
-  workspace: any;
+  workspace: WorkspaceWithRole;
   onSearchChange?: (search: string) => void;
   onRoleFilterChange?: (role: string) => void;
 }) {
@@ -211,7 +208,9 @@ export function MembersList({
   const handleRoleUpdate = async (memberId: string, newRole: string) => {
     try {
       const memberToUpdate = members.find(m => m.id === memberId);
-      if (!memberToUpdate) {return;}
+      if (!memberToUpdate) {
+        return;
+      }
 
       const response = await fetch(
         `/api/workspaces/by-id/${workspaceId}/members/${memberToUpdate.userId}`,
@@ -231,7 +230,7 @@ export function MembersList({
       // Update local state
       setMembers(
         members.map(member =>
-          member.id === memberId ? { ...member, role: newRole as any } : member
+          member.id === memberId ? { ...member, role: newRole as WorkspaceRole } : member
         )
       );
 
@@ -246,7 +245,9 @@ export function MembersList({
   const handleRemoveMember = async (memberId: string) => {
     try {
       const memberToRemove = members.find(m => m.id === memberId);
-      if (!memberToRemove) {return;}
+      if (!memberToRemove) {
+        return;
+      }
 
       const response = await fetch(
         `/api/workspaces/by-id/${workspaceId}/members/${memberToRemove.userId}`,
@@ -494,7 +495,7 @@ export function MembersList({
   );
 }
 
-export function InviteMemberButton({ workspace }: { workspace: any }) {
+export function InviteMemberButton({ workspace }: { workspace: WorkspaceWithRole }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -583,8 +584,8 @@ export function InviteMemberButton({ workspace }: { workspace: any }) {
             <DialogTitle className='text-xl'>Invite Team Member</DialogTitle>
           </div>
           <DialogDescription className='text-base leading-relaxed'>
-            Send an invitation to join your workspace. They&apos;ll receive an email with instructions to
-            join.
+            Send an invitation to join your workspace. They&apos;ll receive an email with
+            instructions to join.
           </DialogDescription>
         </DialogHeader>
 

@@ -18,7 +18,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
+import { Workspace } from '@/lib/db/schema';
+import { PlanLimits } from '@/lib/plans';
 
 interface CreateWorkspaceDialogProps {
   trigger?: React.ReactNode;
@@ -28,9 +29,9 @@ interface CreateWorkspaceDialogProps {
       limit: number;
       unlimited: boolean;
     };
-    planLimits: any;
+    planLimits: PlanLimits;
   };
-  onSuccess?: (workspace: any) => void;
+  onSuccess?: (workspace: Workspace) => void;
 }
 
 export function CreateWorkspaceDialog({ trigger, usage, onSuccess }: CreateWorkspaceDialogProps) {
@@ -44,18 +45,26 @@ export function CreateWorkspaceDialog({ trigger, usage, onSuccess }: CreateWorks
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !canCreateWorkspace) {return;}
+    if (!name.trim() || !canCreateWorkspace) {
+      return;
+    }
 
     setLoading(true);
     setError('');
 
     try {
       // TODO: Implement workspace creation API call
-      const newWorkspace = {
+      const newWorkspace: Workspace = {
         id: Date.now().toString(),
         name: name.trim(),
         slug: name.toLowerCase().replace(/\s+/g, '-'),
         type: 'team' as const,
+        ownerId: '', // Will be populated by API
+        description: null,
+        avatarUrl: null,
+        settings: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       setOpen(false);
@@ -104,8 +113,8 @@ export function CreateWorkspaceDialog({ trigger, usage, onSuccess }: CreateWorks
             <DialogTitle className='text-xl'>Create New Workspace</DialogTitle>
           </div>
           <DialogDescription className='text-base leading-relaxed'>
-            Create a new workspace to organize your forms and collaborate with your team. You&apos;ll be
-            able to invite members and manage permissions.
+            Create a new workspace to organize your forms and collaborate with your team.
+            You&apos;ll be able to invite members and manage permissions.
           </DialogDescription>
         </DialogHeader>
 

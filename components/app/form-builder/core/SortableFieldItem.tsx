@@ -10,7 +10,7 @@ import { Button } from '@/components/shared/ui/button';
 import { Input } from '@/components/shared/ui/input';
 import { Textarea } from '@/components/shared/ui/textarea';
 import { getFieldDefinition } from '@/lib/form-builder/field-registry';
-import { FieldConfig, DragItem } from '@/lib/form-builder/types';
+import { FieldConfig, DragItem, TextareaFieldConfig } from '@/lib/form-builder/types';
 
 import { DependencyIndicator } from '../conditional/DependencyIndicator';
 
@@ -87,7 +87,7 @@ export function SortableFieldItem({
         );
 
       case 'textarea':
-        const textareaField = field as any;
+        const textareaField = field as TextareaFieldConfig;
         return (
           <Textarea
             placeholder={field.placeholder || 'Enter text...'}
@@ -125,10 +125,10 @@ export function SortableFieldItem({
         );
 
       case 'radio':
-        const radioField = field as any;
+        const radioField = field as FieldConfig & { options?: { label: string; value: string }[] };
         return (
           <div className='space-y-2'>
-            {radioField.options?.slice(0, 3).map((option: any, index: number) => (
+            {radioField.options?.slice(0, 3).map((option, index) => (
               <div key={index} className='flex items-center space-x-2'>
                 <div className='w-4 h-4 border border-gray-300 rounded-full'></div>
                 <span className='text-sm text-gray-600'>{option.label}</span>

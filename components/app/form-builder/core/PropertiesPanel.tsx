@@ -19,7 +19,14 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { getFieldDefinition } from '@/lib/form-builder/field-registry';
-import { FormConfig, FieldConfig, ValidationRule } from '@/lib/form-builder/types';
+import {
+  FormConfig,
+  FieldConfig,
+  ValidationRule,
+  SectionFieldConfig,
+  TextareaFieldConfig,
+  FieldStyling,
+} from '@/lib/form-builder/types';
 
 import { ConditionalLogicBuilder } from '../conditional/ConditionalLogicBuilder';
 import { DependencyIndicator } from '../conditional/DependencyIndicator';
@@ -30,6 +37,10 @@ interface PropertiesPanelProps {
   onUpdateConfig: (updates: Partial<FormConfig>) => void;
   onUpdateField: (fieldId: string, updates: Partial<FieldConfig>) => void;
 }
+
+type FieldWithOptions = FieldConfig & {
+  options?: { label: string; value: string }[];
+};
 
 interface ValidationRuleEditorProps {
   rules: ValidationRule[];
@@ -289,7 +300,7 @@ export function PropertiesPanel({
                 <Label htmlFor='section-description'>Description</Label>
                 <Textarea
                   id='section-description'
-                  value={(selectedField as any).description || ''}
+                  value={(selectedField as SectionFieldConfig).description || ''}
                   onChange={e => handleFieldUpdate({ description: e.target.value })}
                   placeholder='Optional section description'
                   rows={2}
@@ -352,22 +363,20 @@ export function PropertiesPanel({
                     </p>
                   </div>
                   <Switch
-                    checked={(selectedField as any).collapsible || false}
+                    checked={(selectedField as SectionFieldConfig).collapsible || false}
                     onCheckedChange={checked => handleFieldUpdate({ collapsible: checked })}
                   />
                 </div>
 
-                {(selectedField as any).collapsible && (
+                {(selectedField as SectionFieldConfig).collapsible && (
                   <div className='flex items-center justify-between'>
                     <div>
                       <Label>Default State</Label>
                       <p className='text-sm text-gray-500'>Section starts collapsed</p>
                     </div>
                     <Switch
-                      checked={(selectedField as any).isCollapsed || false}
-                      onCheckedChange={checked =>
-                        handleFieldUpdate({ isCollapsed: checked } as any)
-                      }
+                      checked={(selectedField as SectionFieldConfig).isCollapsed || false}
+                      onCheckedChange={checked => handleFieldUpdate({ isCollapsed: checked })}
                     />
                   </div>
                 )}
@@ -383,7 +392,7 @@ export function PropertiesPanel({
                   type='number'
                   min='1'
                   max='20'
-                  value={(selectedField as any).rows || 4}
+                  value={(selectedField as TextareaFieldConfig).rows || 4}
                   onChange={e => handleFieldUpdate({ rows: parseInt(e.target.value) || 4 })}
                 />
               </div>
@@ -396,24 +405,14 @@ export function PropertiesPanel({
                 <div className='space-y-2'>
                   <Label>Options</Label>
                   <div className='space-y-2'>
-                    {(
-                      (
-                        selectedField as FieldConfig & {
-                          options?: { label: string; value: string }[];
-                        }
-                      ).options || []
-                    ).map((option, index: number) => (
+                    {((selectedField as FieldWithOptions).options || []).map((option, index) => (
                       <div key={index} className='flex items-center space-x-2'>
                         <Input
                           value={option.label}
                           onChange={e => {
-                            const newOptions = [
-                              ...((
-                                selectedField as FieldConfig & {
-                                  options?: { label: string; value: string }[];
-                                }
-                              ).options || []),
-                            ];
+                            const currentOptions =
+                              (selectedField as FieldWithOptions).options || [];
+                            const newOptions = [...currentOptions];
                             newOptions[index] = {
                               ...option,
                               label: e.target.value,
@@ -428,13 +427,9 @@ export function PropertiesPanel({
                           variant='ghost'
                           size='sm'
                           onClick={() => {
-                            const newOptions = (
-                              (
-                                selectedField as FieldConfig & {
-                                  options?: { label: string; value: string }[];
-                                }
-                              ).options || []
-                            ).filter((_, i: number) => i !== index);
+                            const currentOptions =
+                              (selectedField as FieldWithOptions).options || [];
+                            const newOptions = currentOptions.filter((_, i) => i !== index);
                             handleFieldUpdate({ options: newOptions });
                           }}
                           className='px-2'
@@ -448,7 +443,7 @@ export function PropertiesPanel({
                       size='sm'
                       onClick={() => {
                         const newOptions = [
-                          ...((selectedField as any).options || []),
+                          ...((selectedField as FieldWithOptions).options || []),
                           { label: 'New Option', value: 'new_option' },
                         ];
                         handleFieldUpdate({ options: newOptions });
@@ -468,12 +463,12 @@ export function PropertiesPanel({
                 <div className='space-y-2'>
                   <Label>Field Width</Label>
                   <Select
-                    value={(selectedField as any).styling?.width || 'full'}
+                    value={selectedField.styling?.width || 'full'}
                     onValueChange={value =>
                       handleFieldUpdate({
                         styling: {
-                          ...((selectedField as any).styling || {}),
-                          width: value,
+                          ...(selectedField.styling || {}),
+                          width: value as FieldStyling['width'],
                         },
                       })
                     }
@@ -494,11 +489,11 @@ export function PropertiesPanel({
                   <Label htmlFor='field-css'>Custom CSS Class</Label>
                   <Input
                     id='field-css'
-                    value={(selectedField as any).styling?.className || ''}
+                    value={selectedField.styling?.className || ''}
                     onChange={e =>
                       handleFieldUpdate({
                         styling: {
-                          ...((selectedField as any).styling || {}),
+                          ...(selectedField.styling || {}),
                           className: e.target.value,
                         },
                       })

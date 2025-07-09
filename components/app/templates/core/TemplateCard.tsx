@@ -43,7 +43,7 @@ export interface TemplatePermissions {
 export interface TemplateAction {
   type: 'clone' | 'createForm' | 'edit' | 'delete' | 'preview';
   templateId: string;
-  data?: any;
+  data?: unknown;
 }
 
 export interface TemplateCardProps {
@@ -69,7 +69,7 @@ export function TemplateCard({
   isLoading = false,
   variant = 'default',
 }: TemplateCardProps) {
-  const handleAction = (type: TemplateAction['type'], data?: any) => {
+  const handleAction = (type: TemplateAction['type'], data?: unknown) => {
     if (onAction) {
       onAction({
         type,
@@ -80,7 +80,9 @@ export function TemplateCard({
   };
 
   const getCategoryColor = (category: string | null) => {
-    if (!category) {return 'bg-gray-100 text-gray-700';}
+    if (!category) {
+      return 'bg-gray-100 text-gray-700';
+    }
 
     const colors: Record<string, string> = {
       HR: 'bg-blue-100 text-blue-700',

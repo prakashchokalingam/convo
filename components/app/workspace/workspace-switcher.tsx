@@ -26,6 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/shared/ui/dropdown-menu';
+import { PlanLimits } from '@/lib/plans';
 import type { WorkspaceWithRole } from '@/lib/types/workspace';
 import { getWorkspaceUrl, getWorkspaceSettingsUrl, getMembersUrl } from '@/lib/urls/workspace-urls';
 
@@ -39,7 +40,7 @@ interface WorkspaceSwitcherProps {
       limit: number;
       unlimited: boolean;
     };
-    planLimits: any;
+    planLimits: PlanLimits;
   };
 }
 
